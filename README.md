@@ -63,6 +63,7 @@ npm run watch:js   # recompila al guardar (en otra terminal: npm run watch:css)
   - *Archivo, carpeta, página, video, enlace, encuesta, glosario*.
   - Navegación: volver a la semana y actividad anterior / siguiente.
 - **Participantes** (búsqueda, grupos, exportar CSV), **Calificaciones** (libro del aula por competencia, exportar, enviar al registro), **Banco de preguntas** (filtros, nueva pregunta) e **Informes** (indicadores, entregas por semana, estudiantes en riesgo).
+- **Usar en otras secciones**: vincular (los cambios se sincronizan) o copiar (independiente) todo el curso, un bimestre o una sola actividad a otras secciones del docente; las fechas se ajustan al horario de cada sección y no se comparten entregas, notas, foros ni asistencia.
 - Para simular otro momento: `curso.html?hoy=2026-11-09T08:20` (la clase del lunes aparece "En vivo ahora").
 
 ## Sistema visual

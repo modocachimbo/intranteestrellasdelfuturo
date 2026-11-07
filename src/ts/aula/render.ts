@@ -43,8 +43,10 @@ export function banner(c: Course, progress: number, tab = 'curso'): string {
       </div>
       <div class="side">
         <div class="course-progress"><div class="row"><span>Avance del año</span><span>${progress} %</span></div><div class="bar"><span style="width:${progress}%"></span></div></div>
+        <button class="share-btn" type="button" id="share-open">${ico('copy', 'ico-sm')}<span>Usar en otras secciones</span></button>
         <button class="edit-switch" type="button" role="switch" aria-checked="false" id="edit-switch"><span class="knob"></span>Modo edición</button>
       </div>
+      <div class="links-row" id="links-row"></div>
     </div>
   </section>
   <nav class="course-nav" aria-label="Secciones del aula" style="--curso:${c.color}">
@@ -122,6 +124,7 @@ export function activity(x: Activity): string {
           <button type="button" role="menuitem" data-act="edit">${ico('edit', 'ico-sm')}Editar ajustes</button>
           <button type="button" role="menuitem" data-act="toggle">${ico('eyeoff', 'ico-sm')}${x.hidden ? 'Mostrar' : 'Ocultar'} a estudiantes</button>
           <button type="button" role="menuitem" data-act="dup">${ico('copy', 'ico-sm')}Duplicar</button>
+          <button type="button" role="menuitem" data-act="share">${ico('users', 'ico-sm')}Copiar a otra sección…</button>
           <button type="button" role="menuitem" data-act="edit">${ico('lock', 'ico-sm')}Restricciones de acceso</button>
           <hr>
           <button type="button" role="menuitem" class="danger" data-act="del">${ico('trash', 'ico-sm')}Eliminar</button>

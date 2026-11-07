@@ -11,6 +11,8 @@ import {
 import { activityView } from './views/activity';
 import { bankRow, bankView, csv, gradebookView, gradedColumns, participantsView, questionDialog, reportsView } from './views/tabs';
 import { Store, allWeeks } from './store';
+import { MIS_SECCIONES, label, linksRow, loadShares, saveShares, shareDialog } from './views/share';
+import type { ShareMode } from './views/share';
 import type { Activity, ActivityType, BankQuestion, Course, Week } from './types';
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector(s) as T | null;
@@ -133,6 +135,7 @@ function render(): void {
   else if (r === 'informes') { tab = r; body = `<div class="page-pad">${reportsView(course, currentPeriodObj(), NOW)}</div>`; }
   else body = courseShell();
   root.innerHTML = banner(course, progressYear(), tab) + body;
+  const lr = $('#links-row'); if (lr) lr.innerHTML = linksRow(course);
   setEditing(state.editing, false);
   updateExpandButton();
 }
@@ -220,7 +223,7 @@ function download(name: string, content: string, type = 'text/csv;charset=utf-8'
 }
 
 // ---------- Ventanas ----------
-document.body.insertAdjacentHTML('beforeend', chooserDialog() + formDialog() + questionDialog() +
+document.body.insertAdjacentHTML('beforeend', chooserDialog() + formDialog() + questionDialog() + shareDialog(course) +
   `<dialog class="win small" id="win-confirm" aria-labelledby="win-confirm-t"><div class="win-head"><span class="ico-tile" style="background:var(--amarillo-100);color:#6B4A00"><svg class="ico" aria-hidden="true"><use href="#i-grade"></use></svg></span><div class="grow"><h2 id="win-confirm-t">Enviar al Registro de notas</h2><p id="win-confirm-sub"></p></div><button class="win-close" type="button" data-close aria-label="Cerrar"><svg class="ico" aria-hidden="true"><use href="#i-close"></use></svg></button></div>
    <div class="win-body" id="win-confirm-body"></div>
    <div class="win-foot"><button class="btn btn-ghost" type="button" data-close>Cancelar</button><button class="btn btn-star" type="button" id="confirm-send">Sí, enviar al registro</button></div></dialog>` +
@@ -340,6 +343,89 @@ $('#confirm-send')?.addEventListener('click', () => {
   state.bridge = false; ls.set('ef-bridge-off', '1');
 });
 
+
+// ---------- Usar en otras secciones ----------
+const shareWin = $('#win-share') as HTMLDialogElement;
+let shareOne: Activity | null = null;
+
+function openShare(one?: Activity): void {
+  shareOne = one ?? null;
+  const wrap = $('#scope-one-wrap') as HTMLElement;
+  wrap.hidden = !one;
+  if (one) { $('#scope-one-name')!.textContent = one.name; ($('input[name=scope][value=one]') as HTMLInputElement).checked = true; }
+  else ($('input[name=scope][value=all]') as HTMLInputElement).checked = true;
+  ($('#share-period') as HTMLSelectElement).value = CURRENT_PERIOD === 's0' ? 'b1' : CURRENT_PERIOD;
+  $$('[data-state-for]').forEach((x) => { x.textContent = ''; x.className = 'state'; });
+  $$<HTMLInputElement>('#share-form input[name=to]').forEach((cb) => { cb.checked = cb.defaultChecked; });
+  ($('input[name=mode][value=link]') as HTMLInputElement).checked = true;
+  const done = loadShares(course);
+  $$<HTMLInputElement>('#share-form input[name=to]').forEach((cb) => {
+    const rec = done.find((r) => r.to === cb.value);
+    const st = $(`[data-state-for="${cb.value}"]`)!;
+    if (rec) { st.textContent = rec.mode === 'link' ? 'Ya vinculada' : 'Ya copiada'; st.className = 'state done'; }
+  });
+  updateShareSummary();
+  shareWin.showModal();
+}
+
+function shareScope(): { weeks: number; acts: number; text: string } {
+  const scope = ($('input[name=scope]:checked') as HTMLInputElement).value;
+  if (scope === 'one' && shareOne) return { weeks: 0, acts: 1, text: `“${shareOne.name}”` };
+  if (scope === 'period') {
+    const p = course.periods.find((x) => x.id === ($('#share-period') as HTMLSelectElement).value)!;
+    const ws = p.units.flatMap((u) => u.weeks);
+    return { weeks: ws.length, acts: ws.reduce((n, w) => n + w.activities.length, 0), text: `el ${p.name}` };
+  }
+  return { weeks: WEEKS.length, acts: WEEKS.reduce((n, w) => n + w.activities.length, 0), text: 'todo el curso' };
+}
+
+function updateShareSummary(): void {
+  const to = $$<HTMLInputElement>('#share-form input[name=to]:checked');
+  const mode = ($('input[name=mode]:checked') as HTMLInputElement).value as ShareMode;
+  const sc = shareScope();
+  const go = $('#share-go') as HTMLButtonElement;
+  go.disabled = !to.length;
+  go.lastChild!.textContent = to.length ? `${mode === 'link' ? 'Vincular con' : 'Copiar a'} ${to.length} ${to.length === 1 ? 'sección' : 'secciones'}` : 'Elige una sección';
+  $('#share-summary')!.textContent = to.length
+    ? `${sc.weeks ? sc.weeks + ' semanas · ' : ''}${sc.acts} ${sc.acts === 1 ? 'actividad' : 'actividades'} → ${to.length} ${to.length === 1 ? 'sección' : 'secciones'}`
+    : 'Marca al menos una sección.';
+  $$('.sec-opt').forEach((l) => l.classList.toggle('on', (l.querySelector('input') as HTMLInputElement).checked));
+  $$('.mode-card').forEach((l) => l.classList.toggle('on', (l.querySelector('input') as HTMLInputElement).checked));
+}
+
+($('#share-form') as HTMLFormElement).addEventListener('change', (e) => {
+  if ((e.target as HTMLElement).id === 'share-period') ($('input[name=scope][value=period]') as HTMLInputElement).checked = true;
+  updateShareSummary();
+});
+($('#share-form') as HTMLFormElement).addEventListener('submit', (e) => {
+  e.preventDefault();
+  const to = $$<HTMLInputElement>('#share-form input[name=to]:checked').map((x) => x.value);
+  if (!to.length) return;
+  const mode = ($('input[name=mode]:checked') as HTMLInputElement).value as ShareMode;
+  const sc = shareScope();
+  const go = $('#share-go') as HTMLButtonElement;
+  go.disabled = true;
+  to.forEach((id, i) => {
+    const st = $(`[data-state-for="${id}"]`)!;
+    st.textContent = 'En cola…'; st.className = 'state busy';
+    setTimeout(() => { st.textContent = mode === 'link' ? 'Vinculando…' : 'Copiando…'; }, 250 + i * 450);
+    setTimeout(() => { st.textContent = mode === 'link' ? 'Vinculada' : 'Copiada'; st.className = 'state done'; }, 800 + i * 450);
+  });
+  setTimeout(() => {
+    const list = loadShares(course).filter((r) => !(to.includes(r.to) && sc.text !== `“${shareOne?.name}”`));
+    const stamp = new Date().toLocaleString('es-PE', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+    if (shareOne && ($('input[name=scope]:checked') as HTMLInputElement).value === 'one') {
+      saveShares(course, list.concat(to.map((id) => ({ to: id, mode: 'copy' as ShareMode, scope: shareOne!.name, when: stamp }))).filter((r, i, arr) => arr.findIndex((x) => x.to === r.to && x.mode === r.mode) === i));
+    } else {
+      saveShares(course, list.concat(to.map((id) => ({ to: id, mode, scope: sc.text, when: stamp }))));
+    }
+    const names = to.map((id) => { const s = MIS_SECCIONES.find((x) => x.id === id)!; return `${s.grade} ${s.section}`; }).join(', ');
+    shareWin.close();
+    const lr = $('#links-row'); if (lr) lr.innerHTML = linksRow(course);
+    toast(`${mode === 'link' && sc.acts > 1 ? 'Vinculado' : 'Copiado'} ${sc.text} → ${names}.${($('#share-dates') as HTMLInputElement).checked ? ' Fechas ajustadas al horario de cada sección.' : ''}`);
+  }, 900 + to.length * 450);
+});
+
 // ---------- Eventos ----------
 function closeMenus(except?: Element): void {
   $$('.menu-pop.open').forEach((m) => {
@@ -424,6 +510,15 @@ document.addEventListener('click', (e) => {
   }
   if (el.closest('#bridge-close')) { state.bridge = false; ls.set('ef-bridge-off', '1'); $('#bridge-strip')?.remove(); return; }
   if (el.closest('#edit-switch')) { setEditing(!state.editing); return; }
+  if (el.closest('#share-open')) { openShare(); return; }
+  const ul = el.closest<HTMLElement>('[data-unlink]');
+  if (ul) {
+    const s = MIS_SECCIONES.find((x) => x.id === ul.dataset.unlink)!;
+    saveShares(course, loadShares(course).filter((r) => !(r.to === s.id && r.mode === 'link')));
+    const lr = $('#links-row'); if (lr) lr.innerHTML = linksRow(course);
+    toast(`Desvinculada: ${label(s)}. Su contenido se queda como copia independiente.`);
+    return;
+  }
 
   // Semanas
   const head = el.closest<HTMLElement>('.wk > header');
@@ -507,6 +602,7 @@ document.addEventListener('click', (e) => {
     else if (act === 'dup') { const c: Activity = { ...a, id: `n${Date.now()}`, name: `${a.name} (copia)`, stat: undefined }; w.activities.splice(w.activities.indexOf(a) + 1, 0, c); store.add(w.id, c); toast(`Duplicado: ${a.name}`); }
     else if (act === 'del') { w.activities.splice(w.activities.indexOf(a), 1); store.remove(a.id); toast(`Eliminado: ${a.name}`); }
     else if (act === 'edit') { openForm(a.type, w.id, a); return; }
+    else if (act === 'share') { openShare(a); return; }
     rerenderView();
     return;
   }
