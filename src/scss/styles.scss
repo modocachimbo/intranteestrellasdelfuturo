@@ -1,3 +1,4 @@
+// Estilos generales de la intranet (se compilan a assets/css/styles.css)
 /* ==========================================================
    Intranet · IEP Las Estrellas del Futuro
    Sistema visual: colores del logo (azul rey + amarillo estrella)
@@ -499,22 +500,7 @@ input.nota.g-x { background: #fff; border: 1.5px dashed #9AA4BF; }
 .bridge b { color: var(--azul-900); }
 .sede[aria-pressed="true"] { background: var(--azul-900); border-color: var(--azul-900); box-shadow: var(--sombra-2); }
 
-/* Botón destacado: Aula virtual */
-.aula-btn { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: var(--amarillo-400); color: var(--azul-950); text-decoration: none; box-shadow: 0 8px 20px rgba(245,196,0,.25); transition: transform .15s, background .15s; }
-.aula-btn:hover { background: var(--amarillo-500); color: var(--azul-950); text-decoration: none; transform: translateY(-1px); }
-.aula-btn .ico { --ico-fill: #fff; --ico-fill-op: 1; }
-.aula-btn span { flex: 1; min-width: 0; }
-.aula-btn b { display: block; font-family: var(--f-titulo); font-weight: 600; font-size: 15.5px; line-height: 1.2; }
-.aula-btn small { display: block; font-size: 12px; color: #4A3A00; }
-.aula-btn[aria-current="page"] { outline: 3px solid #fff; outline-offset: -3px; }
-.to-aula { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 600; padding-top: 2px; }
-.to-aula .ico { color: var(--azul-600); }
 
-/* ---------- Menú: Aula virtual resaltada (mismo tamaño) ---------- */
-.nav a.hl { background: var(--amarillo-400); color: var(--azul-950); font-weight: 700; margin-top: 6px; }
-.nav a.hl .ico { --ico-fill: #fff; --ico-fill-op: 1; }
-.nav a.hl:hover { background: var(--amarillo-500); color: var(--azul-950); }
-.nav a.hl[aria-current="page"] { background: var(--amarillo-400); color: var(--azul-950); box-shadow: inset 0 0 0 2px #fff, 0 6px 16px rgba(0,0,0,.18); }
 
 /* ---------- Sedes ---------- */
 .sede-tabs { display: flex; flex-wrap: wrap; gap: 12px; }
