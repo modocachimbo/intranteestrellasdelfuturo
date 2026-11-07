@@ -22,7 +22,12 @@ export function weekState(w: Week, today: Date, all: Week[]): WeekState {
 }
 
 // ---------- Cabecera ----------
-export function banner(c: Course, progress: number): string {
+export const COURSE_TABS: [string, string, string][] = [
+  ['curso', 'Curso', 'grid'], ['participantes', 'Participantes', 'users'], ['calificaciones', 'Calificaciones', 'grade'],
+  ['banco', 'Banco de preguntas', 'exam'], ['informes', 'Informes', 'survey'],
+];
+
+export function banner(c: Course, progress: number, tab = 'curso'): string {
   return `<section class="course-banner" style="--curso:${c.color}">
     <svg class="wm" aria-hidden="true"><use href="#i-${c.icon}"></use></svg>
     <div class="inner">
@@ -44,11 +49,7 @@ export function banner(c: Course, progress: number): string {
   </section>
   <nav class="course-nav" aria-label="Secciones del aula" style="--curso:${c.color}">
     <div class="inner">
-      <a href="#" aria-current="page">${ico('grid')}Curso</a>
-      <a href="#">${ico('users')}Participantes</a>
-      <a href="#">${ico('grade')}Calificaciones <span class="badge-n">2</span></a>
-      <a href="#">${ico('exam')}Banco de preguntas</a>
-      <a href="#">${ico('survey')}Informes</a>
+      ${COURSE_TABS.map(([id, label, icon]) => `<a href="#${id}"${tab === id ? ' aria-current="page"' : ''}>${ico(icon)}${label}${id === 'calificaciones' ? ' <span class="badge-n">2</span>' : ''}</a>`).join('')}
     </div>
   </nav>`;
 }
@@ -108,7 +109,7 @@ export function activity(x: Activity): string {
     <span class="ic">${ico(t.icon)}</span>
     <div class="info">
       <span class="type">${t.name}${t.graded ? ' · calificable' : ''}${comp}</span>
-      <a class="name" href="#">${esc(x.name)}</a>
+      <a class="name" href="#a-${x.id}">${esc(x.name)}</a>
       ${x.info ? `<div class="dates"><span>${ico('clock')}${esc(x.info)}</span></div>` : ''}
       ${x.restriction ? `<span class="restrict">${ico('lock')}${esc(x.restriction)}</span>` : ''}
       ${x.hidden ? `<span class="restrict muted">${ico('eyeoff')}Oculto para estudiantes</span>` : ''}

@@ -52,6 +52,19 @@ npm run watch:js   # recompila al guardar (en otra terminal: npm run watch:css)
 - Lo que el docente agrega se guarda por ahora en el navegador (`localStorage`) hasta conectar la base de datos.
 - Para probar otra fecha: `curso.html?hoy=2026-06-10`.
 
+### Aula virtual: qué funciona (IV Bimestre completo, datos inventados)
+
+- **Curso**: Semana 0 y 4 bimestres; el IV con sus 9 semanas llenas (clase en vivo por Meet cada semana, diapositivas, lecturas, tareas, exámenes, foros, actividades interactivas).
+- **Página de cada actividad** (`curso.html#a-ID`):
+  - *Tarea*: indicaciones, entregas de los 31 estudiantes, filtros, nota 0–20 y comentario por estudiante, guardar.
+  - *Examen virtual*: configuración, vista previa de preguntas con % de acierto, resultados, distribución de notas.
+  - *Foro*: temas y respuestas, publicar y responder.
+  - *Clase en vivo*: enlace de Google Meet, estado (programada / en vivo / finalizada), unirse, copiar enlace, agregar al calendario (.ics), grabación y asistencia.
+  - *Archivo, carpeta, página, video, enlace, encuesta, glosario*.
+  - Navegación: volver a la semana y actividad anterior / siguiente.
+- **Participantes** (búsqueda, grupos, exportar CSV), **Calificaciones** (libro del aula por competencia, exportar, enviar al registro), **Banco de preguntas** (filtros, nueva pregunta) e **Informes** (indicadores, entregas por semana, estudiantes en riesgo).
+- Para simular otro momento: `curso.html?hoy=2026-11-09T08:20` (la clase del lunes aparece "En vivo ahora").
+
 ## Sistema visual
 
 - **Colores** (del logo): azul rey `#1E4FC4`, azul marino `#0B2266` y amarillo estrella `#FFD43B`.

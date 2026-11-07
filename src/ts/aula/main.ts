@@ -1,13 +1,17 @@
-/* Aula virtual: estado, navegación (por enlace #b4 / #s30), modo edición y ventanas. */
+/* Aula virtual: estado, rutas (#b4, #s30, #a-12, #participantes…), modo edición y ventanas. */
 import { TYPES } from './catalog';
-import { today } from './calendar';
+import { fechaHora, hora, now as nowFn, today } from './calendar';
 import { QUIMICA_3A } from './data/quimica-3a';
+import { BANK } from './data/extras';
+import { STUDENTS, submissionsFor, summary } from './data/students';
 import {
-  banner, bridgeStrip, chooserDialog, formDialog, indexPanel, introHeader, periodFooter,
+  banner, bridgeStrip, chooserDialog, esc, formDialog, indexPanel, introHeader, periodFooter,
   periodHeader, toolbar, unitHeader, week, weekState,
 } from './render';
+import { activityView } from './views/activity';
+import { bankRow, bankView, csv, gradebookView, gradedColumns, participantsView, questionDialog, reportsView } from './views/tabs';
 import { Store, allWeeks } from './store';
-import type { Activity, ActivityType, Course, Week } from './types';
+import type { Activity, ActivityType, BankQuestion, Course, Week } from './types';
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector(s) as T | null;
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => Array.from(r.querySelectorAll(s)) as T[];
@@ -20,6 +24,7 @@ const ls = {
 const course: Course = QUIMICA_3A;      // ← para otro curso, cambiar este import
 const store = new Store(course.id);
 store.apply(course);
+const NOW = nowFn();
 const TODAY = today();
 const WEEKS = allWeeks(course);
 const teaching = WEEKS.slice(1);
@@ -28,6 +33,32 @@ const currentWeek: Week = teaching.find((w) => weekState(w, TODAY, teaching) ===
 const periodOf = (w: Week): string => w.number === 0 ? 's0'
   : (course.periods.find((p) => p.units.some((u) => u.weeks.includes(w)))?.id ?? 's0');
 const CURRENT_PERIOD = periodOf(currentWeek);
+const currentPeriodObj = () => course.periods.find((p) => p.id === (CURRENT_PERIOD === 's0' ? 'b1' : CURRENT_PERIOD))!;
+
+/** Completa los textos de la lista a partir de las fechas y las entregas. */
+function derive(a: Activity): void {
+  const t = a.type;
+  if (t === 'assign' && a.due) {
+    const s = summary(submissionsFor(a, NOW));
+    a.info = NOW <= a.due ? `Vence: ${fechaHora(a.due)}` : `Venció: ${fechaHora(a.due)}`;
+    a.stat = NOW <= a.due ? `${s.sent}/${s.total} entregaron` : s.toGrade ? `${s.toGrade} por calificar` : `${s.sent}/${s.total} entregaron`;
+  } else if ((t === 'quiz' || t === 'h5p') && (a.close || a.due)) {
+    const end = (a.close ?? a.due)!;
+    const opens = a.open ?? end;
+    const s = summary(submissionsFor({ ...a, due: end }, NOW));
+    a.info = NOW < opens ? `Abre: ${fechaHora(opens)}` : NOW <= end ? `Cierra: ${fechaHora(end)}` : `Cerró: ${fechaHora(end)}`;
+    if (a.questions) a.info += ` · ${a.questions} preguntas · ${a.minutes} min`;
+    a.stat = NOW < opens ? undefined : `${s.sent}/${s.total} ${t === 'h5p' ? 'completaron' : 'rindieron'}`;
+  } else if (t === 'live' && a.start) {
+    const end = new Date(a.start.getTime() + (a.minutes ?? 90) * 60000);
+    a.info = `${fechaHora(a.start)} – ${hora(end)} · Google Meet`;
+    a.stat = NOW > end ? 'Grabación disponible' : NOW >= new Date(a.start.getTime() - 15 * 60000) ? 'En vivo ahora' : undefined;
+  } else if (!a.info) {
+    a.info = t === 'folder' ? `${a.files?.length ?? 0} archivos` : t === 'url' ? (a.url ?? '').replace(/^https?:\/\//, '').split('/')[0]
+      : t === 'page' ? 'Lectura' : t === 'forum' ? 'Foro de participación' : t === 'survey' ? 'Encuesta' : t === 'glossary' ? 'Glosario colaborativo' : a.size;
+  }
+}
+WEEKS.forEach((w) => w.activities.forEach(derive));
 
 // ---------- Estado ----------
 const state = {
@@ -36,15 +67,15 @@ const state = {
   editing: ls.get('ef-modo-edicion') === '1',
   indexOpen: ls.get('ef-indice') ? ls.get('ef-indice') === '1' : window.innerWidth >= 1500,
   bridge: ls.get('ef-bridge-off') !== '1',
+  route: 'curso' as string,
 };
-// abre también la siguiente a la actual
 const nextOfCurrent = WEEKS[WEEKS.indexOf(currentWeek) + 1];
 if (nextOfCurrent) state.open.add(nextOfCurrent.id);
 
 const root = $('#aula-root') as HTMLElement;
 document.body.style.setProperty('--curso', course.color);
 
-// ---------- Render ----------
+// ---------- Render del curso ----------
 function progressYear(): number {
   const done = teaching.filter((w) => weekState(w, TODAY, teaching) === 'past').length;
   return Math.round((done / teaching.length) * 100);
@@ -58,7 +89,7 @@ function renderContent(): string {
   let html = '';
   if (state.view === 's0') {
     const w = course.intro;
-    html += introHeader(course) + week(w, 'now', state.open.has(w.id) || true, ...nb(w));
+    html += introHeader(course) + week(w, 'now', true, ...nb(w));
   } else {
     const p = course.periods.find((x) => x.id === state.view)!;
     const ws = p.units.flatMap((u) => u.weeks);
@@ -73,20 +104,41 @@ function renderContent(): string {
   return html;
 }
 
-function render(): void {
-  root.innerHTML = `
-    ${banner(course, progressYear())}
-    ${toolbar(course, state.view, CURRENT_PERIOD, state.indexOpen)}
+function courseShell(): string {
+  return `${toolbar(course, state.view, CURRENT_PERIOD, state.indexOpen)}
     ${state.bridge ? bridgeStrip() : ''}
     <div class="aula-body${state.indexOpen ? ' index-open' : ''}">
       ${indexPanel(course, state.view, TODAY, teaching)}
       <main class="aula-content" id="aula-content">${renderContent()}</main>
     </div>`;
+}
+
+/** Orden de todas las actividades del curso (para "anterior / siguiente"). */
+function flatActivities(): { a: Activity; week: Week }[] {
+  return WEEKS.flatMap((w) => w.activities.map((a) => ({ a, week: w })));
+}
+
+function render(): void {
+  const r = state.route;
+  let body = '';
+  let tab = 'curso';
+  if (r.startsWith('a-')) {
+    const list = flatActivities();
+    const i = list.findIndex((x) => x.a.id === r.slice(2));
+    if (i < 0) { state.route = 'curso'; render(); return; }
+    body = `<div class="page-pad">${activityView({ a: list[i].a, week: list[i].week, prev: list[i - 1] ?? null, next: list[i + 1] ?? null, now: NOW })}</div>`;
+  } else if (r === 'participantes') { tab = r; body = `<div class="page-pad">${participantsView(course)}</div>`; }
+  else if (r === 'calificaciones') { tab = r; body = `<div class="page-pad">${gradebookView(course, currentPeriodObj(), NOW)}</div>`; }
+  else if (r === 'banco') { tab = r; body = `<div class="page-pad">${bankView()}</div>`; }
+  else if (r === 'informes') { tab = r; body = `<div class="page-pad">${reportsView(course, currentPeriodObj(), NOW)}</div>`; }
+  else body = courseShell();
+  root.innerHTML = banner(course, progressYear(), tab) + body;
   setEditing(state.editing, false);
   updateExpandButton();
 }
 
 function rerenderView(): void {
+  if (state.route !== 'curso') { render(); return; }
   const content = $('#aula-content');
   if (content) content.innerHTML = renderContent();
   const idx = $('#aula-index');
@@ -95,38 +147,35 @@ function rerenderView(): void {
   updateExpandButton();
 }
 
-// ---------- Navegación ----------
-function goView(view: string, opts: { scrollTop?: boolean } = {}): void {
-  if (state.view !== view) { state.view = view; rerenderView(); }
-  if (opts.scrollTop !== false) $('.aula-toolbar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+// ---------- Rutas ----------
+const scrollTo = (id: string, smooth = true) => requestAnimationFrame(() =>
+  document.getElementById(id)?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' }));
 
-function goWeek(id: string, smooth = true): void {
-  const w = WEEKS.find((x) => x.id === id);
-  if (!w) return;
-  state.open.add(id);
-  const v = periodOf(w);
-  if (state.view !== v) { state.view = v; rerenderView(); }
-  else {
-    const sec = document.getElementById(id);
-    if (sec?.classList.contains('closed')) toggleWeek(sec, true);
+function route(smooth: boolean): void {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith('a-') || ['participantes', 'calificaciones', 'banco', 'informes'].includes(h)) {
+    state.route = h; render();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    return;
   }
-  requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' }));
+  const wasCourse = state.route === 'curso';
+  state.route = 'curso';
+  if (/^s\d+$/.test(h)) {
+    const w = WEEKS.find((x) => x.id === h);
+    if (!w) return;
+    state.open.add(h); state.view = periodOf(w);
+    if (wasCourse) rerenderView(); else render();
+    scrollTo(h, smooth);
+  } else if (/^b\d$/.test(h) || h === 'semana0') {
+    state.view = h === 'semana0' ? 's0' : h;
+    if (wasCourse) rerenderView(); else render();
+    if (smooth) $('.aula-toolbar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else if (/^u\d+$/.test(h)) {
+    const p = course.periods.find((x) => x.units.some((u) => u.id === h));
+    if (p) { state.view = p.id; if (wasCourse) rerenderView(); else render(); scrollTo(h, smooth); }
+  } else if (!wasCourse || !root.innerHTML) render();
 }
-
-function goUnit(id: string): void {
-  const p = course.periods.find((x) => x.units.some((u) => u.id === id));
-  if (!p) return;
-  if (state.view !== p.id) { state.view = p.id; rerenderView(); }
-  requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-}
-
-function fromHash(smooth: boolean): void {
-  const h = location.hash.slice(1);
-  if (/^s\d+$/.test(h)) goWeek(h, smooth);
-  else if (/^b\d$/.test(h) || h === 'semana0') goView(h === 'semana0' ? 's0' : h, { scrollTop: smooth });
-  else if (/^u\d+$/.test(h)) goUnit(h);
-}
+const go = (hash: string) => { if (location.hash === '#' + hash) route(true); else location.hash = hash; };
 
 function toggleWeek(sec: HTMLElement, force?: boolean): void {
   const open = force ?? sec.classList.contains('closed');
@@ -154,18 +203,28 @@ function setEditing(on: boolean, notify = true): void {
   if (notify) toast(on ? 'Modo edición activado: ya puedes agregar y ordenar contenido' : 'Modo edición desactivado');
 }
 
-// ---------- Aviso breve ----------
+// ---------- Avisos y descargas ----------
 let toastTimer = 0;
 function toast(msg: string): void {
   const t = $('#toast');
   if (!t) return;
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => t.classList.remove('show'), 2800);
+  toastTimer = window.setTimeout(() => t.classList.remove('show'), 3000);
+}
+function download(name: string, content: string, type = 'text/csv;charset=utf-8'): void {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const link = Object.assign(document.createElement('a'), { href: url, download: name });
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // ---------- Ventanas ----------
-document.body.insertAdjacentHTML('beforeend', chooserDialog() + formDialog() + '<div class="toast" id="toast" role="status" aria-live="polite"></div>');
+document.body.insertAdjacentHTML('beforeend', chooserDialog() + formDialog() + questionDialog() +
+  `<dialog class="win small" id="win-confirm" aria-labelledby="win-confirm-t"><div class="win-head"><span class="ico-tile" style="background:var(--amarillo-100);color:#6B4A00"><svg class="ico" aria-hidden="true"><use href="#i-grade"></use></svg></span><div class="grow"><h2 id="win-confirm-t">Enviar al Registro de notas</h2><p id="win-confirm-sub"></p></div><button class="win-close" type="button" data-close aria-label="Cerrar"><svg class="ico" aria-hidden="true"><use href="#i-close"></use></svg></button></div>
+   <div class="win-body" id="win-confirm-body"></div>
+   <div class="win-foot"><button class="btn btn-ghost" type="button" data-close>Cancelar</button><button class="btn btn-star" type="button" id="confirm-send">Sí, enviar al registro</button></div></dialog>` +
+  '<div class="toast" id="toast" role="status" aria-live="polite"></div>');
 const chooser = $('#win-chooser') as HTMLDialogElement;
 const form = $('#win-form') as HTMLDialogElement;
 let target: { weekId: string; editId?: string } | null = null;
@@ -204,12 +263,10 @@ function openForm(type: ActivityType, weekId: string, edit?: Activity): void {
   $('#win-form-ic')!.innerHTML = `<svg class="ico" aria-hidden="true"><use href="#i-${t.icon}"></use></svg>`;
   $('#win-form-note')!.textContent = 'Se guarda en este navegador hasta conectar la base de datos.';
   ($('#f-name') as HTMLInputElement).value = edit?.name ?? '';
-  ($('#f-desc') as HTMLTextAreaElement).value = '';
-  // Fechas sugeridas según la semana
+  ($('#f-desc') as HTMLTextAreaElement).value = edit?.description ?? '';
   ($('#f-from') as HTMLInputElement).value = toLocalInput(w.start, 8, 0);
   ($('#f-due') as HTMLInputElement).value = toLocalInput(w.end, 23, 59);
-  const close = new Date(w.end.getTime() + 2 * 86400000);
-  ($('#f-close') as HTMLInputElement).value = toLocalInput(close, 23, 59);
+  ($('#f-close') as HTMLInputElement).value = toLocalInput(new Date(w.end.getTime() + 2 * 86400000), 23, 59);
   if (chooser.open) chooser.close();
   form.showModal();
   setTimeout(() => ($('#f-name') as HTMLInputElement).focus(), 50);
@@ -233,27 +290,54 @@ function findActivity(id: string): { w: Week; a: Activity } | null {
   } else {
     const t = TYPES[currentType];
     const due = ($('#f-due') as HTMLInputElement).value;
+    const from = ($('#f-from') as HTMLInputElement).value;
     const rest = ($('#f-rest') as HTMLSelectElement).value;
     const restAct = ($('#f-rest-act') as HTMLInputElement).value.trim();
     const comp = ($('#f-comp') as HTMLSelectElement).value.split(' · ')[0];
     const des = ($('#f-des') as HTMLSelectElement).value;
     const a: Activity = {
-      id: `n${Date.now()}`,
-      type: currentType,
-      name,
-      info: t.graded && due ? `Vence: ${new Date(due).toLocaleString('es-PE', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}` : 'Recién creada',
+      id: `n${Date.now()}`, type: currentType, name,
+      description: ($('#f-desc') as HTMLTextAreaElement).value.trim() || undefined,
       hidden: draft,
       competency: t.graded ? `${comp} · ${des}` : undefined,
       restriction: rest ? `${rest}${restAct ? ': ' + restAct : ''}` : undefined,
     };
+    if (currentType === 'assign') { a.open = new Date(from); a.due = new Date(due); a.graded = 0; }
+    if (currentType === 'quiz' || currentType === 'h5p') { a.open = new Date(from); a.close = new Date(due); a.questions = 10; a.minutes = 20; a.attempts = 1; }
+    if (currentType === 'live') { a.start = new Date(from); a.minutes = 90; a.meet = 'https://meet.google.com/efq-3asm-qmc'; }
+    derive(a);
     w.activities.push(a);
     store.add(w.id, a);
     toast(`${draft ? 'Guardado como borrador' : 'Publicado'}: ${name}`);
   }
   form.close();
   state.open.add(w.id);
-  rerenderView();
-  requestAnimationFrame(() => document.getElementById(w.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  if (state.route !== 'curso') go(w.id); else { rerenderView(); scrollTo(w.id); }
+});
+
+// Nueva pregunta del banco
+($('#q-form') as HTMLFormElement).addEventListener('submit', (e) => {
+  e.preventDefault();
+  const q: BankQuestion = {
+    id: `q${Date.now()}`, unit: Number(($('#q-unit') as HTMLSelectElement).value),
+    type: ($('#q-type') as HTMLSelectElement).value as BankQuestion['type'],
+    text: ($('#q-text') as HTMLTextAreaElement).value.trim(),
+    options: ($('#q-opts') as HTMLTextAreaElement).value.split('\n').map((x) => x.trim()).filter(Boolean),
+    answer: ($('#q-ans') as HTMLInputElement).value.trim(),
+    difficulty: ($('#q-diff') as HTMLSelectElement).value as BankQuestion['difficulty'], usedIn: 0,
+  };
+  if (!q.options?.length) delete q.options;
+  BANK.unshift(q);
+  $('#q-grid')?.insertAdjacentHTML('afterbegin', bankRow(q));
+  ($('#win-question') as HTMLDialogElement).close();
+  ($('#q-form') as HTMLFormElement).reset();
+  toast('Pregunta guardada en el banco');
+});
+
+$('#confirm-send')?.addEventListener('click', () => {
+  ($('#win-confirm') as HTMLDialogElement).close();
+  toast(`Notas enviadas al Registro de notas · ${STUDENTS.length} estudiantes. Ya las pueden ver estudiantes y padres.`);
+  state.bridge = false; ls.set('ef-bridge-off', '1');
 });
 
 // ---------- Eventos ----------
@@ -265,23 +349,67 @@ function closeMenus(except?: Element): void {
   });
 }
 
+function filterTable(): void {
+  const q = (($('#p-search') as HTMLInputElement | null)?.value ?? '').toLowerCase();
+  const g = $('[data-group-filter][aria-pressed="true"]')?.dataset.groupFilter ?? 'all';
+  $$<HTMLTableRowElement>('#p-table tbody tr').forEach((tr) => {
+    tr.hidden = !((tr.dataset.name ?? '').includes(q) && (g === 'all' || tr.dataset.group === g));
+  });
+}
+function filterBank(): void {
+  const q = (($('#q-search') as HTMLInputElement | null)?.value ?? '').toLowerCase();
+  const u = $('[data-unit-filter][aria-pressed="true"]')?.dataset.unitFilter ?? 'all';
+  $$('#q-grid .q-card').forEach((c) => { c.hidden = !((c.dataset.text ?? '').includes(q) && (u === 'all' || c.dataset.unit === u)); });
+}
+function filterSubs(f: string): void {
+  $$<HTMLTableRowElement>('table.subs tbody tr').forEach((tr) => {
+    const st = tr.dataset.status, graded = tr.dataset.graded === 'true';
+    tr.hidden = !(f === 'all' || (f === 'sent' && (st === 'ontime' || st === 'late')) || (f === 'tograde' && (st === 'ontime' || st === 'late') && !graded) || (f === 'missing' && (st === 'missing' || st === 'open')));
+  });
+}
+
+function exportCsv(kind: string): void {
+  if (kind === 'participantes') {
+    download('participantes-quimica-3A.csv', csv([['Apellidos y nombres', 'Código', 'Grupo', 'Último acceso'], ...STUDENTS.map((s) => [s.name, s.code, s.group, s.lastAccess])]));
+  } else if (kind === 'calificaciones') {
+    const cols = gradedColumns(currentPeriodObj(), NOW);
+    const subs = cols.map((c) => submissionsFor({ ...c.a, due: c.a.due ?? c.a.close }, NOW));
+    download('calificaciones-quimica-3A.csv', csv([['Estudiante', ...cols.map((c) => `${c.a.name} (${c.comp})`)], ...STUDENTS.map((s, i) => [s.name, ...subs.map((x) => x[i].grade ?? (x[i].status === 'missing' ? 'NE' : ''))])]));
+  } else {
+    const f = findActivity(state.route.slice(2));
+    if (!f) return;
+    const subs = submissionsFor({ ...f.a, due: f.a.due ?? f.a.close }, NOW);
+    download(`resultados-${f.a.id}.csv`, csv([['Estudiante', 'Estado', 'Nota'], ...subs.map((x) => [x.student.name, x.status, x.grade ?? ''])]));
+  }
+  toast('Archivo descargado');
+}
+
 document.addEventListener('click', (e) => {
   const el = e.target as HTMLElement;
 
-  // Ventanas: cerrar con botón o clic en el fondo
+  // Ventanas
   if (el.closest('[data-close]')) { el.closest('dialog')?.close(); return; }
   if (el instanceof HTMLDialogElement) { el.close(); return; }
-
-  // Selector de actividades
   const tabF = el.closest<HTMLElement>('.chooser-tabs [data-filter]');
   if (tabF) { filterChooser(tabF.dataset.filter!, ($('#chooser-q') as HTMLInputElement).value); return; }
   const item = el.closest<HTMLElement>('.chooser-item');
   if (item && target) { openForm(item.dataset.type as ActivityType, target.weekId); return; }
 
-  // Barra de herramientas
+  // Acciones genéricas
+  const tst = el.closest<HTMLElement>('[data-toast]');
+  if (tst) { e.preventDefault(); toast(tst.dataset.toast!); return; }
+  const dl = el.closest<HTMLElement>('[data-fake-download]');
+  if (dl) { e.preventDefault(); toast(`Descargando ${dl.dataset.fakeDownload}… (archivo de ejemplo)`); return; }
+  const cp = el.closest<HTMLElement>('[data-copy]');
+  if (cp) { navigator.clipboard?.writeText(cp.dataset.copy!).then(() => toast('Enlace copiado'), () => toast('Copia el enlace manualmente')); return; }
+  const cs = el.closest<HTMLElement>('[data-csv]');
+  if (cs) { exportCsv(cs.dataset.csv!); return; }
+  if (el.closest('[data-print]')) { window.print(); return; }
+
+  // Barra de herramientas del curso
   const tab = el.closest<HTMLElement>('[data-view]');
-  if (tab) { goView(tab.dataset.view!); history.replaceState(null, '', '#' + (tab.dataset.view === 's0' ? 'semana0' : tab.dataset.view)); return; }
-  if (el.closest('#go-now')) { history.replaceState(null, '', '#' + currentWeek.id); goWeek(currentWeek.id); return; }
+  if (tab) { go(tab.dataset.view === 's0' ? 'semana0' : tab.dataset.view!); return; }
+  if (el.closest('#go-now')) { go(currentWeek.id); return; }
   if (el.closest('#toggle-index') || el.closest('#close-index')) {
     state.indexOpen = !state.indexOpen;
     $('.aula-body')?.classList.toggle('index-open', state.indexOpen);
@@ -298,19 +426,63 @@ document.addEventListener('click', (e) => {
   if (el.closest('#edit-switch')) { setEditing(!state.editing); return; }
 
   // Semanas
-  const tog = el.closest<HTMLElement>('.wk > header');
-  if (tog && !el.closest('a') ) { toggleWeek(tog.parentElement as HTMLElement); return; }
+  const head = el.closest<HTMLElement>('.wk > header');
+  if (head && !el.closest('a')) { toggleWeek(head.parentElement as HTMLElement); return; }
   const add = el.closest<HTMLElement>('.add-act');
   if (add) { openChooser(add.dataset.week!); return; }
 
-  // Enlaces internos (#s30, #u7) → navegación sin saltos bruscos
-  const link = el.closest<HTMLAnchorElement>('a[href^="#"]');
-  if (link && link.getAttribute('href')!.length > 1) {
-    e.preventDefault();
-    const id = link.getAttribute('href')!.slice(1);
-    history.replaceState(null, '', '#' + id);
-    if (id.startsWith('u')) goUnit(id); else goWeek(id);
-    if (window.innerWidth < 1024 && link.closest('.aula-index')) { state.indexOpen = false; $('.aula-body')?.classList.remove('index-open'); }
+  // Página de actividad
+  const editA = el.closest<HTMLElement>('[data-edit-activity]');
+  if (editA) { const f = findActivity(editA.dataset.editActivity!); if (f) openForm(f.a.type, f.w.id, f.a); return; }
+  const sf = el.closest<HTMLElement>('[data-sub-filter]');
+  if (sf) { $$('[data-sub-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b === sf))); filterSubs(sf.dataset.subFilter!); return; }
+  if (el.closest('[data-save-grades]')) {
+    const n = $$<HTMLInputElement>('table.subs input.nota').filter((i) => !i.disabled && i.value !== '').length;
+    const counter = $('[data-graded-count]'); if (counter) counter.textContent = String(n);
+    toast(`Calificaciones guardadas · ${n} con nota`);
+    return;
+  }
+  if (el.closest('[data-post]')) {
+    const ta = $('#new-post') as HTMLTextAreaElement;
+    const text = ta.value.trim();
+    if (!text) { ta.focus(); return; }
+    $('#posts')?.insertAdjacentHTML('afterbegin', `<article class="post docente new"><header><span class="avatar sm" style="background:var(--amarillo-400)">JR</span><div><b>${esc(course.teacher)}</b><span class="chip blue">Docente</span><small>Ahora</small></div></header><p>${esc(text)}</p></article>`);
+    ta.value = ''; toast('Mensaje publicado');
+    return;
+  }
+  const rp = el.closest<HTMLElement>('[data-reply]');
+  if (rp) {
+    const art = rp.closest('.post')!;
+    if (art.querySelector(':scope > .reply-box')) return;
+    rp.parentElement!.insertAdjacentHTML('afterend', `<div class="reply-box"><label class="sr-only" for="r-${Date.now()}">Respuesta</label><textarea placeholder="Escribe tu respuesta…"></textarea><div class="composer-foot"><button class="btn btn-ghost" type="button" data-cancel-reply>Cancelar</button><button class="btn btn-primary" type="button" data-send-reply>Responder</button></div></div>`);
+    (art.querySelector(':scope > .reply-box textarea') as HTMLTextAreaElement).focus();
+    return;
+  }
+  if (el.closest('[data-cancel-reply]')) { el.closest('.reply-box')?.remove(); return; }
+  if (el.closest('[data-send-reply]')) {
+    const box = el.closest('.reply-box')!;
+    const text = (box.querySelector('textarea') as HTMLTextAreaElement).value.trim();
+    if (!text) return;
+    box.outerHTML = `<article class="post docente reply new"><header><span class="avatar sm" style="background:var(--amarillo-400)">JR</span><div><b>${esc(course.teacher)}</b><span class="chip blue">Docente</span><small>Ahora</small></div></header><p>${esc(text)}</p></article>`;
+    toast('Respuesta publicada');
+    return;
+  }
+  const sub = el.closest<HTMLElement>('[data-toggle-sub]');
+  if (sub) { const on = sub.getAttribute('aria-pressed') !== 'true'; sub.setAttribute('aria-pressed', String(on)); sub.lastChild!.textContent = on ? 'Suscrito' : 'Suscribirme'; toast(on ? 'Recibirás notificaciones de este foro' : 'Ya no recibirás notificaciones'); return; }
+
+  // Pestañas
+  const gf = el.closest<HTMLElement>('[data-group-filter]');
+  if (gf) { $$('[data-group-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b === gf))); filterTable(); return; }
+  const uf = el.closest<HTMLElement>('[data-unit-filter]');
+  if (uf) { $$('[data-unit-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b === uf))); filterBank(); return; }
+  if (el.closest('[data-new-question]')) { ($('#win-question') as HTMLDialogElement).showModal(); return; }
+  const send = el.closest<HTMLElement>('[data-send-registry]');
+  if (send) {
+    const cols = gradedColumns(currentPeriodObj(), NOW);
+    $('#win-confirm-sub')!.textContent = `${currentPeriodObj().name} · ${course.name} ${course.grade} ${course.section}`;
+    $('#win-confirm-body')!.innerHTML = `<p>Se enviarán los promedios de <b>${send.dataset.sendRegistry}</b> de ${STUDENTS.length} estudiantes, calculados con ${cols.length} actividades calificadas.</p>
+      <p class="restrict-box"><span>Después de enviarlas, las notas serán visibles para estudiantes y padres en la intranet. Podrás corregirlas hasta el cierre del bimestre.</span></p>`;
+    ($('#win-confirm') as HTMLDialogElement).showModal();
     return;
   }
 
@@ -339,15 +511,25 @@ document.addEventListener('click', (e) => {
     return;
   }
   if (!el.closest('.menu-pop')) closeMenus();
+
+  // Al tocar un enlace del índice en celular, cerrar el índice
+  if (el.closest('.aula-index a') && window.innerWidth < 1024) { state.indexOpen = false; $('.aula-body')?.classList.remove('index-open'); }
 });
 
 document.addEventListener('input', (e) => {
   const el = e.target as HTMLInputElement;
   if (el.id === 'chooser-q') filterChooser('all', el.value);
+  if (el.id === 'p-search') filterTable();
+  if (el.id === 'q-search') filterBank();
+  if (el.classList.contains('nota')) {
+    const v = el.value === '' ? null : Math.max(0, Math.min(20, Number(el.value)));
+    if (v !== null && String(v) !== el.value) el.value = String(v);
+    el.className = `nota ${v === null ? 'g-x' : v >= 18 ? 'g-ad' : v >= 14 ? 'g-a' : v >= 11 ? 'g-b' : 'g-c'}`;
+  }
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenus(); });
-window.addEventListener('hashchange', () => fromHash(true));
+window.addEventListener('hashchange', () => route(true));
 
 // ---------- Inicio ----------
 render();
-if (location.hash) fromHash(false);
+if (location.hash) route(false);

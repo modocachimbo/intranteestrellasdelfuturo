@@ -53,7 +53,36 @@ export function rangeLong(a: Date, b: Date): string {
 
 /** Fecha "de hoy" usada para marcar la semana actual. Permite ?hoy=2026-11-04 para pruebas. */
 export function today(): Date {
-  const q = new URLSearchParams(location.search).get('hoy');
-  const t = q ? parse(q) : new Date();
+  const t = now();
   return new Date(t.getFullYear(), t.getMonth(), t.getDate());
+}
+
+/** Fecha y hora actuales. Con ?hoy=2026-11-09T08:30 se puede simular otro momento. */
+export function now(): Date {
+  const q = new URLSearchParams(location.search).get('hoy');
+  if (!q) return new Date();
+  const [d, t] = q.split('T');
+  const base = parse(d);
+  if (t) { const [h, m] = t.split(':').map(Number); base.setHours(h || 0, m || 0); } else base.setHours(10, 0);
+  return base;
+}
+
+const DIAS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+const DIAS_L = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const hora = (d: Date): string => {
+  const h = d.getHours(), m = d.getMinutes();
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a. m.' : 'p. m.'}`;
+};
+/** "lun 9 nov, 8:00 a. m." */
+export const fechaHora = (d: Date): string => `${DIAS[d.getDay()]} ${d.getDate()} ${MESES[d.getMonth()]}, ${hora(d)}`;
+/** "lunes 9 de noviembre" */
+export const fechaLarga = (d: Date): string => `${DIAS_L[d.getDay()]} ${d.getDate()} de ${MESES_L[d.getMonth()]}`;
+export { hora };
+
+/** "en 2 días", "en 3 h", "hace 5 días" */
+export function relativo(d: Date, ref: Date): string {
+  const diff = d.getTime() - ref.getTime();
+  const abs = Math.abs(diff), h = Math.round(abs / 3600000), dd = Math.round(abs / 86400000);
+  const txt = abs < 3600000 ? `${Math.max(1, Math.round(abs / 60000))} min` : h < 36 ? `${h} h` : `${dd} días`;
+  return diff >= 0 ? `en ${txt}` : `hace ${txt}`;
 }
