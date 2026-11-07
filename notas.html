@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de notas · Estrellas del Futuro</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#0F172A;background:#F4F6FA}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+
+<style>body>div:first-child{min-height:100vh!important}</style>
+</head>
+<body>
+
+
+<div style="min-height: 1060px; display: flex; flex-wrap: wrap; background: #F4F6FA; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+
+  <nav aria-label="Menú principal" style="flex: 1 1 232px; max-width: 100%; background: #0B1F4B; color: #E0E7FF; padding: 24px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 0 8px">
+      <div style="width: 40px; height: 40px; border-radius: 11px; background: #F59E0B; color: #0B1F4B; display: flex; align-items: center; justify-content: center; font: 700 17px 'Space Grotesk', sans-serif">EF</div>
+      <div style="display: flex; flex-direction: column">
+        <span style="font: 700 15px 'Space Grotesk', sans-serif; color: #FFFFFF">Estrellas del Futuro</span>
+        <span style="font-size: 12px; color: #A5B4FC">Intranet 2026</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      
+        <a href="panel.html" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #E0E7FF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Inicio</a>
+      
+        <a href="curso.html" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #E0E7FF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h10a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4zM4 16a4 4 0 0 1 4-4h10"/></svg>Mis cursos</a>
+      
+        <a href="notas.html" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; background: #1D4ED8; color: #FFFFFF; font-weight: 600;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Registro de notas</a>
+      
+        <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #E0E7FF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Asistencia</a>
+      
+        <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #E0E7FF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2"/></svg>Horario</a>
+      
+        <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #E0E7FF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v16H3zM3 10h18M8 3v4M16 3v4"/></svg>Agenda</a>
+      
+        <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #E0E7FF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Mensajes</a>
+      
+        <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 10px; text-decoration: none; font-size: 14px; color: #E0E7FF;"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1zM17 8a5 5 0 0 1 0 8"/></svg>Comunicados</a>
+      
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px; margin-right: auto">
+        <span style="font-size: 13px; color: #475569">Química · Ciencia y Tecnología</span>
+        <h1 style="margin: 0; font: 700 30px/1.1 'Space Grotesk', sans-serif; letter-spacing: -0.02em">Registro de notas</h1>
+      </div>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #475569">Aula
+        <select style="height: 44px; min-width: 160px; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 0 10px; font: 500 14px Inter, sans-serif; color: #0F172A; background: #FFFFFF"><option>3.º A Secundaria</option></select>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #475569">Periodo
+        <select style="height: 44px; min-width: 140px; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 0 10px; font: 500 14px Inter, sans-serif; color: #0F172A; background: #FFFFFF"><option>IV Bimestre</option></select>
+      </label>
+    </div>
+
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; background: #FFFFFF; border: 1px solid #E3E8F0; border-radius: 16px; padding: 18px 20px">
+      <div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="font-weight: 600">Avance del registro</span><span style="font-weight: 700">61%</span></div>
+        <div role="img" aria-label="61 por ciento completado" style="height: 8px; border-radius: 99px; background: #E2E8F0; overflow: hidden"><div style="width: 61%; height: 100%; background: #1D4ED8"></div></div>
+        <span style="font-size: 13px; color: #475569">Faltan 12 notas · Guardado automático hace 1 min</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: #FFFBEB; border: 1px solid #FCD34D">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span style="font-size: 14px; color: #78350F"><strong>Cierre:</strong> 15 nov · quedan 8 días</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1.5px solid #CBD5E1; background: #FFFFFF; color: #0F172A; font: 600 14px Inter, sans-serif; cursor: pointer">Importar Excel</button>
+        <button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1.5px solid #CBD5E1; background: #FFFFFF; color: #0F172A; font: 600 14px Inter, sans-serif; cursor: pointer">Imprimir</button>
+        <button type="button" style="height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: #1D4ED8; color: #FFFFFF; font: 600 14px Inter, sans-serif; cursor: pointer">Guardar notas</button>
+      </div>
+    </div>
+
+    
+    <div style="background: #FFFFFF; border: 1px solid #E3E8F0; border-radius: 16px; overflow-x: auto">
+      <table style="width: 100%; min-width: 940px; border-collapse: collapse; font-size: 14px; text-align: center">
+        <thead>
+          <tr style="font-size: 12px; color: #334155">
+            <th scope="col" rowspan="2" style="padding: 12px; border-bottom: 1px solid #E3E8F0; width: 40px">N.º</th>
+            <th scope="col" rowspan="2" style="padding: 12px; border-bottom: 1px solid #E3E8F0; text-align: left">Estudiante</th>
+            <th scope="colgroup" colspan="3" style="padding: 12px 8px; background: #EEF2FF; border-left: 1px solid #E3E8F0">C1 · Indaga mediante métodos científicos</th>
+            <th scope="colgroup" colspan="3" style="padding: 12px 8px; background: #F0FDFA; border-left: 1px solid #E3E8F0">C2 · Explica el mundo físico</th>
+            <th scope="colgroup" colspan="3" style="padding: 12px 8px; background: #FFF7ED; border-left: 1px solid #E3E8F0">C3 · Diseña soluciones tecnológicas</th>
+            <th scope="col" rowspan="2" style="padding: 12px; border-bottom: 1px solid #E3E8F0; border-left: 1px solid #E3E8F0">Promedio<br>bimestral</th>
+            <th scope="col" rowspan="2" style="padding: 12px; border-bottom: 1px solid #E3E8F0">Conclusión</th>
+          </tr>
+          <tr style="font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0; border-left: 1px solid #E3E8F0">D1</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0">D2</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0">Prom.</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0; border-left: 1px solid #E3E8F0">D1</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0">D2</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0">Prom.</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0; border-left: 1px solid #E3E8F0">D1</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0">D2</th>
+            <th scope="col" style="padding: 8px; border-bottom: 1px solid #E3E8F0">Prom.</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">1</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Alvarado Ríos, Camila</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #DCFCE7; color: #166534;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">2</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Benites Paredes, Diego</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #F1F5F9; color: #475569;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">3</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Castro Huamán, Lucía</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #DCFCE7; color: #166534;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">4</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Díaz Salazar, Mateo</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; border: 1.5px dashed #94A3B8; color: #475569;">—</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; border: 1.5px dashed #94A3B8; color: #475569;">—</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; border: 1.5px dashed #94A3B8; color: #475569;">—</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #F1F5F9; color: #475569;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">5</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Espinoza León, Valeria</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #DCFCE7; color: #166534;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">6</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Flores Quispe, Thiago</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #9A3412; color: #FFFFFF;">C</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #9A3412; color: #FFFFFF;">C</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #9A3412; color: #FFFFFF;">C</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #9A3412; color: #FFFFFF;">C</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #9A3412; color: #FFFFFF;">C</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #F1F5F9; color: #475569;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">7</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">García Torres, Ariana</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #DCFCE7; color: #166534;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">8</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Huerta Molina, Sebastián</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; border: 1.5px dashed #94A3B8; color: #475569;">—</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; border: 1.5px dashed #94A3B8; color: #475569;">—</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; border: 1.5px dashed #94A3B8; color: #475569;">—</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; border: 1.5px dashed #94A3B8; color: #475569;">—</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #F1F5F9; color: #475569;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">9</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Lozano Vega, Fernanda</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #1E3A8A; color: #FFFFFF;">AD</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #DCFCE7; color: #166534;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+            <tr>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; color: #475569">10</td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; text-align: left; font-weight: 500; white-space: nowrap">Mendoza Cruz, Joaquín</td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #DBEAFE; color: #1E3A8A;">A</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+                <td style="padding: 6px 8px; border-bottom: 1px solid #EEF2F7; background: #F8FAFC;"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7; border-left: 1px solid #E3E8F0"><span style="display: inline-flex; width: 34px; height: 30px; border-radius: 8px; font-weight: 700; font-size: 13px; align-items: center; justify-content: center; background: #FEF3C7; color: #92400E;">B</span></td>
+              <td style="padding: 8px 12px; border-bottom: 1px solid #EEF2F7"><button type="button" aria-label="Escribir conclusión descriptiva" style="width: 36px; height: 36px; border-radius: 8px; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: #F1F5F9; color: #475569;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></button></td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font-size: 13px; color: #334155">
+      <span style="font-weight: 600">Escala:</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="display: inline-flex; width: 34px; height: 28px; border-radius: 8px; background: #1E3A8A; color: #FFFFFF; font-weight: 700; align-items: center; justify-content: center">AD</span>Logro destacado</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="display: inline-flex; width: 34px; height: 28px; border-radius: 8px; background: #DBEAFE; color: #1E3A8A; font-weight: 700; align-items: center; justify-content: center">A</span>Logro esperado</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="display: inline-flex; width: 34px; height: 28px; border-radius: 8px; background: #FEF3C7; color: #92400E; font-weight: 700; align-items: center; justify-content: center">B</span>En proceso</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="display: inline-flex; width: 34px; height: 28px; border-radius: 8px; background: #9A3412; color: #FFFFFF; font-weight: 700; align-items: center; justify-content: center">C</span>En inicio</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="display: inline-flex; width: 34px; height: 28px; border-radius: 8px; border: 1.5px dashed #94A3B8; color: #475569; align-items: center; justify-content: center">—</span>Sin nota</span>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
