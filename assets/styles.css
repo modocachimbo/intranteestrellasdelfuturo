@@ -362,7 +362,7 @@ table.notes td.avg { background: var(--fondo); }
 .donut .center b { font-family: var(--f-titulo); font-size: 40px; font-weight: 600; line-height: 1; color: var(--azul-900); }
 .donut .center small { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-3); margin-top: 6px; }
 .bars { display: flex; flex-direction: column; gap: 14px; }
-.bar-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 64px; gap: 12px; align-items: center; }
+.bar-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 64px; gap: 12px; align-items: center; }
 .bar-row .lbl { font-size: 13.5px; font-weight: 600; color: var(--tinta); display: flex; justify-content: space-between; margin-bottom: 6px; }
 .bar-row .lbl span { color: var(--tinta-3); font-weight: 500; }
 .bar-row .track { height: 10px; border-radius: 99px; background: var(--borde-suave); overflow: hidden; }
@@ -410,3 +410,10 @@ table.schedule td.recreo { height: 34px; background: transparent; border: 1.5px 
   .stats { grid-template-columns: minmax(0, 1fr); justify-items: center; }
   .bars { width: 100%; }
 }
+
+/* Notas numéricas (0–20) */
+input.nota { width: 46px; height: 34px; border-radius: 8px; border: 1.5px solid transparent; text-align: center; font-weight: 700; font-size: 14px; -moz-appearance: textfield; }
+input.nota::-webkit-outer-spin-button, input.nota::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input.nota:focus { outline: none; border-color: var(--azul-500); box-shadow: 0 0 0 3px var(--azul-100); }
+input.nota.g-x { background: #fff; border: 1.5px dashed #9AA4BF; }
+.nota-prom { display: inline-grid; place-items: center; width: 46px; height: 34px; border-radius: 8px; font-family: var(--f-titulo); font-weight: 600; font-size: 15px; }
