@@ -104,14 +104,8 @@
   // Grupos del menú: el aula virtual (aprender) separada de la gestión académica (oficial)
   var NAV = [
     ['', [
-      ['inicio', 'Inicio', 'panel.html', 'home']
-    ]],
-    ['Aula virtual', [
-      ['cursos', 'Mis aulas virtuales', 'cursos.html', 'book']
-    ]],
-    ['Gestión académica', [
-      ['notas', 'Registro de notas', 'notas.html', 'grade'],
-      ['asistencia', 'Asistencia', '#', 'check'],
+      ['inicio', 'Inicio', 'panel.html', 'home'],
+      ['cursos', 'Mis cursos', 'cursos.html', 'book'],
       ['horario', 'Horario', 'horario.html', 'clock']
     ]],
     ['Comunicación', [
@@ -131,6 +125,7 @@
           (n[4] ? '<span class="count" aria-label="' + n[4] + ' sin leer">' + n[4] + '</span>' : '') + '</a>';
       });
       h += '</div></div>';
+      if (!g[0]) h += '<a class="aula-btn" href="aula-virtual.html"' + (page === 'aula' ? ' aria-current="page"' : '') + '>' + ico('star') + '<span><b>Aula virtual</b><small>Tareas, material, foros y exámenes</small></span>' + ico('arrow', 'ico-sm') + '</a>';
     });
     h += '</nav><div class="sidebar-foot nav">' +
       '<a href="#">' + ico('user') + '<span>Mi perfil</span></a>' +

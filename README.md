@@ -10,7 +10,8 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 | `index.html` | Ingreso con el código de usuario que entrega la administración. |
 | `panel.html` | Inicio del docente: bienvenida, aviso de cierre de notas, indicadores, estadística académica por rangos de nota, estrella del bimestre, mis cursos, semana y horario de hoy, comunicados y cumpleaños. |
 | `horario.html` | Horario semanal con recreos; cada clase abre su aula virtual. |
-| `cursos.html` | Mis aulas virtuales: una portada por curso y sección, filtradas por sede. |
+| `cursos.html` | Mis cursos (académico): registrar notas, asistencia, estudiantes y sílabo por curso, filtrado por sede. |
+| `aula-virtual.html` | Aula virtual: una portada por curso y sección (botón destacado en el menú). |
 | `curso.html` | Aula virtual (aprender): Tablero, Temario, Material, Tareas, Exámenes virtuales, Foro y Clases en vivo. Las notas de tareas se envían al registro con un botón. |
 | `notas.html` | Registro de notas numéricas (0–20) por competencias, con promedios automáticos y conclusión descriptiva. |
 | `movil.html` | Vista previa de la intranet dentro de un celular. |
