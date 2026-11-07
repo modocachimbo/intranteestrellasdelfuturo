@@ -106,7 +106,7 @@
     ['cursos', 'Mis cursos', 'curso.html', 'book'],
     ['notas', 'Registro de notas', 'notas.html', 'grade'],
     ['asistencia', 'Asistencia', '#', 'check'],
-    ['horario', 'Horario', '#', 'clock'],
+    ['horario', 'Horario', 'horario.html', 'clock'],
     ['agenda', 'Agenda', '#', 'calendar'],
     ['mensajes', 'Mensajes', '#', 'chat', 3],
     ['comunicados', 'Comunicados', '#', 'megaphone']

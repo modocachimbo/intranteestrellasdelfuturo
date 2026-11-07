@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horario · Estrellas del Futuro</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="horario">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="main">
+    <header class="topbar" id="topbar"></header>
+
+    <section class="page-band">
+      <svg class="stars" aria-hidden="true"><use href="#deco-stars"></use></svg>
+      <div class="inner">
+        <div class="course-head">
+          <span class="ico-tile"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-clock"></use></svg></span>
+          <div><h1>Mi horario</h1><p>Química · 10 clases por semana · IV Bimestre</p></div>
+          <div class="selects" style="align-items:flex-end">
+            <button class="btn btn-ghost" type="button"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-print"></use></svg>Imprimir</button>
+            <button class="btn btn-star" type="button"><svg class="ico ico-sm" aria-hidden="true" style="--ico-fill:#fff"><use href="#i-download"></use></svg>Descargar PDF</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="content overlap">
+      <section class="card week-nav" style="box-shadow:var(--sombra-2)">
+        <button class="icon-btn" type="button" aria-label="Semana anterior"><svg class="ico" aria-hidden="true" style="transform:rotate(90deg)"><use href="#i-chevron"></use></svg></button>
+        <h2>Semana del 2 al 6 de noviembre</h2>
+        <button class="icon-btn" type="button" aria-label="Semana siguiente"><svg class="ico" aria-hidden="true" style="transform:rotate(-90deg)"><use href="#i-chevron"></use></svg></button>
+      </section>
+
+      <section class="card table-wrap" style="padding:8px">
+        <table class="schedule">
+          <thead>
+            <tr><th class="hora" scope="col">Hora</th><th scope="col">Lunes 2</th><th scope="col">Martes 3</th><th scope="col">Miércoles 4</th><th scope="col">Jueves 5</th><th scope="col" class="hoy">Viernes 6</th></tr>
+          </thead>
+          <tbody>
+<tr><td class="h">7:50 – 9:20</td><td><a class="class-pill " href="curso.html"><b>Química</b><span>3.º A</span></a></td><td></td><td><a class="class-pill " href="curso.html"><b>Química</b><span>3.º A</span></a></td><td></td><td><a class="class-pill " href="curso.html"><b>Química</b><span>4.º A</span></a></td></tr>
+<tr><td class="h" style="height:34px;font-size:12px">9:20 – 9:35</td><td class="recreo" colspan="5">RECREO</td></tr>
+<tr><td class="h">9:35 – 11:05</td><td><a class="class-pill " href="curso.html"><b>Química</b><span>1.º A</span></a></td><td><a class="class-pill " href="curso.html"><b>Química</b><span>2.º A</span></a></td><td></td><td><a class="class-pill y" href="curso.html"><b>Laboratorio</b><span>1.º A</span></a></td><td></td></tr>
+<tr><td class="h" style="height:34px;font-size:12px">11:05 – 11:20</td><td class="recreo" colspan="5">RECREO</td></tr>
+<tr><td class="h">11:20 – 12:50</td><td><a class="class-pill " href="curso.html"><b>Química</b><span>5.º A</span></a></td><td></td><td><a class="class-pill " href="curso.html"><b>Química</b><span>2.º B</span></a></td><td></td><td><a class="class-pill " href="curso.html"><b>Química</b><span>2.º A</span></a></td></tr>
+<tr><td class="h" style="height:34px;font-size:12px">12:50 – 13:00</td><td class="recreo" colspan="5">RECREO</td></tr>
+<tr><td class="h">13:00 – 14:30</td><td></td><td><a class="class-pill " href="curso.html"><b>Química</b><span>4.º A</span></a></td><td></td><td><a class="class-pill " href="curso.html"><b>Química</b><span>5.º A</span></a></td><td><a class="class-pill n" href="curso.html"><b>Tutoría</b><span>3.º A</span></a></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="legend">
+        <strong>Leyenda:</strong>
+        <span><span class="grade" style="background:var(--azul-600);width:22px;height:16px"></span>Clase de Química</span>
+        <span><span class="grade" style="background:var(--amarillo-400);width:22px;height:16px"></span>Laboratorio</span>
+        <span><span class="grade" style="background:var(--azul-900);width:22px;height:16px"></span>Tutoría</span>
+        <span style="color:var(--tinta-3)">Toca una clase para abrir su aula virtual.</span>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

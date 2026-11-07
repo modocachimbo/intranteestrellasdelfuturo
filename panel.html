@@ -7,7 +7,7 @@
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body data-page="inicio">
@@ -92,7 +92,41 @@
       </section>
 
       <div class="grid-main">
-        <!-- 4. Mis cursos -->
+        <div class="stack">
+        <!-- 4. Estadística académica -->
+        <section class="card card-pad">
+          <div class="card-head">
+            <h2>Estadística académica</h2>
+            <label><span class="sr-only">Filtrar por aula</span><select class="pill-select"><option>Todas mis aulas</option><option>1.º A</option><option>2.º A</option><option>2.º B</option><option>3.º A</option><option>4.º A</option><option>5.º A</option></select></label>
+          </div>
+          <div class="stats">
+            <div class="donut" role="img" aria-label="95 por ciento de estudiantes aprobados en el IV bimestre">
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#EEF1F7" stroke-width="22"/>
+                <circle class="seg-ad" cx="100" cy="100" r="80" fill="none" stroke-width="22" stroke-dasharray="79.4 502.65" stroke-dashoffset="0"/>
+                <circle class="seg-a"  cx="100" cy="100" r="80" fill="none" stroke-width="22" stroke-dasharray="279 502.65" stroke-dashoffset="-82.4"/>
+                <circle class="seg-b"  cx="100" cy="100" r="80" fill="none" stroke-width="22" stroke-dasharray="108.6 502.65" stroke-dashoffset="-364.4"/>
+                <circle class="seg-c"  cx="100" cy="100" r="80" fill="none" stroke-width="22" stroke-dasharray="23.6 502.65" stroke-dashoffset="-476"/>
+              </svg>
+              <div class="center"><b>95%</b><small>Aprobados</small></div>
+            </div>
+            <div class="bars">
+              <div class="bar-row"><span class="grade g-ad">AD</span><div><div class="lbl">Logro destacado <span>28 estudiantes</span></div><div class="track"><span class="seg-ad" style="width:16%"></span></div></div><span class="pct">16%</span></div>
+              <div class="bar-row"><span class="grade g-a">A</span><div><div class="lbl">Logro esperado <span>96 estudiantes</span></div><div class="track"><span class="seg-a" style="width:56%"></span></div></div><span class="pct">56%</span></div>
+              <div class="bar-row"><span class="grade g-b">B</span><div><div class="lbl">En proceso <span>38 estudiantes</span></div><div class="track"><span class="seg-b" style="width:22%"></span></div></div><span class="pct">22%</span></div>
+              <div class="bar-row"><span class="grade g-c">C</span><div><div class="lbl">En inicio <span>9 estudiantes</span></div><div class="track"><span class="seg-c" style="width:5%"></span></div></div><span class="pct">5%</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card star-strip" aria-label="Estudiante destacado">
+          <span class="ico-tile"><svg class="ico" aria-hidden="true"><use href="#i-star"></use></svg></span>
+          <span class="t">Estrella del bimestre</span>
+          <b>Lucía Castro Huamán</b>
+          <span class="chip blue" style="margin-left:auto">3.º A · Promedio AD</span>
+        </section>
+
+        <!-- 5. Mis cursos -->
         <section class="card card-pad">
           <div class="card-head"><h2>Mis cursos</h2><a href="curso.html">Ver todos</a></div>
           <div class="courses">
@@ -128,11 +162,21 @@
             </a>
           </div>
         </section>
+        </div>
 
-        <!-- 5. Columna derecha -->
+        <!-- 6. Columna derecha -->
         <aside class="stack">
           <section class="card card-pad">
-            <div class="card-head"><h2>Hoy</h2><a href="#">Horario</a></div>
+            <div class="card-head"><h2>Noviembre</h2><a href="horario.html">Horario</a></div>
+            <nav class="week" aria-label="Semana actual">
+              <a href="#"><span>Dom</span><b>1</b></a>
+              <a href="#" class="has"><span>Lun</span><b>2</b></a>
+              <a href="#"><span>Mar</span><b>3</b></a>
+              <a href="#" class="has"><span>Mié</span><b>4</b></a>
+              <a href="#"><span>Jue</span><b>5</b></a>
+              <a href="#" class="has"><span>Vie</span><b>6</b></a>
+              <a href="#" class="has" aria-current="date"><span>Sáb</span><b>7</b></a>
+            </nav>
             <div class="timeline">
               <div class="slot"><time>8:00</time><div class="now"><b>Química · 3.º A</b><small>Aula 302 · Alcanos · ahora</small></div></div>
               <div class="slot"><time>9:30</time><div><b>Química · 1.º A</b><small>Laboratorio</small></div></div>
