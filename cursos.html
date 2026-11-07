@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=202611071526">
+<link rel="stylesheet" href="assets/styles.css?v=202611071533">
 </head>
 <body data-page="cursos">
 <div class="app">
@@ -17,7 +17,7 @@
   <div class="main">
     <header class="topbar" id="topbar"></header>
 
-    <section class="page-band">
+    <section class="page-band ">
       <svg class="stars" aria-hidden="true"><use href="#deco-stars"></use></svg>
       <div class="inner">
         <div class="course-head">
@@ -28,80 +28,90 @@
     </section>
 
     <main class="content overlap">
-      <div class="sedes" role="group" aria-label="Sede">
-        <button class="sede" type="button" data-sede-btn="s1" aria-pressed="true"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-home"></use></svg>Sede principal <span class="n">7</span></button>
-        <button class="sede" type="button" data-sede-btn="s2" aria-pressed="false"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-home"></use></svg>Sede 2 <span class="n">2</span></button>
-      </div>
+      <div class="sede-tabs" role="group" aria-label="Elegir sede"><button class="sede-tab" type="button" data-sede-btn="mazo" aria-pressed="true"><span class="ico-tile"><svg class="ico " aria-hidden="true"><use href="#i-school"></use></svg></span><span><b>Sede Mazo</b><small><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"></use></svg>Mazo · Végueta</small></span><span class="count" aria-label="9 aulas">9</span></button><button class="sede-tab" type="button" data-sede-btn="huacho" aria-pressed="false"><span class="ico-tile"><svg class="ico " aria-hidden="true"><use href="#i-school"></use></svg></span><span><b>Sede Huacho</b><small><svg class="ico ico-sm" aria-hidden="true"><use href="#i-pin"></use></svg>Huacho</small></span><span class="count" aria-label="2 aulas">2</span></button></div>
       <p class="prop-note"><b>Lo académico de cada curso:</b> registro de notas, asistencia, lista de estudiantes y sílabo. Para tareas, material, foros y exámenes virtuales entra al <a href="aula-virtual.html">Aula virtual</a>.</p>
-      <div class="sede-block" data-sede="s1"><div class="level-title"><h2>Secundaria</h2><span></span></div><div class="aula-grid" style="margin-top:16px"><article class="card aula" data-sede="s1">
-  <div class="head"><span class="badge ">1A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">1.º A · Secundaria · 30 estudiantes</div></div></div>
-  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>82 %</strong></div><div class="progress"><span style="width:82%"></span></div></div>
-  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
-  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
-  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article>
-<article class="card aula" data-sede="s1">
-  <div class="head"><span class="badge y">2A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">2.º A · Secundaria · 28 estudiantes</div></div></div>
-  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>74 %</strong></div><div class="progress"><span style="width:74%"></span></div></div>
-  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
-  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
-  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article>
-<article class="card aula" data-sede="s1">
-  <div class="head"><span class="badge y">2B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">2.º B · Secundaria · 29 estudiantes</div></div></div>
-  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>90 %</strong></div><div class="progress"><span style="width:90%"></span></div></div>
-  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
-  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
-  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article>
-<article class="card aula" data-sede="s1">
-  <div class="head"><span class="badge ">3A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">3.º A · Secundaria · 31 estudiantes</div></div></div>
-  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>61 %</strong></div><div class="progress"><span style="width:61%"></span></div></div>
-  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
-  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
-  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article>
-<article class="card aula" data-sede="s1">
-  <div class="head"><span class="badge n">3A<small>Tutoría</small></span><div><h3>Tutoría</h3><div class="sub">3.º A · Secundaria · 31 estudiantes</div></div></div>
-  <div class="sub">Tutor del aula · conducta, reuniones con padres y libreta del salón</div>
-  <a class="btn btn-primary enter" href="#"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>Ver mi salón</a>
-  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-chat"></use></svg>Padres</a></div>
-  <a class="to-aula" href="aula-virtual.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article>
-<article class="card aula" data-sede="s1">
-  <div class="head"><span class="badge ">4A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">4.º A · Secundaria · 27 estudiantes</div></div></div>
-  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>55 %</strong></div><div class="progress"><span style="width:55%"></span></div></div>
-  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
-  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
-  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article>
-<article class="card aula" data-sede="s1">
-  <div class="head"><span class="badge n">5A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">5.º A · Secundaria · 26 estudiantes</div></div></div>
-  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>48 %</strong></div><div class="progress"><span style="width:48%"></span></div></div>
-  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
-  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
-  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article></div></div><div class="sede-block" data-sede="s2"><div class="level-title"><h2>Secundaria</h2><span></span></div><div class="aula-grid" style="margin-top:16px"><article class="card aula" data-sede="s2">
-  <div class="head"><span class="badge ">1B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">1.º B · Secundaria · 25 estudiantes</div></div></div>
+      <div class="sede-block" data-sede="mazo"><section class="level lv-primaria" aria-label="Primaria"><div class="level-head"><span class="ico-tile"><svg class="ico " aria-hidden="true"><use href="#i-primaria"></use></svg></span><h2>Primaria</h2><small>2 aulas</small><span class="line"></span></div><div class="aula-grid"><article class="card aula" style="--curso:#0F766E">
+  <div class="head"><span class="badge curso">5A<small>Prim.</small></span><div><h3>Ciencia y Tecnología</h3><div class="sub">5.º A · Primaria · 27 estudiantes</div></div></div>
   <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>70 %</strong></div><div class="progress"><span style="width:70%"></span></div></div>
   <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
   <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
   <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
 </article>
-<article class="card aula" data-sede="s2">
-  <div class="head"><span class="badge y">3B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">3.º B · Secundaria · 24 estudiantes</div></div></div>
+<article class="card aula" style="--curso:#0F766E">
+  <div class="head"><span class="badge curso">6A<small>Prim.</small></span><div><h3>Ciencia y Tecnología</h3><div class="sub">6.º A · Primaria · 26 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>64 %</strong></div><div class="progress"><span style="width:64%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article></div></section><section class="level lv-secundaria" aria-label="Secundaria"><div class="level-head"><span class="ico-tile"><svg class="ico " aria-hidden="true"><use href="#i-secundaria"></use></svg></span><h2>Secundaria</h2><small>7 aulas</small><span class="line"></span></div><div class="aula-grid"><article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">1A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">1.º A · Secundaria · 30 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>82 %</strong></div><div class="progress"><span style="width:82%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article>
+<article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">2A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">2.º A · Secundaria · 28 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>74 %</strong></div><div class="progress"><span style="width:74%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article>
+<article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">2B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">2.º B · Secundaria · 29 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>90 %</strong></div><div class="progress"><span style="width:90%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article>
+<article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">3A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">3.º A · Secundaria · 31 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>61 %</strong></div><div class="progress"><span style="width:61%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article>
+<article class="card aula" style="--curso:#0B2266">
+  <div class="head"><span class="badge curso">3A<small>Tutoría</small></span><div><h3>Tutoría</h3><div class="sub">3.º A · Secundaria · 31 estudiantes</div></div></div>
+  <div class="sub">Tutor del aula · conducta, reuniones con padres y libreta del salón</div>
+  <a class="btn btn-primary enter" href="#"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>Ver mi salón</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-chat"></use></svg>Padres</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article>
+<article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">4A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">4.º A · Secundaria · 27 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>55 %</strong></div><div class="progress"><span style="width:55%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article>
+<article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">5A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">5.º A · Secundaria · 26 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>48 %</strong></div><div class="progress"><span style="width:48%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article></div></section></div><div class="sede-block" data-sede="huacho"><section class="level lv-secundaria" aria-label="Secundaria"><div class="level-head"><span class="ico-tile"><svg class="ico " aria-hidden="true"><use href="#i-secundaria"></use></svg></span><h2>Secundaria</h2><small>2 aulas</small><span class="line"></span></div><div class="aula-grid"><article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">1B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">1.º B · Secundaria · 25 estudiantes</div></div></div>
+  <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>70 %</strong></div><div class="progress"><span style="width:70%"></span></div></div>
+  <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
+  <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
+  <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
+</article>
+<article class="card aula" style="--curso:#6D28D9">
+  <div class="head"><span class="badge curso">3B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">3.º B · Secundaria · 24 estudiantes</div></div></div>
   <div><div class="progress-row"><span>Notas registradas · IV Bimestre</span><strong>66 %</strong></div><div class="progress"><span style="width:66%"></span></div></div>
   <a class="btn btn-primary enter" href="notas.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-grade"></use></svg>Registrar notas</a>
   <div class="acts"><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-users"></use></svg>Estudiantes</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-exam"></use></svg>Sílabo</a></div>
   <a class="to-aula" href="curso.html"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-star"></use></svg>Ir al aula virtual de este curso</a>
-</article></div></div>
+</article></div></section></div>
     </main>
   </div>
 </div>
-<script src="assets/app.js?v=202611071526"></script>
+<script src="assets/app.js?v=202611071533"></script>
 <script>
 (function () {
-  var sede = 's1';
+  var sede = 'mazo';
   function apply() {
     document.querySelectorAll('.sede-block').forEach(function (s) { s.hidden = s.getAttribute('data-sede') !== sede; });
     document.querySelectorAll('[data-sede-btn]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-sede-btn') === sede ? 'true' : 'false'); });

@@ -77,6 +77,16 @@
            '<rect x="4" y="12" width="16" height="8.5" rx="2"/><path d="M4 15.5c2 1.5 4 1.5 6 0s4-1.5 6 0 3 1 4 .5"/><path d="M12 12V8.5"/><path d="M12 4.5c1 1.2 1 2.4 0 3-1-.6-1-1.8 0-3z"/>'],
     timer: ['<path d="M12 6a7 7 0 0 1 7 7h-7z"/>',
             '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 1.5M10 2.5h4"/>'],
+    school: ['<path d="M5 10.5h14V20H5z"/>',
+             '<path d="M3 20.5h18M5 20.5v-10L12 6l7 4.5v10"/><path d="M12 6V2.8h3.2"/><path d="M10 20.5v-4h4v4"/><path d="M8.2 13.2h.01M15.8 13.2h.01"/>'],
+    pin: ['<circle cx="12" cy="10" r="3"/>',
+          '<path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.6"/>'],
+    inicial: ['<rect x="13" y="12.5" width="7" height="7" rx="1.5"/><rect x="8.5" y="4" width="7" height="7" rx="1.5"/>',
+              '<rect x="4" y="12.5" width="7" height="7" rx="1.5"/><rect x="13" y="12.5" width="7" height="7" rx="1.5"/><rect x="8.5" y="4" width="7" height="7" rx="1.5"/><path d="M6.5 17.6 7.5 14.4l1 3.2M6.9 16.6h1.3M15.2 14.5h1.4a1 1 0 0 1 0 2H15.2v-2zm0 2h1.6a1 1 0 0 1 0 2h-1.6z" stroke-width="1.3"/>'],
+    primaria: ['<path d="M6.5 11h11v8.5a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1z"/>',
+               '<path d="M6 9.5a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1z"/><path d="M9.5 5.5V4a2.5 2.5 0 0 1 5 0v1.5"/><path d="M9 13.5h6v3H9z"/>'],
+    secundaria: ['<path d="M12 5 2.5 9.5 12 14l9.5-4.5z"/>',
+                 '<path d="M12 5 2.5 9.5 12 14l9.5-4.5z"/><path d="M6.5 11.6V16c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.4"/><path d="M21.5 9.5v5"/>'],
     star: ['<path d="' + star(12, 12.5, 9, 3.9) + '"/>',
            '<path d="' + star(12, 12.5, 9, 3.9) + '"/>'],
     arrow: ['', '<path d="M5 12h14M13 6l6 6-6 6"/>'],
@@ -106,7 +116,8 @@
     ['', [
       ['inicio', 'Inicio', 'panel.html', 'home'],
       ['cursos', 'Mis cursos', 'cursos.html', 'book'],
-      ['horario', 'Horario', 'horario.html', 'clock']
+      ['horario', 'Horario', 'horario.html', 'clock'],
+      ['aula', 'Aula virtual', 'aula-virtual.html', 'star', 0, 'hl']
     ]],
     ['Comunicación', [
       ['agenda', 'Agenda', '#', 'calendar'],
@@ -121,11 +132,10 @@
     NAV.forEach(function (g) {
       h += '<div class="nav-group">' + (g[0] ? '<div class="nav-label">' + g[0] + '</div>' : '') + '<div class="nav">';
       g[1].forEach(function (n) {
-        h += '<a href="' + n[2] + '"' + (n[0] === page ? ' aria-current="page"' : '') + '>' + ico(n[3]) + '<span>' + n[1] + '</span>' +
+        h += '<a href="' + n[2] + '"' + (n[5] ? ' class="' + n[5] + '"' : '') + (n[0] === page ? ' aria-current="page"' : '') + '>' + ico(n[3]) + '<span>' + n[1] + '</span>' +
           (n[4] ? '<span class="count" aria-label="' + n[4] + ' sin leer">' + n[4] + '</span>' : '') + '</a>';
       });
       h += '</div></div>';
-      if (!g[0]) h += '<a class="aula-btn" href="aula-virtual.html"' + (page === 'aula' ? ' aria-current="page"' : '') + '>' + ico('star') + '<span><b>Aula virtual</b><small>Tareas, material, foros y exámenes</small></span>' + ico('arrow', 'ico-sm') + '</a>';
     });
     h += '</nav><div class="sidebar-foot nav">' +
       '<a href="#">' + ico('user') + '<span>Mi perfil</span></a>' +

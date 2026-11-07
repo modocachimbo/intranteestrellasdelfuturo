@@ -22,6 +22,12 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 - **Gestión académica**: registro de notas oficial, asistencia y horario. El docente registra; estudiantes, padres y tutores consultan según su rol.
 - El puente: las notas de tareas y exámenes del aula virtual se envían al registro oficial con "Enviar al registro".
 
+## Organización de aulas
+
+- **Sedes**: Sede Mazo (Mazo · Végueta) y Sede Huacho, como filtro arriba.
+- **Niveles** dentro de cada sede, en orden Inicial → Primaria → Secundaria; solo se muestran los que tiene el profesor.
+- **Un color por curso** (Matemática, Comunicación, Ciencia y Tecnología, Química, Física, Biología, Ciencias Sociales, Inglés, Arte y Cultura, Educación Física, Educación Religiosa, Computación, Tutoría), el mismo en Mis cursos y en Aula virtual.
+
 ## Sistema visual
 
 - **Colores** (del logo): azul rey `#1E4FC4`, azul marino `#0B2266` y amarillo estrella `#FFD43B`.
