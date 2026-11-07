@@ -12,7 +12,7 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 | `horario.html` | Horario semanal con recreos; cada clase abre su aula virtual. |
 | `cursos.html` | Mis cursos (académico): registrar notas, asistencia, estudiantes y sílabo por curso, filtrado por sede. |
 | `aula-virtual.html` | Aula virtual: una portada por curso y sección (botón destacado en el menú). |
-| `curso.html` | Aula virtual (aprender): Tablero, Temario, Material, Tareas, Exámenes virtuales, Foro y Clases en vivo. Las notas de tareas se envían al registro con un botón. |
+| `curso.html` | Aula virtual estilo Moodle: semanas/unidades con actividades y recursos, índice del curso, bloques (enviar al registro, por calificar, eventos, actividad reciente), modo edición y ventanas para añadir actividades. |
 | `notas.html` | Registro de notas numéricas (0–20) por competencias, con promedios automáticos y conclusión descriptiva. |
 | `movil.html` | Vista previa de la intranet dentro de un celular. |
 
@@ -33,6 +33,7 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 - **Colores** (del logo): azul rey `#1E4FC4`, azul marino `#0B2266` y amarillo estrella `#FFD43B`.
 - **Tipografía**: *Outfit* para títulos y *Plus Jakarta Sans* para textos (Google Fonts).
 - **Iconos propios**: duotono (trazo azul + relleno amarillo), definidos en `assets/app.js`.
+- Aula virtual: `assets/aula.css` y `assets/aula.js` (modo edición, ventanas, menús).
 - Estilos en `assets/styles.css`; menú lateral y barra superior se generan en `assets/app.js`.
 - En celular el menú se abre con ☰.
 
