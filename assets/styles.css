@@ -487,3 +487,14 @@ input.nota.g-x { background: #fff; border: 1.5px dashed #9AA4BF; }
 
 [hidden] { display: none !important; }
 @media (max-width: 720px) { .switch { border-radius: 18px; width: 100%; } .switch button { flex: 1 1 100%; border-radius: 12px; text-align: left; } }
+
+/* Menú agrupado */
+.nav-groups { display: flex; flex-direction: column; gap: 14px; }
+.nav-group { display: flex; flex-direction: column; gap: 6px; }
+.nav-group .nav-label { margin: 0; padding: 0 12px; }
+.sidebar { gap: 18px; }
+/* Puente aula virtual → registro */
+.bridge { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 14px 18px; border-radius: var(--r-lg); background: var(--azul-50); border: 1px solid var(--azul-200); }
+.bridge .grow { flex: 1 1 260px; min-width: 0; font-size: 14px; color: var(--tinta-2); }
+.bridge b { color: var(--azul-900); }
+.sede[aria-pressed="true"] { background: var(--azul-900); border-color: var(--azul-900); box-shadow: var(--sombra-2); }

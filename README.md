@@ -10,10 +10,16 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 | `index.html` | Ingreso con el código de usuario que entrega la administración. |
 | `panel.html` | Inicio del docente: bienvenida, aviso de cierre de notas, indicadores, estadística académica por rangos de nota, estrella del bimestre, mis cursos, semana y horario de hoy, comunicados y cumpleaños. |
 | `horario.html` | Horario semanal con recreos; cada clase abre su aula virtual. |
-| `cursos.html` | Mis cursos: 3 propuestas para ordenar sedes, grados y secciones (cada sección = su aula virtual). |
-| `curso.html` | Aula virtual del curso (Tablero, Cronología, Clases en vivo, Tareas, Exámenes, Material, Calificaciones, Asistencia, Foro). |
+| `cursos.html` | Mis aulas virtuales: una portada por curso y sección, filtradas por sede. |
+| `curso.html` | Aula virtual (aprender): Tablero, Temario, Material, Tareas, Exámenes virtuales, Foro y Clases en vivo. Las notas de tareas se envían al registro con un botón. |
 | `notas.html` | Registro de notas numéricas (0–20) por competencias, con promedios automáticos y conclusión descriptiva. |
 | `movil.html` | Vista previa de la intranet dentro de un celular. |
+
+## Aula virtual vs. gestión académica
+
+- **Aula virtual** (por curso y sección): para enseñar y aprender. Solo docente y estudiantes del aula.
+- **Gestión académica**: registro de notas oficial, asistencia y horario. El docente registra; estudiantes, padres y tutores consultan según su rol.
+- El puente: las notas de tareas y exámenes del aula virtual se envían al registro oficial con "Enviar al registro".
 
 ## Sistema visual
 

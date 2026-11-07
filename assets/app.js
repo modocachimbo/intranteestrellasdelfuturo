@@ -101,23 +101,36 @@
 
   // ---------- Menú lateral ----------
   var page = document.body.getAttribute('data-page');
+  // Grupos del menú: el aula virtual (aprender) separada de la gestión académica (oficial)
   var NAV = [
-    ['inicio', 'Inicio', 'panel.html', 'home'],
-    ['cursos', 'Mis cursos', 'cursos.html', 'book'],
-    ['notas', 'Registro de notas', 'notas.html', 'grade'],
-    ['asistencia', 'Asistencia', '#', 'check'],
-    ['horario', 'Horario', 'horario.html', 'clock'],
-    ['agenda', 'Agenda', '#', 'calendar'],
-    ['mensajes', 'Mensajes', '#', 'chat', 3],
-    ['comunicados', 'Comunicados', '#', 'megaphone']
+    ['', [
+      ['inicio', 'Inicio', 'panel.html', 'home']
+    ]],
+    ['Aula virtual', [
+      ['cursos', 'Mis aulas virtuales', 'cursos.html', 'book']
+    ]],
+    ['Gestión académica', [
+      ['notas', 'Registro de notas', 'notas.html', 'grade'],
+      ['asistencia', 'Asistencia', '#', 'check'],
+      ['horario', 'Horario', 'horario.html', 'clock']
+    ]],
+    ['Comunicación', [
+      ['agenda', 'Agenda', '#', 'calendar'],
+      ['mensajes', 'Mensajes', '#', 'chat', 3],
+      ['comunicados', 'Comunicados', '#', 'megaphone']
+    ]]
   ];
   var sb = document.getElementById('sidebar');
   if (sb) {
     var h = '<a class="brand" href="panel.html"><img src="logo.png" alt=""><span><b>Las Estrellas<br>del Futuro</b><small>Intranet 2026</small></span></a>';
-    h += '<div class="nav-label">Principal</div><nav class="nav" aria-label="Menú principal">';
-    NAV.forEach(function (n) {
-      h += '<a href="' + n[2] + '"' + (n[0] === page ? ' aria-current="page"' : '') + '>' + ico(n[3]) + '<span>' + n[1] + '</span>' +
-        (n[4] ? '<span class="count" aria-label="' + n[4] + ' sin leer">' + n[4] + '</span>' : '') + '</a>';
+    h += '<nav class="nav-groups" aria-label="Menú principal">';
+    NAV.forEach(function (g) {
+      h += '<div class="nav-group">' + (g[0] ? '<div class="nav-label">' + g[0] + '</div>' : '') + '<div class="nav">';
+      g[1].forEach(function (n) {
+        h += '<a href="' + n[2] + '"' + (n[0] === page ? ' aria-current="page"' : '') + '>' + ico(n[3]) + '<span>' + n[1] + '</span>' +
+          (n[4] ? '<span class="count" aria-label="' + n[4] + ' sin leer">' + n[4] + '</span>' : '') + '</a>';
+      });
+      h += '</div></div>';
     });
     h += '</nav><div class="sidebar-foot nav">' +
       '<a href="#">' + ico('user') + '<span>Mi perfil</span></a>' +

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=202611071518">
+<link rel="stylesheet" href="assets/styles.css?v=202611071523">
 </head>
 <body data-page="cursos">
 <div class="app">
@@ -20,7 +20,7 @@
     <section class="page-band">
       <svg class="stars" aria-hidden="true"><use href="#deco-stars"></use></svg>
       <div class="inner">
-        <nav class="crumbs" aria-label="Ruta"><a href="panel.html">Inicio</a><span aria-hidden="true">/</span><a href="panel.html">Mis cursos</a><span aria-hidden="true">/</span><span>Química 3.º A</span></nav>
+        <nav class="crumbs" aria-label="Ruta"><a href="panel.html">Inicio</a><span aria-hidden="true">/</span><a href="cursos.html">Mis aulas virtuales</a><span aria-hidden="true">/</span><span>Química 3.º A</span></nav>
         <div class="course-head">
           <span class="ico-tile"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-flask"></use></svg></span>
           <div><h1>Química</h1><p>3.º A Secundaria · 31 estudiantes · Lun y Mié, 8:00 a. m.</p></div>
@@ -35,14 +35,12 @@
     <main class="content overlap">
       <nav class="tabs" role="tablist" aria-label="Secciones del curso">
         <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-grid"></use></svg>Tablero</a>
-        <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-timeline"></use></svg>Cronología</a>
-        <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-video"></use></svg>Clases en vivo</a>
-        <a class="tab" role="tab" aria-selected="true" href="#"><svg class="ico" aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a>
-        <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-exam"></use></svg>Exámenes</a>
+        <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-timeline"></use></svg>Temario</a>
         <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-folder"></use></svg>Material</a>
-        <a class="tab" role="tab" aria-selected="false" href="notas.html"><svg class="ico" aria-hidden="true"><use href="#i-grade"></use></svg>Calificaciones</a>
-        <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a>
+        <a class="tab" role="tab" aria-selected="true" href="#"><svg class="ico" aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a>
+        <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-exam"></use></svg>Exámenes virtuales</a>
         <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-chat"></use></svg>Foro</a>
+        <a class="tab" role="tab" aria-selected="false" href="#"><svg class="ico" aria-hidden="true"><use href="#i-video"></use></svg>Clases en vivo</a>
       </nav>
 
       <div class="toolbar">
@@ -60,6 +58,12 @@
           <button class="filter" type="button" aria-pressed="false">Borradores · 1</button>
         </div>
       </div>
+
+      <section class="bridge" aria-label="Enviar notas al registro">
+        <span class="ico-tile"><svg class="ico" aria-hidden="true"><use href="#i-grade"></use></svg></span>
+        <div class="grow"><b>2 tareas calificadas listas para el registro.</b> Las notas del aula virtual no son oficiales hasta que las envíes al Registro de notas, que es lo que ven estudiantes y padres.</div>
+        <a class="btn btn-primary" href="notas.html">Enviar al registro <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+      </section>
 
       <section class="card table-wrap">
         <table class="data" style="min-width:820px">
@@ -120,7 +124,7 @@
 
       <div class="grid-main" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
         <section class="card card-pad">
-          <div class="card-head"><h2>Próximos temas</h2><a href="#">Cronología</a></div>
+          <div class="card-head"><h2>Próximos temas</h2><a href="#">Ver temario</a></div>
           <div class="timeline">
             <div class="slot"><time>9 nov</time><div><b>Alcanos: nomenclatura IUPAC</b><small><span class="chip green" style="padding:2px 8px">Dictado</span></small></div></div>
             <div class="slot"><time>16 nov</time><div><b>Alquenos y alquinos</b><small><span class="chip yellow" style="padding:2px 8px">Pendiente</span></small></div></div>
@@ -137,6 +141,6 @@
     </main>
   </div>
 </div>
-<script src="assets/app.js?v=202611071518"></script>
+<script src="assets/app.js?v=202611071523"></script>
 </body>
 </html>
