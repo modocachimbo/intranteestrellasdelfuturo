@@ -3,12 +3,15 @@ import { TYPES } from './catalog';
 import { fechaHora, hora, now as nowFn, today } from './calendar';
 import { QUIMICA_3A } from './data/quimica-3a';
 import { BANK } from './data/extras';
-import { STUDENTS, submissionsFor, summary } from './data/students';
+import { STUDENTS, shortName, submissionsFor, summary } from './data/students';
 import {
   banner, bridgeStrip, chooserDialog, esc, formDialog, indexPanel, introHeader, periodFooter,
   periodHeader, toolbar, unitHeader, week, weekState,
 } from './render';
 import { activityView } from './views/activity';
+import { effectiveReview, reviewView } from './views/review';
+import { getReview, rubricTotal, saveReview } from './reviews';
+import type { Review } from './reviews';
 import { bankRow, bankView, csv, gradebookView, gradedColumns, participantsView, questionDialog, reportsView } from './views/tabs';
 import { Store, allWeeks } from './store';
 import { MIS_SECCIONES, label, linksRow, loadShares, saveShares, shareDialog } from './views/share';
@@ -37,11 +40,16 @@ const periodOf = (w: Week): string => w.number === 0 ? 's0'
 const CURRENT_PERIOD = periodOf(currentWeek);
 const currentPeriodObj = () => course.periods.find((p) => p.id === (CURRENT_PERIOD === 's0' ? 'b1' : CURRENT_PERIOD))!;
 
+/** Entregas con las revisiones guardadas por el docente aplicadas. */
+function subsWithReviews(a: Activity) {
+  return submissionsFor(a, NOW).map((x) => { const r = getReview(a.id, x.student.id); return r ? { ...x, grade: r.grade ?? undefined, feedback: r.feedback } : x; });
+}
+
 /** Completa los textos de la lista a partir de las fechas y las entregas. */
 function derive(a: Activity): void {
   const t = a.type;
   if (t === 'assign' && a.due) {
-    const s = summary(submissionsFor(a, NOW));
+    const s = summary(subsWithReviews(a));
     a.info = NOW <= a.due ? `Vence: ${fechaHora(a.due)}` : `Venció: ${fechaHora(a.due)}`;
     a.stat = NOW <= a.due ? `${s.sent}/${s.total} entregaron` : s.toGrade ? `${s.toGrade} por calificar` : `${s.sent}/${s.total} entregaron`;
   } else if ((t === 'quiz' || t === 'h5p') && (a.close || a.due)) {
@@ -124,6 +132,11 @@ function render(): void {
   const r = state.route;
   let body = '';
   let tab = 'curso';
+  if (r.startsWith('r-')) {
+    const html = renderReview();
+    if (html) { root.innerHTML = html; setEditing(state.editing, false); return; }
+    state.route = 'curso'; render(); return;
+  }
   if (r.startsWith('a-')) {
     const list = flatActivities();
     const i = list.findIndex((x) => x.a.id === r.slice(2));
@@ -156,6 +169,7 @@ const scrollTo = (id: string, smooth = true) => requestAnimationFrame(() =>
 
 function route(smooth: boolean): void {
   const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith('r-')) { openReviewRoute(h); return; }
   if (h.startsWith('a-') || ['participantes', 'calificaciones', 'banco', 'informes'].includes(h)) {
     state.route = h; render();
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -426,6 +440,178 @@ function updateShareSummary(): void {
   }, 900 + to.length * 450);
 });
 
+
+// ---------- Revisión de tareas ----------
+const rvState = {
+  aid: '', index: 0, work: null as Review | null, dirty: false,
+  onlyPending: ls.get('ef-rv-pending') !== '0', zoom: 1, tool: 'none',
+};
+
+function rvContext() {
+  const f = findActivity(rvState.aid);
+  if (!f) return null;
+  const subs = submissionsFor(f.a, NOW);
+  return { f, subs };
+}
+
+function openReviewRoute(h: string): void {
+  const m = h.match(/^r-(.+)-(\d+)$/);
+  if (!m) return;
+  if (rvState.dirty) saveWork('draft', true);
+  rvState.aid = m[1]; rvState.index = Number(m[2]); rvState.work = null; rvState.dirty = false;
+  state.route = h;
+  render();
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function renderReview(): string | null {
+  const ctx = rvContext();
+  if (!ctx) return null;
+  const { f, subs } = ctx;
+  const i = Math.min(rvState.index, subs.length - 1);
+  const sub = subs[i];
+  if (!rvState.work) rvState.work = structuredCloneSafe(effectiveReview(sub, getReview(f.a.id, sub.student.id)));
+  return reviewView({
+    a: f.a, week: f.w, subs, index: i, review: rvState.work,
+    reviews: subs.map((x) => getReview(f.a.id, x.student.id)),
+    onlyPending: rvState.onlyPending, zoom: rvState.zoom, tool: rvState.tool,
+  });
+}
+const structuredCloneSafe = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
+
+function rerenderReview(keepScroll = true): void {
+  const y = window.scrollY;
+  const vy = $('#viewer')?.scrollTop ?? 0;
+  const html = renderReview();
+  if (html) root.innerHTML = html;
+  if (keepScroll) { window.scrollTo(0, y); const v = $('#viewer'); if (v) v.scrollTop = vy; }
+}
+
+function saveWork(kind: 'draft' | 'returned' | 'next' | 'graded', silent = false): void {
+  const ctx = rvContext();
+  if (!ctx || !rvState.work) return;
+  const sub = ctx.subs[rvState.index];
+  const w = rvState.work;
+  w.state = kind === 'returned' ? 'returned' : w.grade !== null ? 'graded' : 'draft';
+  w.updated = new Date().toISOString();
+  saveReview(ctx.f.a.id, sub.student.id, w);
+  derive(ctx.f.a);
+  rvState.dirty = false;
+  if (!silent) {
+    const who = shortName(sub.student);
+    toast(kind === 'returned' ? `Devuelta a ${who} para que corrija y vuelva a entregar` : w.grade !== null ? `Guardado: ${who} · ${w.grade}/20` : `Borrador guardado: ${who}`);
+  }
+}
+
+function goStudent(step: number, fromSave = false): void {
+  const ctx = rvContext();
+  if (!ctx) return;
+  const { f, subs } = ctx;
+  const n = subs.length;
+  const isPending = (k: number) => {
+    const s = subs[k]; const r = getReview(f.a.id, s.student.id);
+    return (s.status === 'ontime' || s.status === 'late') && (r ? r.grade === null : s.grade === undefined);
+  };
+  let k = rvState.index;
+  for (let t = 0; t < n; t++) {
+    k = (k + step + n) % n;
+    if (!rvState.onlyPending || isPending(k)) { location.hash = `r-${f.a.id}-${k}`; return; }
+  }
+  if (fromSave) { toast('¡Listo! No quedan entregas por calificar en esta tarea.'); location.hash = `a-${f.a.id}`; }
+  else toast('No hay más entregas por calificar.');
+}
+
+function placeMark(paper: HTMLElement, ev: MouseEvent): void {
+  if (!rvState.work || !['ok', 'bad', 'note'].includes(rvState.tool)) return;
+  const box = paper.getBoundingClientRect();
+  const x = Math.round(((ev.clientX - box.left) / box.width) * 1000) / 10;
+  const y = Math.round(((ev.clientY - box.top) / box.height) * 1000) / 10;
+  rvState.work.marks.push({ x, y, page: Number(paper.dataset.page), kind: rvState.tool as 'ok' | 'bad' | 'note', text: '' });
+  rvState.dirty = true;
+  rerenderReview();
+  if (rvState.tool === 'note') {
+    const bubbles = $$<HTMLElement>('.note-bubble');
+    bubbles[bubbles.length - 1]?.focus();
+  }
+}
+
+function setRubric(ci: number, pts: number): void {
+  const w = rvState.work!;
+  w.rubric[ci] = pts;
+  const t = rubricTotal(w.rubric);
+  if (!w.manual && t !== null) w.grade = t;
+  rvState.dirty = true;
+  rerenderReview();
+}
+
+function handleReviewClick(el: HTMLElement, e: MouseEvent): boolean {
+  if (!state.route.startsWith('r-')) return false;
+  const w = rvState.work;
+  const tool = el.closest<HTMLElement>('[data-tool]');
+  if (tool) { rvState.tool = tool.dataset.tool!; rerenderReview(); return true; }
+  const z = el.closest<HTMLElement>('[data-zoom]');
+  if (z) { rvState.zoom = Math.min(1.6, Math.max(0.6, Math.round((rvState.zoom + Number(z.dataset.zoom) * 0.1) * 10) / 10)); rerenderReview(); return true; }
+  const mk = el.closest<HTMLElement>('[data-mark]');
+  if (mk && w) {
+    if (rvState.tool === 'erase') { w.marks.splice(Number(mk.dataset.mark), 1); rvState.dirty = true; rerenderReview(); }
+    return true;
+  }
+  const paper = el.closest<HTMLElement>('.paper');
+  if (paper) { placeMark(paper, e); return true; }
+  const lvl = el.closest<HTMLElement>('.lvl');
+  if (lvl && w) { setRubric(Number(lvl.dataset.crit), Number(lvl.dataset.pts)); return true; }
+  if (el.closest('[data-use-rubric]') && w) { w.grade = rubricTotal(w.rubric); w.manual = false; rvState.dirty = true; rerenderReview(); return true; }
+  const qc = el.closest<HTMLElement>('[data-quick]');
+  if (qc && w) {
+    const ta = $('#rv-feedback') as HTMLTextAreaElement;
+    w.feedback = (ta.value.trim() ? ta.value.trim() + ' ' : '') + qc.dataset.quick;
+    ta.value = w.feedback; ta.focus(); rvState.dirty = true; return true;
+  }
+  if (el.closest('[data-grade-zero]') && w) { w.grade = 0; w.manual = true; w.feedback = w.feedback || 'No entregó (NE).'; saveWork('graded'); rerenderReview(); return true; }
+  const sv = el.closest<HTMLElement>('[data-rv-save]');
+  if (sv) {
+    const kind = sv.dataset.rvSave as 'draft' | 'returned' | 'next';
+    if (kind === 'next' && w && w.grade === null && rvContext()!.subs[rvState.index].status !== 'open' && rvContext()!.subs[rvState.index].status !== 'missing') {
+      toast('Falta la nota: completa la rúbrica o escribe la nota final.'); ($('#rv-grade') as HTMLInputElement)?.focus(); return true;
+    }
+    saveWork(kind === 'next' ? 'graded' : kind);
+    if (kind === 'next') goStudent(1, true); else rerenderReview();
+    return true;
+  }
+  const st = el.closest<HTMLElement>('[data-rv-step]');
+  if (st) { goStudent(Number(st.dataset.rvStep)); return true; }
+  return false;
+}
+
+document.addEventListener('change', (e) => {
+  const el = e.target as HTMLInputElement;
+  if (el.id === 'rv-select') { location.hash = `r-${rvState.aid}-${el.value}`; }
+  if (el.id === 'rv-pending') { rvState.onlyPending = el.checked; ls.set('ef-rv-pending', el.checked ? '1' : '0'); }
+});
+
+document.addEventListener('input', (e) => {
+  const el = e.target as HTMLElement;
+  const w = rvState.work;
+  if (!w || !state.route.startsWith('r-')) return;
+  if (el.id === 'rv-grade') {
+    const inp = el as HTMLInputElement;
+    const v = inp.value === '' ? null : Math.max(0, Math.min(20, Math.round(Number(inp.value))));
+    if (v !== null && String(v) !== inp.value) inp.value = String(v);
+    w.grade = v; w.manual = v !== rubricTotal(w.rubric); rvState.dirty = true;
+    inp.className = `grade-big ${v === null ? 'g-x' : v >= 18 ? 'g-ad' : v >= 14 ? 'g-a' : v >= 11 ? 'g-b' : 'g-c'}`;
+  }
+  if (el.id === 'rv-feedback') { w.feedback = (el as HTMLTextAreaElement).value; rvState.dirty = true; }
+  if (el.id === 'rv-private') { w.privateNote = (el as HTMLTextAreaElement).value; rvState.dirty = true; }
+  if (el.classList.contains('note-bubble')) { const m = w.marks[Number(el.dataset.note)]; if (m) { m.text = el.textContent ?? ''; rvState.dirty = true; } }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!state.route.startsWith('r-')) return;
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); ($('[data-rv-save="next"]') as HTMLButtonElement)?.click(); }
+  if (e.altKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); goStudent(e.key === 'ArrowRight' ? 1 : -1); }
+});
+window.addEventListener('beforeunload', () => { if (rvState.dirty) saveWork('draft', true); });
+
 // ---------- Eventos ----------
 function closeMenus(except?: Element): void {
   $$('.menu-pop.open').forEach((m) => {
@@ -459,7 +645,7 @@ function exportCsv(kind: string): void {
     download('participantes-quimica-3A.csv', csv([['Apellidos y nombres', 'Código', 'Grupo', 'Último acceso'], ...STUDENTS.map((s) => [s.name, s.code, s.group, s.lastAccess])]));
   } else if (kind === 'calificaciones') {
     const cols = gradedColumns(currentPeriodObj(), NOW);
-    const subs = cols.map((c) => submissionsFor({ ...c.a, due: c.a.due ?? c.a.close }, NOW));
+    const subs = cols.map((c) => submissionsFor({ ...c.a, due: c.a.due ?? c.a.close }, NOW).map((x) => { const r = getReview(c.a.id, x.student.id); return r ? { ...x, grade: r.grade ?? undefined } : x; }));
     download('calificaciones-quimica-3A.csv', csv([['Estudiante', ...cols.map((c) => `${c.a.name} (${c.comp})`)], ...STUDENTS.map((s, i) => [s.name, ...subs.map((x) => x[i].grade ?? (x[i].status === 'missing' ? 'NE' : ''))])]));
   } else {
     const f = findActivity(state.route.slice(2));
@@ -472,6 +658,7 @@ function exportCsv(kind: string): void {
 
 document.addEventListener('click', (e) => {
   const el = e.target as HTMLElement;
+  if (handleReviewClick(el, e)) return;
 
   // Ventanas
   if (el.closest('[data-close]')) { el.closest('dialog')?.close(); return; }

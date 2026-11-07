@@ -5,6 +5,7 @@ import { fechaHora, fechaLarga, hora, relativo } from '../calendar';
 import { ENCUESTA, GLOSARIO, forumPosts, quizQuestions } from '../data/extras';
 import { STUDENTS, rng, shortName, submissionsFor, summary } from '../data/students';
 import { esc } from '../render';
+import { getReview } from '../reviews';
 import type { Activity, ForumPost, Submission, Week } from '../types';
 
 export interface ActivityCtx {
@@ -72,7 +73,10 @@ function avatar(name: string, i: number): string {
 // ---------- Tarea ----------
 function assignView(c: ActivityCtx): string {
   const a = c.a;
-  const subs = submissionsFor(a, c.now);
+  const subs = submissionsFor(a, c.now).map((x) => {
+    const rv = getReview(a.id, x.student.id);
+    return rv ? { ...x, grade: rv.grade ?? undefined, feedback: rv.feedback || x.feedback, returned: rv.state === 'returned' } : x;
+  });
   const s = summary(subs);
   const due = a.due!;
   const isOpen = c.now <= due;
@@ -84,7 +88,7 @@ function assignView(c: ActivityCtx): string {
       <td><span class="chip ${tone}">${lbl}</span>${x.when ? `<small class="when">${x.when}</small>` : ''}</td>
       <td>${x.file ? `<a href="#" class="file-link" data-fake-download="${x.file}">${ico('file', 'ico-sm')}${x.file}</a>` : '<span class="muted">—</span>'}</td>
       <td><input class="nota ${x.grade !== undefined ? gradeClass(x.grade) : 'g-x'}" type="number" min="0" max="20" inputmode="numeric" value="${x.grade ?? ''}" ${canGrade ? '' : 'disabled'} aria-label="Nota de ${esc(shortName(x.student))}"></td>
-      <td><input class="feedback" type="text" value="${esc(x.feedback ?? '')}" placeholder="${canGrade ? 'Comentario…' : ''}" ${canGrade ? '' : 'disabled'} aria-label="Comentario para ${esc(shortName(x.student))}"></td>
+      <td><a class="btn ${canGrade && x.grade === undefined ? 'btn-primary' : 'btn-ghost'} rv-btn" href="#r-${a.id}-${i}">${canGrade ? (x.grade === undefined ? 'Calificar' : 'Revisar') : 'Ver'}</a>${x.feedback ? `<small class="when fb" title="${esc(x.feedback)}">“${esc(x.feedback.length > 34 ? x.feedback.slice(0, 32) + '…' : x.feedback)}”</small>` : ''}${(x as { returned?: boolean }).returned ? '<small class="when">Devuelta</small>' : ''}</td>
     </tr>`;
   }).join('');
   const chips = chip('calendar', `Abre: ${fechaHora(a.open ?? due)}`) + chip('clock', `Vence: ${fechaHora(due)}`, isOpen ? 'warn' : '') +
@@ -101,12 +105,13 @@ function assignView(c: ActivityCtx): string {
             <button class="filter" type="button" aria-pressed="false" data-sub-filter="tograde">Por calificar · ${s.toGrade}</button>
             <button class="filter" type="button" aria-pressed="false" data-sub-filter="missing">${isOpen ? 'Pendientes' : 'Sin entregar'} · ${isOpen ? s.total - s.sent : s.missing}</button>
           </div></div>
-        <div class="table-wrap"><table class="data subs"><thead><tr><th>Estudiante</th><th>Estado</th><th>Archivo</th><th>Nota</th><th>Comentario</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <div class="table-wrap"><table class="data subs"><thead><tr><th>Estudiante</th><th>Estado</th><th>Archivo</th><th>Nota</th><th>Revisión</th></tr></thead><tbody>${rows}</tbody></table></div>
         <div class="card-foot">
           <button class="btn btn-ghost" type="button" data-toast="Descargando las ${s.sent} entregas en un archivo ZIP…">${ico('download', 'ico-sm')}Descargar todas</button>
           <button class="btn btn-ghost" type="button" data-toast="Se envió un recordatorio a los estudiantes que no entregaron.">${ico('bell', 'ico-sm')}Recordar a quienes faltan</button>
           <span class="grow"></span>
-          <button class="btn btn-primary" type="button" data-save-grades>${ico('save', 'ico-sm')}Guardar calificaciones</button>
+          <button class="btn btn-ghost" type="button" data-save-grades>${ico('save', 'ico-sm')}Guardar notas rápidas</button>
+          <a class="btn btn-primary" href="#r-${a.id}-${Math.max(0, subs.findIndex((x) => (x.status === 'ontime' || x.status === 'late') && x.grade === undefined))}">${ico('checkc', 'ico-sm')}${s.toGrade ? `Calificar entregas (${s.toGrade})` : 'Revisar entregas'}</a>
         </div>
       </section>
     </div>

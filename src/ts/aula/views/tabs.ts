@@ -4,6 +4,7 @@ import { TYPES } from '../catalog';
 import { BANK } from '../data/extras';
 import { STUDENTS, rng, shortName, submissionsFor, summary } from '../data/students';
 import { esc } from '../render';
+import { getReview } from '../reviews';
 import type { Activity, BankQuestion, Course, Period, Student, Week } from '../types';
 
 const gradeClass = (g: number) => (g >= 18 ? 'g-ad' : g >= 14 ? 'g-a' : g >= 11 ? 'g-b' : 'g-c');
@@ -51,7 +52,7 @@ export function gradedColumns(p: Period, now: Date): GradeCol[] {
 
 export function gradebookView(c: Course, p: Period, now: Date): string {
   const cols = gradedColumns(p, now);
-  const subsBy = cols.map((col) => submissionsFor({ ...col.a, due: col.a.due ?? col.a.close }, now));
+  const subsBy = cols.map((col) => submissionsFor({ ...col.a, due: col.a.due ?? col.a.close }, now).map((x) => { const r = getReview(col.a.id, x.student.id); return r ? { ...x, grade: r.grade ?? undefined } : x; }));
   const comps = Array.from(new Set(cols.map((x) => x.comp))).sort();
   const cell = (g: number | undefined, status: string) => g !== undefined ? `<span class="grade ${gradeClass(g)}">${g}</span>`
     : status === 'missing' ? '<span class="grade g-miss" title="No entregó">NE</span>' : '<span class="grade g-x" title="Por calificar">…</span>';
