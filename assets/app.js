@@ -1,0 +1,168 @@
+/* Intranet · IEP Las Estrellas del Futuro
+   Iconos propios (duotono azul + amarillo estrella), menú lateral y barra superior. */
+(function () {
+  'use strict';
+
+  // ---------- Estrella (forma base de la marca) ----------
+  function star(cx, cy, R, r) {
+    var p = [];
+    for (var i = 0; i < 10; i++) {
+      var rad = (Math.PI / 5) * i - Math.PI / 2, d = i % 2 ? r : R;
+      p.push((cx + d * Math.cos(rad)).toFixed(2) + ' ' + (cy + d * Math.sin(rad)).toFixed(2));
+    }
+    return 'M' + p.join(' L') + ' Z';
+  }
+
+  // ---------- Set de iconos ----------
+  // Cada icono: [relleno amarillo, trazo azul]
+  var I = {
+    home: ['<path d="M6 10.2 12 5.6l6 4.6V19h-4v-5h-4v5H6z"/>',
+           '<path d="M3 11 12 4l9 7"/><path d="M5.5 9.6V19a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1V9.6"/>'],
+    book: ['<path d="M7 4h11v13H7a2 2 0 0 0-2 2V6a2 2 0 0 1 2-2z"/>',
+           '<path d="M5 19V6a2 2 0 0 1 2-2h11v13H7a2 2 0 0 0 0 4h11"/><path d="M9 8.5h5"/>'],
+    grade: ['<path d="' + star(12, 14.2, 4.2, 1.8) + '"/>',
+            '<path d="M9 4.5h6v2.5H9z"/><path d="M9 5.7H6.5a1 1 0 0 0-1 1V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V6.7a1 1 0 0 0-1-1H15"/><path stroke-width="1.4" d="' + star(12, 14.2, 4.2, 1.8) + '"/>'],
+    check: ['<circle cx="12" cy="12.5" r="5"/>',
+            '<rect x="4" y="4.5" width="16" height="16" rx="3"/><path d="m8.5 12.5 2.5 2.5 4.8-5"/>'],
+    clock: ['<path d="M12 3a9 9 0 0 1 9 9h-9z"/>',
+            '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>'],
+    calendar: ['<path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3H4z"/>',
+               '<rect x="4" y="5" width="16" height="15.5" rx="2.5"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/><path d="M8.5 14h.01M12 14h.01M15.5 14h.01M8.5 17h.01M12 17h.01"/>'],
+    chat: ['<path d="M10 4h9a2 2 0 0 1 2 2v7l-2.5-2H10a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>',
+           '<path d="M10 4h9a2 2 0 0 1 2 2v7l-2.5-2H10a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M16 14v1.5a2 2 0 0 1-2 2H7.5L4 20.5V10a2 2 0 0 1 2-2h2"/>'],
+    megaphone: ['<path d="M14.5 5.5v13L9 15H6a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h3z"/>',
+                '<path d="M14.5 5.5v13L9 15H6a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h3z"/><path d="M18 9a4 4 0 0 1 0 6"/><path d="m8 15 1.3 5h2.2L10.5 15"/>'],
+    user: ['<circle cx="12" cy="8" r="4"/>',
+           '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>'],
+    logout: ['<path d="M5 4h8v16H5z"/>',
+             '<path d="M13 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h7"/><path d="m16 8 4 4-4 4M20 12H10"/>'],
+    search: ['<circle cx="11" cy="11" r="6.5"/>',
+             '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>'],
+    bell: ['<path d="M6 16v-5a6 6 0 0 1 12 0v5z"/>',
+           '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 21h4"/>'],
+    plus: ['', '<path d="M12 5v14M5 12h14"/>'],
+    chevron: ['', '<path d="m6 9 6 6 6-6"/>'],
+    menu: ['', '<path d="M4 7h16M4 12h16M4 17h10"/>'],
+    edit: ['<path d="M15 5l4 4-9.5 9.5H5.5v-4z"/>',
+           '<path d="M4.5 19.5h4L19 9l-4-4L4.5 15.5z"/><path d="m13 7 4 4"/>'],
+    trash: ['<path d="M6.5 7.5h11l-1 12.5h-9z"/>',
+            '<path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/><path d="M10 11v5M14 11v5"/>'],
+    download: ['<path d="M4 15h16v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>',
+               '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/>'],
+    upload: ['<path d="M4 15h16v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>',
+             '<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/>'],
+    print: ['<rect x="4" y="9" width="16" height="7" rx="1.5"/>',
+            '<path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7.5" rx="2"/><path d="M7 14h10v6H7z"/>'],
+    save: ['<path d="M8 4h8v5H8z"/>',
+           '<path d="M5 4h11l3 3v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M8 4v5h7V4"/><path d="M8 20v-6h8v6"/>'],
+    eye: ['<circle cx="12" cy="12" r="3"/>',
+          '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>'],
+    flask: ['<path d="M7.6 14.5h8.8l2.6 4.6a1 1 0 0 1-.9 1.4H5.9a1 1 0 0 1-.9-1.4z"/>',
+            '<path d="M9 3.5h6M10 3.5v6L4.6 19.1a1 1 0 0 0 .9 1.4h13a1 1 0 0 0 .9-1.4L14 9.5v-6"/><path d="M7.6 14.5h8.8"/>'],
+    grid: ['<rect x="4" y="4" width="7" height="7" rx="2"/>',
+           '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>'],
+    timeline: ['<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/>',
+               '<path d="M6 8.5v7"/><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M11 6h9M11 12h7M11 18h9"/>'],
+    video: ['<rect x="3" y="6.5" width="12" height="11" rx="2.5"/>',
+            '<rect x="3" y="6" width="12.5" height="12" rx="2.5"/><path d="m15.5 10.5 5-3v9l-5-3"/>'],
+    tasks: ['<rect x="3.5" y="4" width="5" height="5" rx="1.5"/>',
+            '<rect x="3.5" y="4" width="5" height="5" rx="1.5"/><path d="m4.8 6.6 1.2 1.1 1.8-2"/><rect x="3.5" y="14" width="5" height="5" rx="1.5"/><path d="M12 6.5h8.5M12 16.5h8.5"/>'],
+    exam: ['<path d="M6 3.5h8l4 4V20a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 20z"/>',
+           '<path d="M14 3.5H6.5a1 1 0 0 0-1 1V19.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V8z"/><path d="M14 3.5V8h4.5"/><path d="m9 14 2 2 4-4"/>'],
+    folder: ['<path d="M3.5 9h17v9a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/>',
+             '<path d="M3.5 18V6.5A1.5 1.5 0 0 1 5 5h4.5l2 2.5H19A1.5 1.5 0 0 1 20.5 9v9a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18z"/><path d="M3.5 10h17"/>'],
+    users: ['<circle cx="9" cy="8" r="3.5"/>',
+            '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>'],
+    cake: ['<path d="M4.5 13h15v7h-15z"/>',
+           '<rect x="4" y="12" width="16" height="8.5" rx="2"/><path d="M4 15.5c2 1.5 4 1.5 6 0s4-1.5 6 0 3 1 4 .5"/><path d="M12 12V8.5"/><path d="M12 4.5c1 1.2 1 2.4 0 3-1-.6-1-1.8 0-3z"/>'],
+    timer: ['<path d="M12 6a7 7 0 0 1 7 7h-7z"/>',
+            '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 1.5M10 2.5h4"/>'],
+    star: ['<path d="' + star(12, 12.5, 9, 3.9) + '"/>',
+           '<path d="' + star(12, 12.5, 9, 3.9) + '"/>'],
+    arrow: ['', '<path d="M5 12h14M13 6l6 6-6 6"/>'],
+    lab: ['<circle cx="12" cy="12" r="4"/>',
+          '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>']
+  };
+
+  var sprite = '<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">';
+  Object.keys(I).forEach(function (k) {
+    sprite += '<symbol id="i-' + k + '" viewBox="0 0 24 24">' +
+      '<g style="fill:var(--ico-fill);opacity:var(--ico-fill-op)">' + I[k][0] + '</g>' +
+      '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + I[k][1] + '</g></symbol>';
+  });
+  // Estrellas decorativas para las franjas
+  sprite += '<symbol id="deco-stars" viewBox="0 0 200 200"><path fill="currentColor" d="' + star(120, 85, 70, 29) + '"/>' +
+    '<path fill="currentColor" d="' + star(38, 160, 22, 9) + '"/><path fill="currentColor" d="' + star(185, 175, 12, 5) + '"/></symbol>';
+  sprite += '</svg>';
+  document.body.insertAdjacentHTML('afterbegin', sprite);
+
+  function ico(name, cls) { return '<svg class="ico ' + (cls || '') + '" aria-hidden="true"><use href="#i-' + name + '"></use></svg>'; }
+  window.EFicon = ico;
+
+  // ---------- Menú lateral ----------
+  var page = document.body.getAttribute('data-page');
+  var NAV = [
+    ['inicio', 'Inicio', 'panel.html', 'home'],
+    ['cursos', 'Mis cursos', 'curso.html', 'book'],
+    ['notas', 'Registro de notas', 'notas.html', 'grade'],
+    ['asistencia', 'Asistencia', '#', 'check'],
+    ['horario', 'Horario', '#', 'clock'],
+    ['agenda', 'Agenda', '#', 'calendar'],
+    ['mensajes', 'Mensajes', '#', 'chat', 3],
+    ['comunicados', 'Comunicados', '#', 'megaphone']
+  ];
+  var sb = document.getElementById('sidebar');
+  if (sb) {
+    var h = '<a class="brand" href="panel.html"><img src="logo.png" alt=""><span><b>Las Estrellas<br>del Futuro</b><small>Intranet 2026</small></span></a>';
+    h += '<div class="nav-label">Principal</div><nav class="nav" aria-label="Menú principal">';
+    NAV.forEach(function (n) {
+      h += '<a href="' + n[2] + '"' + (n[0] === page ? ' aria-current="page"' : '') + '>' + ico(n[3]) + '<span>' + n[1] + '</span>' +
+        (n[4] ? '<span class="count" aria-label="' + n[4] + ' sin leer">' + n[4] + '</span>' : '') + '</a>';
+    });
+    h += '</nav><div class="sidebar-foot nav">' +
+      '<a href="#">' + ico('user') + '<span>Mi perfil</span></a>' +
+      '<a href="index.html">' + ico('logout') + '<span>Cerrar sesión</span></a></div>';
+    sb.innerHTML = h;
+  }
+
+  // ---------- Barra superior ----------
+  var tb = document.getElementById('topbar');
+  if (tb) {
+    tb.innerHTML =
+      '<button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">' + ico('menu') + '</button>' +
+      '<label class="search">' + ico('search', 'ico-sm') + '<span class="sr-only">Buscar</span><input type="search" placeholder="Buscar estudiante, curso o tarea…"></label>' +
+      '<div class="topbar-actions">' +
+      '<button class="btn btn-ghost hide-sm" type="button">IV Bimestre ' + ico('chevron', 'ico-sm') + '</button>' +
+      '<button class="icon-btn" type="button" aria-label="Mensajes, 3 sin leer">' + ico('chat') + '<span class="dot"></span></button>' +
+      '<button class="icon-btn" type="button" aria-label="Notificaciones">' + ico('bell') + '</button>' +
+      '<div class="user"><span class="avatar">JR</span><span class="who"><b>Javier Rojas</b><small>Docente · Química</small></span></div>' +
+      '</div>';
+  }
+
+  // ---------- Menú en celular ----------
+  var app = document.querySelector('.app'), btn = document.getElementById('menu-btn'), scrim = document.getElementById('scrim');
+  function setMenu(open) {
+    if (!app) return;
+    app.classList.toggle('menu-open', open);
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  if (btn) btn.addEventListener('click', function () { setMenu(!app.classList.contains('menu-open')); });
+  if (scrim) scrim.addEventListener('click', function () { setMenu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
+
+  // ---------- Filtros (estado visual) ----------
+  document.querySelectorAll('.filters').forEach(function (g) {
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest('.filter'); if (!b) return;
+      g.querySelectorAll('.filter').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    });
+  });
+
+  // ---------- Ver contraseña ----------
+  var eye = document.getElementById('ver-clave');
+  if (eye) eye.addEventListener('click', function () {
+    var i = document.getElementById('clave'), ver = i.type === 'password';
+    i.type = ver ? 'text' : 'password';
+    eye.setAttribute('aria-label', ver ? 'Ocultar contraseña' : 'Mostrar contraseña');
+  });
+})();

@@ -3,71 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Intranet en el celular · Estrellas del Futuro</title>
-
+<title>Vista celular · Estrellas del Futuro</title>
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body{margin:0}
-a{color:#1D4ED8}a:hover{color:#1E3A8A}
+  body { margin: 0; min-height: 100vh; background: #0B2266; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px 16px; box-sizing: border-box; }
+  h1 { font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 22px; margin: 0; }
+  p { margin: 0; color: #C7D6FF; font-size: 14px; text-align: center; }
+  .phone { width: 390px; height: 800px; max-width: 100%; border-radius: 46px; padding: 12px; background: #050F2E; box-shadow: 0 30px 80px rgba(0,0,0,.45); box-sizing: border-box; }
+  iframe { width: 100%; height: 100%; border: 0; border-radius: 36px; background: #F4F6FB; }
+  nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  nav a { color: #0B2266; background: #FFD43B; font-weight: 600; font-size: 14px; padding: 10px 16px; border-radius: 999px; text-decoration: none; }
+  nav a:hover { background: #F5C400; }
 </style>
-
-<style>body{background:#E2E8F0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 0;box-sizing:border-box}.marco{border-radius:44px;overflow:hidden;box-shadow:0 0 0 10px #0F172A,0 30px 60px rgba(15,23,42,.35)}@media (max-width:430px){body{padding:0;display:block}.marco{border-radius:0;box-shadow:none}.marco>div{width:100%!important;height:100vh!important}}</style>
 </head>
 <body>
-<div class="marco">
-
-<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F6FA; font-family: Inter, system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; overflow: hidden">
-  <header style="background: #0B1F4B; color: #FFFFFF; padding: 20px 20px 28px; display: flex; flex-direction: column; gap: 18px">
-    <div style="display: flex; align-items: center; gap: 10px">
-      <img src="logo.png" alt="Logo de IEP Las Estrellas del Futuro" width="40" height="40" style="width: 40px; height: 40px; object-fit: contain">
-      <span style="font: 700 15px 'Space Grotesk', sans-serif; flex: 1">Estrellas del Futuro</span>
-      <button type="button" aria-label="Notificaciones" style="width: 44px; height: 44px; border-radius: 12px; border: 0; background: #1E3A8A; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg></button>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 4px">
-      <span style="font-size: 13px; color: #C7D2FE">Sábado 7 nov · IV Bimestre</span>
-      <span style="font: 700 26px/1.15 'Space Grotesk', sans-serif">Hola, Javier</span>
-    </div>
-  </header>
-
-  <div style="flex: 1; padding: 0 16px; margin-top: -14px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
-    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
-      <div style="background: #FFFFFF; border: 1px solid #E3E8F0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="font: 700 26px 'Space Grotesk', sans-serif">12</span><span style="font-size: 12px; color: #475569">Tareas por revisar</span></div>
-      <div style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px"><span style="font: 700 26px 'Space Grotesk', sans-serif; color: #78350F">68%</span><span style="font-size: 12px; color: #92400E">Notas · cierra 15 nov</span></div>
-    </div>
-
-    <section style="background: #1D4ED8; color: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
-      <span style="font-size: 12px; font-weight: 600; color: #DBEAFE">PRÓXIMA CLASE · 8:00 a. m.</span>
-      <span style="font: 700 19px 'Space Grotesk', sans-serif">Química · 3.º A</span>
-      <span style="font-size: 13px; color: #E0E7FF">Aula 302 · Tema: Alcanos</span>
-      <div style="display: flex; gap: 8px">
-        <a href="#" style="flex: 1; height: 44px; border-radius: 10px; background: #FFFFFF; color: #0F172A; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; text-decoration: none">Tomar asistencia</a>
-        <a href="#" style="flex: 1; height: 44px; border-radius: 10px; background: rgba(255,255,255,0.16); color: #FFFFFF; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; text-decoration: none">Abrir aula</a>
-      </div>
-    </section>
-
-    <section style="background: #FFFFFF; border: 1px solid #E3E8F0; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 6px"><h2 style="margin: 0; font: 700 16px 'Space Grotesk', sans-serif">Por revisar</h2><a href="#" style="font-size: 13px; font-weight: 600">Ver todo</a></div>
-      <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 52px; text-decoration: none; color: #0F172A; border-top: 1px solid #EEF2F7"><span style="width: 36px; height: 36px; border-radius: 10px; background: #CCFBF1; color: #115E59; font: 700 12px 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center">Q3</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Mapa conceptual</span><span style="font-size: 12px; color: #475569">29 entregas</span></span><span style="font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 99px; background: #FEF3C7; color: #92400E">Calificar</span></a>
-      <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 52px; text-decoration: none; color: #0F172A; border-top: 1px solid #EEF2F7"><span style="width: 36px; height: 36px; border-radius: 10px; background: #FEF3C7; color: #92400E; font: 700 12px 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center">Q4</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Alquenos · ficha</span><span style="font-size: 12px; color: #475569">19 de 27 entregas</span></span><span style="font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 99px; background: #DBEAFE; color: #1E3A8A">Abierta</span></a>
-      <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 52px; text-decoration: none; color: #0F172A; border-top: 1px solid #EEF2F7"><span style="width: 36px; height: 36px; border-radius: 10px; background: #DBEAFE; color: #1E3A8A; font: 700 12px 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center">Q1</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Práctica N.º 6</span><span style="font-size: 12px; color: #475569">30 entregas</span></span><span style="font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 99px; background: #FEF3C7; color: #92400E">Calificar</span></a>
-    </section>
-  </div>
-
-  <nav aria-label="Navegación" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #FFFFFF; border-top: 1px solid #E3E8F0; padding: 6px 4px 18px">
-    
-      <a href="panel.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; text-decoration: none; font-size: 11px; color: #1D4ED8; font-weight: 700;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Inicio</a>
-    
-      <a href="curso.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; text-decoration: none; font-size: 11px; color: #475569; font-weight: 500;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h10a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4zM4 16a4 4 0 0 1 4-4h10"/></svg>Cursos</a>
-    
-      <a href="notas.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; text-decoration: none; font-size: 11px; color: #475569; font-weight: 500;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Notas</a>
-    
-      <a href="#" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; text-decoration: none; font-size: 11px; color: #475569; font-weight: 500;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Mensajes</a>
-    
-      <a href="#" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; text-decoration: none; font-size: 11px; color: #475569; font-weight: 500;"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
-    
+  <h1>Así se ve en el celular</h1>
+  <p>La misma intranet, adaptada a pantallas pequeñas. Toca ☰ para abrir el menú.</p>
+  <nav aria-label="Elegir pantalla">
+    <a href="panel.html" target="pantalla">Inicio</a>
+    <a href="curso.html" target="pantalla">Curso</a>
+    <a href="notas.html" target="pantalla">Notas</a>
+    <a href="index.html" target="pantalla">Login</a>
   </nav>
-</div>
-</div>
+  <div class="phone"><iframe name="pantalla" src="panel.html" title="Intranet en un celular"></iframe></div>
 </body>
 </html>

@@ -3,67 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ingreso a la intranet · Estrellas del Futuro</title>
-
+<title>Ingreso · Estrellas del Futuro</title>
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:Inter,system-ui,sans-serif;color:#0F172A;background:#1E40AF}
-a{color:#1D4ED8}a:hover{color:#1E3A8A}
-</style>
-
-
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+<div class="login-page">
+  <svg class="stars a" aria-hidden="true"><use href="#deco-stars"></use></svg>
+  <svg class="stars b" aria-hidden="true"><use href="#deco-stars"></use></svg>
 
-
-<div style="min-height: 100vh; background: #1E40AF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; box-sizing: border-box; font-family: Inter, system-ui, sans-serif">
-  <main style="width: 100%; max-width: 900px; background: #FFFFFF; border-radius: 24px; overflow: hidden; display: flex; flex-wrap: wrap; box-shadow: 0 24px 60px rgba(15,23,42,0.28)">
-
-    
-    <section style="flex: 1 1 340px; min-width: 0; min-height: 240px; background: #FACC15; padding: 32px; box-sizing: border-box; display: flex; align-items: center; justify-content: center">
-      <img src="logo.png" alt="Logo de IEP Las Estrellas del Futuro" width="220" height="220" style="width: 220px; height: 220px; max-width: 70%; height: auto; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(30,58,138,0.35))">
+  <main class="login-card">
+    <section class="login-art">
+      <img src="logo.png" alt="Logo de IEP Las Estrellas del Futuro">
     </section>
 
-    
-    <section style="flex: 1 1 360px; min-width: 0; padding: 40px 44px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center">
-      <form action="panel.html" method="get" style="display: flex; flex-direction: column; gap: 16px">
-        <div style="display: flex; flex-direction: column; gap: 6px; text-align: center">
-          <h1 style="margin: 0; font: 700 32px 'Space Grotesk', sans-serif; color: #0F172A">¡Bienvenido!</h1>
-          <p style="margin: 0; font-size: 15px; color: #475569">Ingresa a tu intranet</p>
+    <section class="login-form">
+      <form action="panel.html" method="get" class="login-form" style="padding:0">
+        <h1>¡Bienvenido!</h1>
+        <p class="lead">Ingresa a tu intranet</p>
+
+        <div class="field-col">
+          <label for="codigo">Código de usuario</label>
+          <input class="input" id="codigo" name="codigo" type="text" autocomplete="username" placeholder="Ej. 77703588" aria-describedby="codigo-ayuda">
+          <span class="hint" id="codigo-ayuda">Te lo entrega la administración del colegio.</span>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 8px">
-          <label for="codigo" style="font-size: 13px; font-weight: 600; color: #334155">Código de usuario</label>
-          <input id="codigo" name="codigo" type="text" autocomplete="username" placeholder="Ej. 77703588" aria-describedby="codigo-ayuda" style="height: 50px; border: 1.5px solid #CBD5E1; border-radius: 999px; padding: 0 20px; font: 400 15px Inter, sans-serif; color: #0F172A; background: #F8FAFC">
-          <span id="codigo-ayuda" style="font-size: 12px; color: #475569; padding: 0 8px">Te lo entrega la administración del colegio.</span>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px">
-          <label for="clave" style="font-size: 13px; font-weight: 600; color: #334155">Contraseña</label>
-          <div style="position: relative; display: flex; align-items: center">
-            <input id="clave" name="clave" type="password" autocomplete="current-password" placeholder="••••••••" style="width: 100%; height: 50px; box-sizing: border-box; border: 1.5px solid #CBD5E1; border-radius: 999px; padding: 0 56px 0 20px; font: 400 15px Inter, sans-serif; color: #0F172A; background: #F8FAFC">
-            <button id="ver-clave" type="button" aria-label="Mostrar contraseña" style="position: absolute; right: 4px; width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; color: #475569; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <div class="field-col">
+          <label for="clave">Contraseña</label>
+          <div class="pw">
+            <input class="input" id="clave" name="clave" type="password" autocomplete="current-password" placeholder="••••••••">
+            <button id="ver-clave" type="button" aria-label="Mostrar contraseña"><svg class="ico" aria-hidden="true"><use href="#i-eye"></use></svg></button>
           </div>
         </div>
 
-        <button type="submit" style="height: 52px; border: 0; border-radius: 999px; background: #1D4ED8; color: #FFFFFF; font: 600 16px Inter, sans-serif; cursor: pointer; margin-top: 4px">Ingresar</button>
+        <button class="btn btn-primary btn-pill" type="submit">Ingresar</button>
 
-        <div style="display: flex; flex-direction: column; gap: 6px; text-align: center; font-size: 13px">
+        <div class="login-links">
           <a href="#">¿Olvidaste tu contraseña?</a>
-          <span style="color: #475569">¿No tienes código? <a href="#">Comunícate con la administración</a></span>
+          <span>¿No tienes código? <a href="#">Comunícate con la administración</a></span>
         </div>
       </form>
     </section>
   </main>
-  <p style="margin: 0; font-size: 13px; color: #DBEAFE">© 2026 IEP Las Estrellas del Futuro</p>
+  <p class="login-foot">© 2026 IEP Las Estrellas del Futuro · Mazo, Végueta</p>
 </div>
-<script>
-document.getElementById('ver-clave').addEventListener('click', function () {
-  var i = document.getElementById('clave'); var ver = i.type === 'password';
-  i.type = ver ? 'text' : 'password';
-  this.setAttribute('aria-label', ver ? 'Ocultar contraseña' : 'Mostrar contraseña');
-});
-</script>
+<script src="assets/app.js"></script>
 </body>
 </html>
