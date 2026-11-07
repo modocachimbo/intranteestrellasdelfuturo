@@ -103,7 +103,7 @@
   var page = document.body.getAttribute('data-page');
   var NAV = [
     ['inicio', 'Inicio', 'panel.html', 'home'],
-    ['cursos', 'Mis cursos', 'curso.html', 'book'],
+    ['cursos', 'Mis cursos', 'cursos.html', 'book'],
     ['notas', 'Registro de notas', 'notas.html', 'grade'],
     ['asistencia', 'Asistencia', '#', 'check'],
     ['horario', 'Horario', 'horario.html', 'clock'],

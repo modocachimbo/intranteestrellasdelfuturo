@@ -417,3 +417,73 @@ input.nota::-webkit-outer-spin-button, input.nota::-webkit-inner-spin-button { -
 input.nota:focus { outline: none; border-color: var(--azul-500); box-shadow: 0 0 0 3px var(--azul-100); }
 input.nota.g-x { background: #fff; border: 1.5px dashed #9AA4BF; }
 .nota-prom { display: inline-grid; place-items: center; width: 46px; height: 34px; border-radius: 8px; font-family: var(--f-titulo); font-weight: 600; font-size: 15px; }
+
+/* ---------- Mis cursos: propuestas ---------- */
+.switch { display: inline-flex; gap: 4px; padding: 5px; border-radius: 999px; background: #fff; border: 1px solid var(--borde); box-shadow: var(--sombra-2); flex-wrap: wrap; }
+.switch button { min-height: 42px; padding: 0 18px; border-radius: 999px; border: 0; background: transparent; font-weight: 600; font-size: 14px; color: var(--tinta-2); cursor: pointer; }
+.switch button[aria-pressed="true"] { background: var(--azul-900); color: #fff; }
+.prop-note { font-size: 14px; color: var(--tinta-2); background: var(--azul-50); border: 1px dashed var(--azul-200); border-radius: 14px; padding: 12px 16px; }
+.prop-note b { color: var(--azul-900); }
+.sedes { display: flex; flex-wrap: wrap; gap: 8px; }
+.sede { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--borde); background: #fff; font-weight: 600; font-size: 14px; color: var(--tinta-2); cursor: pointer; }
+.sede[aria-pressed="true"] { border-color: var(--azul-600); background: var(--azul-600); color: #fff; }
+.sede .n { font-size: 12px; padding: 1px 8px; border-radius: 99px; background: var(--borde-suave); color: var(--tinta-2); }
+.sede[aria-pressed="true"] .n { background: rgba(255,255,255,.2); color: #fff; }
+.level-title { display: flex; align-items: center; gap: 12px; margin: 4px 0 -6px; }
+.level-title h2 { font-size: 18px; }
+.level-title span { flex: 1; height: 1px; background: var(--borde); }
+
+/* A · Tarjetas de aula */
+.aula-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.aula { display: flex; flex-direction: column; gap: 14px; padding: 18px; }
+.aula .head { display: flex; gap: 14px; align-items: center; }
+.aula .badge { width: 62px; height: 62px; border-radius: 18px; display: grid; place-items: center; background: var(--azul-600); color: #fff; font-family: var(--f-titulo); font-weight: 600; font-size: 22px; flex: none; line-height: 1; }
+.aula .badge small { font-size: 11px; font-weight: 600; opacity: .8; display: block; text-align: center; margin-top: 3px; }
+.aula .badge.y { background: var(--amarillo-400); color: var(--azul-950); }
+.aula .badge.n { background: var(--azul-900); }
+.aula h3 { font-size: 17px; }
+.aula .sub { font-size: 13px; color: var(--tinta-3); }
+.aula .facts { display: flex; flex-wrap: wrap; gap: 6px; }
+.aula .acts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding-top: 12px; border-top: 1px solid var(--borde-suave); }
+.aula .acts a { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border-radius: 12px; font-size: 12.5px; font-weight: 600; color: var(--tinta-2); text-decoration: none; }
+.aula .acts a:hover { background: var(--azul-50); color: var(--azul-700); }
+.aula .enter { margin-top: 2px; }
+
+/* B · Lista por grado */
+.grade-rows { display: flex; flex-direction: column; }
+.grade-row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 16px; align-items: center; padding: 16px 20px; border-top: 1px solid var(--borde-suave); }
+.grade-row:first-child { border-top: 0; }
+.grade-row .g b { display: block; font-family: var(--f-titulo); font-weight: 600; font-size: 17px; }
+.grade-row .g small { color: var(--tinta-3); font-size: 13px; }
+.sec-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+.sec-pill { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 14px 8px 8px; border-radius: 16px; border: 1.5px solid var(--borde); background: #fff; text-decoration: none; color: var(--tinta); min-width: 230px; flex: 1 1 230px; max-width: 340px; }
+.sec-pill:hover { border-color: var(--azul-500); text-decoration: none; color: var(--tinta); box-shadow: var(--sombra-1); }
+.sec-pill .l { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--azul-100); color: var(--azul-800); font-family: var(--f-titulo); font-weight: 700; font-size: 18px; flex: none; }
+.sec-pill .t { flex: 1; min-width: 0; }
+.sec-pill .t b { display: block; font-size: 14px; }
+.sec-pill .t small { color: var(--tinta-3); font-size: 12.5px; }
+.sec-pill .ico { color: var(--azul-600); }
+
+/* C · Portadas de aula (estilo aula virtual) */
+.cover-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; }
+.cover { overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: var(--tinta); transition: transform .15s, box-shadow .15s; }
+.cover:hover { transform: translateY(-3px); box-shadow: var(--sombra-2); text-decoration: none; color: var(--tinta); }
+.cover .top { position: relative; height: 112px; padding: 16px 18px; background: var(--azul-600); color: #fff; overflow: hidden; }
+.cover .top.y { background: var(--amarillo-400); color: var(--azul-950); }
+.cover .top.n { background: var(--azul-900); }
+.cover .top.s { background: var(--azul-700); }
+.cover .top svg.deco { position: absolute; right: -24px; top: -18px; width: 150px; height: 150px; opacity: .18; color: currentColor; }
+.cover .top.y svg.deco { opacity: .14; color: var(--azul-900); }
+.cover .top .kicker { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+.cover .top h3 { color: inherit; font-size: 22px; margin-top: 4px; }
+.cover .top .sec { position: absolute; right: 16px; bottom: -22px; width: 56px; height: 56px; border-radius: 18px; background: #fff; color: var(--azul-900); display: grid; place-items: center; font-family: var(--f-titulo); font-weight: 700; font-size: 20px; box-shadow: var(--sombra-2); z-index: 1; }
+.cover .body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.cover .body .sub { font-size: 13.5px; color: var(--tinta-2); }
+.cover .body .next { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--tinta-3); }
+.cover .foot { display: flex; gap: 6px; padding: 10px 14px; border-top: 1px solid var(--borde-suave); }
+.cover .foot span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--tinta-2); padding: 6px 10px; border-radius: 99px; background: var(--fondo); }
+.cover .foot span.alert { background: var(--amarillo-100); color: #6B4A00; }
+@media (max-width: 720px) { .grade-row { grid-template-columns: minmax(0, 1fr); } .sec-pill { max-width: none; } }
+
+[hidden] { display: none !important; }
+@media (max-width: 720px) { .switch { border-radius: 18px; width: 100%; } .switch button { flex: 1 1 100%; border-radius: 12px; text-align: left; } }

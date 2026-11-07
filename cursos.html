@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mis cursos · Estrellas del Futuro</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="cursos">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="main">
+    <header class="topbar" id="topbar"></header>
+
+    <section class="page-band">
+      <svg class="stars" aria-hidden="true"><use href="#deco-stars"></use></svg>
+      <div class="inner">
+        <div class="course-head">
+          <span class="ico-tile"><svg class="ico ico-lg" aria-hidden="true"><use href="#i-book"></use></svg></span>
+          <div><h1>Mis cursos</h1><p>Aulas virtuales a cargo de Javier Rojas · Año escolar 2026</p></div>
+        </div>
+      </div>
+    </section>
+
+    <main class="content overlap">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+        <div class="switch" role="group" aria-label="Ver propuesta">
+          <button type="button" data-prop="a" aria-pressed="false">Propuesta A · Tarjetas</button>
+          <button type="button" data-prop="b" aria-pressed="false">Propuesta B · Por grado</button>
+          <button type="button" data-prop="c" aria-pressed="true">Propuesta C · Portadas</button>
+        </div>
+        <div class="sedes" role="group" aria-label="Sede">
+          <button class="sede" type="button" data-sede-btn="s1" aria-pressed="true"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-home"></use></svg>Sede principal <span class="n">7</span></button>
+          <button class="sede" type="button" data-sede-btn="s2" aria-pressed="false"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-home"></use></svg>Sede 2 <span class="n">2</span></button>
+        </div>
+      </div>
+
+      <section data-propuesta="a" hidden>
+        <p class="prop-note"><b>Propuesta A · Tarjetas de aula.</b> Una tarjeta por aula con lo justo: estudiantes, pendientes y próxima clase, un botón grande para entrar y accesos directos a Tareas, Notas y Asistencia. Es la versión ordenada de lo que hoy tiene Elite.</p>
+        <div data-sede="s1" class="sede-block"><div class="level-title"><h2>Secundaria</h2><span></span></div><div class="aula-grid" style="margin-top:16px"><article class="card aula" data-sede="s1">
+  <div class="head"><span class="badge ">1A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">1.º A · Secundaria · Sede principal</div></div></div>
+  <div class="facts"><span class="chip gray">30 estudiantes</span><span class="chip yellow">2 por revisar</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Lun 9 · 9:35 a. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article>
+<article class="card aula" data-sede="s1">
+  <div class="head"><span class="badge y">2A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">2.º A · Secundaria · Sede principal</div></div></div>
+  <div class="facts"><span class="chip gray">28 estudiantes</span><span class="chip yellow">4 por revisar</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Mar 10 · 9:35 a. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article>
+<article class="card aula" data-sede="s1">
+  <div class="head"><span class="badge y">2B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">2.º B · Secundaria · Sede principal</div></div></div>
+  <div class="facts"><span class="chip gray">29 estudiantes</span><span class="chip green">Al día</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Mié 11 · 11:20 a. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article>
+<article class="card aula" data-sede="s1">
+  <div class="head"><span class="badge ">3A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">3.º A · Secundaria · Sede principal</div></div></div>
+  <div class="facts"><span class="chip gray">31 estudiantes</span><span class="chip yellow">3 por revisar</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Lun 9 · 7:50 a. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article>
+<article class="card aula" data-sede="s1">
+  <div class="head"><span class="badge n">3A<small>Tutoría</small></span><div><h3>Tutoría</h3><div class="sub">3.º A · Secundaria · Sede principal</div></div></div>
+  <div class="facts"><span class="chip gray">31 estudiantes</span><span class="chip green">Al día</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Vie 13 · 1:00 p. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article>
+<article class="card aula" data-sede="s1">
+  <div class="head"><span class="badge ">4A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">4.º A · Secundaria · Sede principal</div></div></div>
+  <div class="facts"><span class="chip gray">27 estudiantes</span><span class="chip yellow">1 por revisar</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Mar 10 · 1:00 p. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article>
+<article class="card aula" data-sede="s1">
+  <div class="head"><span class="badge n">5A<small>Sec.</small></span><div><h3>Química</h3><div class="sub">5.º A · Secundaria · Sede principal</div></div></div>
+  <div class="facts"><span class="chip gray">26 estudiantes</span><span class="chip yellow">2 por revisar</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Lun 9 · 11:20 a. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article></div></div><div data-sede="s2" class="sede-block"><div class="level-title"><h2>Secundaria</h2><span></span></div><div class="aula-grid" style="margin-top:16px"><article class="card aula" data-sede="s2">
+  <div class="head"><span class="badge ">1B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">1.º B · Secundaria · Sede 2</div></div></div>
+  <div class="facts"><span class="chip gray">25 estudiantes</span><span class="chip yellow">1 por revisar</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Jue 12 · 7:50 a. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article>
+<article class="card aula" data-sede="s2">
+  <div class="head"><span class="badge ">3B<small>Sec.</small></span><div><h3>Química</h3><div class="sub">3.º B · Secundaria · Sede 2</div></div></div>
+  <div class="facts"><span class="chip gray">24 estudiantes</span><span class="chip green">Al día</span></div>
+  <div class="sub"><svg class="ico ico-sm" aria-hidden="true" style="vertical-align:-4px"><use href="#i-clock"></use></svg> Próxima clase: Jue 12 · 11:20 a. m.</div>
+  <a class="btn btn-primary enter" href="curso.html">Entrar al aula virtual <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+  <div class="acts"><a href="curso.html"><svg class="ico " aria-hidden="true"><use href="#i-tasks"></use></svg>Tareas</a><a href="notas.html"><svg class="ico " aria-hidden="true"><use href="#i-grade"></use></svg>Notas</a><a href="#"><svg class="ico " aria-hidden="true"><use href="#i-check"></use></svg>Asistencia</a></div>
+</article></div></div>
+      </section>
+
+      <section data-propuesta="b" hidden>
+        <p class="prop-note"><b>Propuesta B · Lista por grado.</b> Una fila por grado y, al lado, sus secciones. Es la más compacta y sirve cuando un docente tiene muchas secciones del mismo grado.</p>
+        <section class="card grade-rows sede-block" data-sede="s1"><div class="grade-row"><div class="g"><b>1.º Secundaria</b><small>1 aula(s) a tu cargo</small></div><div class="sec-pills"><a class="sec-pill" href="curso.html"><span class="l">A</span><span class="t"><b>Química · 1.º A</b><small>30 est. · 2 por revisar</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div>
+<div class="grade-row"><div class="g"><b>2.º Secundaria</b><small>2 aula(s) a tu cargo</small></div><div class="sec-pills"><a class="sec-pill" href="curso.html"><span class="l">A</span><span class="t"><b>Química · 2.º A</b><small>28 est. · 4 por revisar</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a><a class="sec-pill" href="curso.html"><span class="l">B</span><span class="t"><b>Química · 2.º B</b><small>29 est. · al día</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div>
+<div class="grade-row"><div class="g"><b>3.º Secundaria</b><small>2 aula(s) a tu cargo</small></div><div class="sec-pills"><a class="sec-pill" href="curso.html"><span class="l">A</span><span class="t"><b>Química · 3.º A</b><small>31 est. · 3 por revisar</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a><a class="sec-pill" href="curso.html"><span class="l">A</span><span class="t"><b>Tutoría · 3.º A</b><small>31 est. · al día</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div>
+<div class="grade-row"><div class="g"><b>4.º Secundaria</b><small>1 aula(s) a tu cargo</small></div><div class="sec-pills"><a class="sec-pill" href="curso.html"><span class="l">A</span><span class="t"><b>Química · 4.º A</b><small>27 est. · 1 por revisar</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div>
+<div class="grade-row"><div class="g"><b>5.º Secundaria</b><small>1 aula(s) a tu cargo</small></div><div class="sec-pills"><a class="sec-pill" href="curso.html"><span class="l">A</span><span class="t"><b>Química · 5.º A</b><small>26 est. · 2 por revisar</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div></section><section class="card grade-rows sede-block" data-sede="s2"><div class="grade-row"><div class="g"><b>1.º Secundaria</b><small>1 aula(s) a tu cargo</small></div><div class="sec-pills"><a class="sec-pill" href="curso.html"><span class="l">B</span><span class="t"><b>Química · 1.º B</b><small>25 est. · 1 por revisar</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div>
+<div class="grade-row"><div class="g"><b>3.º Secundaria</b><small>1 aula(s) a tu cargo</small></div><div class="sec-pills"><a class="sec-pill" href="curso.html"><span class="l">B</span><span class="t"><b>Química · 3.º B</b><small>24 est. · al día</small></span><svg class="ico " aria-hidden="true"><use href="#i-arrow"></use></svg></a></div></div></section>
+      </section>
+
+      <section data-propuesta="c">
+        <p class="prop-note"><b>Propuesta C · Portadas de aula (recomendada).</b> Cada aula virtual tiene su portada de color con la estrella del colegio, como en un aula virtual moderna. Se reconoce de un vistazo, invita a entrar y funciona igual de bien en el celular.</p>
+        <div class="cover-grid sede-block" data-sede="s1"><a class="card cover" href="curso.html" data-sede="s1">
+  <div class="top "><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">1.º Secundaria · Sede principal</div><h3>Química</h3><span class="sec">1A</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Lun 9 · 9:35 a. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>30</span><span class="alert"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-tasks"></use></svg>2 por revisar</span></div>
+</a>
+<a class="card cover" href="curso.html" data-sede="s1">
+  <div class="top y"><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">2.º Secundaria · Sede principal</div><h3>Química</h3><span class="sec">2A</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Mar 10 · 9:35 a. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>28</span><span class="alert"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-tasks"></use></svg>4 por revisar</span></div>
+</a>
+<a class="card cover" href="curso.html" data-sede="s1">
+  <div class="top y"><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">2.º Secundaria · Sede principal</div><h3>Química</h3><span class="sec">2B</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Mié 11 · 11:20 a. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>29</span><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"></use></svg>Al día</span></div>
+</a>
+<a class="card cover" href="curso.html" data-sede="s1">
+  <div class="top s"><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">3.º Secundaria · Sede principal</div><h3>Química</h3><span class="sec">3A</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Lun 9 · 7:50 a. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>31</span><span class="alert"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-tasks"></use></svg>3 por revisar</span></div>
+</a>
+<a class="card cover" href="curso.html" data-sede="s1">
+  <div class="top n"><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">3.º Secundaria · Sede principal</div><h3>Tutoría</h3><span class="sec">3A</span></div>
+  <div class="body"><div class="sub">Espacio del salón: avisos, horario y lista</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Vie 13 · 1:00 p. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>31</span><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"></use></svg>Al día</span></div>
+</a>
+<a class="card cover" href="curso.html" data-sede="s1">
+  <div class="top s"><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">4.º Secundaria · Sede principal</div><h3>Química</h3><span class="sec">4A</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Mar 10 · 1:00 p. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>27</span><span class="alert"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-tasks"></use></svg>1 por revisar</span></div>
+</a>
+<a class="card cover" href="curso.html" data-sede="s1">
+  <div class="top n"><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">5.º Secundaria · Sede principal</div><h3>Química</h3><span class="sec">5A</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Lun 9 · 11:20 a. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>26</span><span class="alert"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-tasks"></use></svg>2 por revisar</span></div>
+</a></div><div class="cover-grid sede-block" data-sede="s2"><a class="card cover" href="curso.html" data-sede="s2">
+  <div class="top "><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">1.º Secundaria · Sede 2</div><h3>Química</h3><span class="sec">1B</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Jue 12 · 7:50 a. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>25</span><span class="alert"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-tasks"></use></svg>1 por revisar</span></div>
+</a>
+<a class="card cover" href="curso.html" data-sede="s2">
+  <div class="top s"><svg class="deco" aria-hidden="true"><use href="#deco-stars"></use></svg><div class="kicker">3.º Secundaria · Sede 2</div><h3>Química</h3><span class="sec">3B</span></div>
+  <div class="body"><div class="sub">Química · Ciencia y Tecnología</div><div class="next"><svg class="ico ico-sm" aria-hidden="true"><use href="#i-clock"></use></svg>Próxima clase: Jue 12 · 11:20 a. m.</div></div>
+  <div class="foot"><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-users"></use></svg>24</span><span><svg class="ico ico-sm" aria-hidden="true"><use href="#i-check"></use></svg>Al día</span></div>
+</a></div>
+      </section>
+    </main>
+  </div>
+</div>
+<script src="assets/app.js"></script>
+<script>
+(function () {
+  var prop = 'c', sede = 's1';
+  function apply() {
+    document.querySelectorAll('[data-propuesta]').forEach(function (s) { s.hidden = s.getAttribute('data-propuesta') !== prop; });
+    document.querySelectorAll('[data-prop]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-prop') === prop ? 'true' : 'false'); });
+    document.querySelectorAll('.sede-block').forEach(function (s) { s.hidden = s.getAttribute('data-sede') !== sede; });
+    document.querySelectorAll('[data-sede-btn]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-sede-btn') === sede ? 'true' : 'false'); });
+  }
+  document.querySelectorAll('[data-prop]').forEach(function (b) { b.addEventListener('click', function () { prop = b.getAttribute('data-prop'); apply(); }); });
+  document.querySelectorAll('[data-sede-btn]').forEach(function (b) { b.addEventListener('click', function () { sede = b.getAttribute('data-sede-btn'); apply(); }); });
+  apply();
+})();
+</script>
+</body>
+</html>
