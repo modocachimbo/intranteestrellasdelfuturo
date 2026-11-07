@@ -1,5 +1,8 @@
 /* Revisiones del docente (nota, rúbrica, retroalimentación y marcas sobre el trabajo).
-   Se guardan en este navegador hasta conectar la base de datos. */
+   Se guardan en este navegador hasta conectar la base de datos.
+   Estados: draft = borrador (el estudiante NO lo ve) · graded = nota publicada (el estudiante ve "Calificado")
+            returned = devuelta para corregir (el estudiante ve la retroalimentación y vuelve a entregar). */
+import type { Stroke } from './pdfink';
 
 export interface Mark { x: number; y: number; page: number; kind: 'ok' | 'bad' | 'note'; text?: string }
 
@@ -9,7 +12,9 @@ export interface Review {
   manual: boolean;             // true si el docente cambió la nota a mano
   feedback: string;
   privateNote: string;
-  marks: Mark[];
+  marks: Mark[];               // marcas antiguas (se convierten a ink)
+  ink?: Stroke[];              // trazos sobre el PDF (lápiz, resaltador, ✓, ✗, texto)
+  published?: string;          // fecha en que se publicó la nota
   state: 'draft' | 'graded' | 'returned';
   updated: string;
 }
@@ -64,3 +69,13 @@ export function rubricFromGrade(g: number): number[] {
   let rest = g - base * 4;
   return [0, 1, 2, 3].map(() => { const v = Math.min(5, base + (rest > 0 ? 1 : 0)); rest--; return [5, 4, 3, 1].reduce((p, c) => (Math.abs(c - v) < Math.abs(p - v) ? c : p)); });
 }
+
+/** Nivel de logro según la escala vigesimal del colegio. */
+export function nivel(g: number): { code: string; name: string; cls: string } {
+  return g >= 18 ? { code: 'AD', name: 'Logro destacado', cls: 'g-ad' } : g >= 14 ? { code: 'A', name: 'Logro esperado', cls: 'g-a' }
+    : g >= 11 ? { code: 'B', name: 'En proceso', cls: 'g-b' } : { code: 'C', name: 'En inicio', cls: 'g-c' };
+}
+
+/** URL del PDF entregado (demo: assets/demo/entregas/<actividad>/<estudiante>.pdf). */
+export const pdfUrl = (aid: string, sid: string) => `assets/demo/entregas/${aid}/${sid}.pdf`;
+export const PDF_EJEMPLO = 'assets/demo/entregas/ejemplo.pdf';

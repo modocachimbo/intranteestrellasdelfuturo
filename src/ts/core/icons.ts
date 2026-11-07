@@ -111,7 +111,21 @@ export const ICONS: Record<string, [string, string]> = {
          '<path d="' + star(12, 12.5, 9, 3.9) + '"/>'],
   arrow: ['', '<path d="M5 12h14M13 6l6 6-6 6"/>'],
   lab: ['<circle cx="12" cy="12" r="4"/>',
-        '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>']
+        '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>'],
+  // Herramientas del visor de PDF
+  pen: ['<path d="M15.5 4.5l4 4L9 19l-5 1 1-5z"/>',
+        '<path d="M15.5 4.5l4 4L9 19l-5 1 1-5zM13 7l4 4"/>'],
+  marker: ['<path d="M7 13l7-8.5 5 4L12 17z"/>',
+           '<path d="M7 13l7-8.5 5 4L12 17zM7 13l-1.5 4.5L8 19l4-2M4 21h7"/>'],
+  eraser: ['<path d="M4.5 15.5l9-9 6 6-6 6H8.5z"/>',
+           '<path d="M4.5 15.5l9-9 6 6-6 6H8.5zM9 11l6 6M8.5 18.5H20"/>'],
+  hand: ['<path d="M8 12V6.5a1.5 1.5 0 013 0V11V5a1.5 1.5 0 013 0v6-4.5a1.5 1.5 0 013 0V15a6 6 0 01-6 6h-.5a6 6 0 01-4.6-2.2L4.7 15.6a1.5 1.5 0 012.3-1.9z"/>',
+         '<path d="M8 12V6.5a1.5 1.5 0 013 0V11V5a1.5 1.5 0 013 0v6-4.5a1.5 1.5 0 013 0V15a6 6 0 01-6 6h-.5a6 6 0 01-4.6-2.2L4.7 15.6a1.5 1.5 0 012.3-1.9L8 15z"/>'],
+  undo: ['', '<path d="M9 7L5 11l4 4M5 11h9a5 5 0 010 10h-3"/>'],
+  redo: ['', '<path d="M15 7l4 4-4 4M19 11h-9a5 5 0 000 10h3"/>'],
+  expand: ['', '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'],
+  text: ['<rect x="4" y="4" width="16" height="16" rx="3"/>', '<path d="M8 8h8M12 8v9"/>'],
+  stylus: ['<circle cx="17" cy="7" r="3"/>', '<path d="M14 10l-8.5 8.5L4 20l1.5-1.5M14 10l2.5-2.5M5.5 18.5l1 1M20 13l1 1M3 4l2 2"/>'],
 };
 
 export type IconName = keyof typeof ICONS;

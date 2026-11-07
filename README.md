@@ -63,14 +63,22 @@ npm run watch:js   # recompila al guardar (en otra terminal: npm run watch:css)
   - *Archivo, carpeta, página, video, enlace, encuesta, glosario*.
   - Navegación: volver a la semana y actividad anterior / siguiente.
 - **Participantes** (búsqueda, grupos, exportar CSV), **Calificaciones** (libro del aula por competencia, exportar, enviar al registro), **Banco de preguntas** (filtros, nueva pregunta) e **Informes** (indicadores, entregas por semana, estudiantes en riesgo).
-- **Revisión de tareas** (`curso.html#r-ID-N`): un estudiante a la vez; visor del trabajo con marcas (correcto, error, comentario) y zoom; rúbrica de 4 criterios que calcula la nota sobre 20; nota final editable; retroalimentación con comentarios rápidos; nota privada; guardar, devolver para corregir, guardar y siguiente; saltar a los que faltan; atajos Ctrl+Enter y Alt+←/→. Las notas se reflejan en la lista de entregas y en Calificaciones.
+- **Revisión de tareas** (`curso.html#r-ID-N`): un estudiante a la vez.
+  - El **PDF entregado se abre dentro de la página** (PDF.js local en `assets/vendor/pdfjs`), sin descargarlo.
+  - **Lápiz para tablet**: lápiz con presión, resaltador, borrador, ✓ correcto, ✗ error y texto; 4 colores y 3 grosores; deshacer y rehacer (Ctrl+Z / Ctrl+Y); borrar la página; zoom y pantalla completa.
+  - **Solo lápiz**: con el lápiz de la tablet, el dedo solo desplaza la hoja y la palma no raya (se activa solo al detectar un lápiz).
+  - Rúbrica de 4 criterios que calcula la nota sobre 20; nota final editable; retroalimentación con comentarios rápidos; nota privada; saltar a los que faltan; Alt+←/→ cambia de estudiante.
+  - **Guardar borrador** (el estudiante no lo ve), **Devolver para corregir** o **Publicar nota** (Ctrl+Enter publica y pasa al siguiente). La lista de entregas muestra *Borrador* o *Publicada*.
+- **Vista del estudiante** (`curso.html#e-ID-N`, botón *Ver como estudiante*): estado de la entrega, **Calificado**, la nota con su nivel de logro (AD, A, B, C), el comentario del docente, la rúbrica y su PDF con las marcas del docente (solo lectura). Si la nota está en borrador ve *En revisión*.
+- PDFs de ejemplo: `assets/demo/entregas/<actividad>/<estudiante>.pdf` (tareas del IV Bimestre); el resto usa `assets/demo/entregas/ejemplo.pdf`. Con *⋯ → Abrir otro PDF* puedes probar con un PDF tuyo.
+- El visor de PDF necesita abrir la página desde la web (GitHub Pages) o un servidor local; desde `file://` el navegador bloquea leer PDFs.
 - **Usar en otras secciones**: vincular (los cambios se sincronizan) o copiar (independiente) todo el curso, un bimestre o una sola actividad a otras secciones del docente; las fechas se ajustan al horario de cada sección y no se comparten entregas, notas, foros ni asistencia.
 - Para simular otro momento: `curso.html?hoy=2026-11-09T08:20` (la clase del lunes aparece "En vivo ahora").
 
 ## Sistema visual
 
 - **Colores** (del logo): azul rey `#1E4FC4`, azul marino `#0B2266` y amarillo estrella `#FFD43B`.
-- **Tipografía**: *Outfit* para títulos y *Plus Jakarta Sans* para textos (Google Fonts).
+- **Tipografía**: *Outfit* para títulos y *Plus Jakarta Sans* para textos (Google Fonts); *Caveat* (local, `assets/fonts`) para la letra a mano.
 - **Iconos propios**: duotono (trazo azul + relleno amarillo), definidos en `src/ts/core/icons.ts`.
 - Estilos en `src/scss/styles.scss`; menú lateral, barra superior e iconos en `src/ts/core/`.
 - En celular el menú se abre con ☰.

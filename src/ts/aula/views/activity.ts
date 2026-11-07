@@ -75,7 +75,7 @@ function assignView(c: ActivityCtx): string {
   const a = c.a;
   const subs = submissionsFor(a, c.now).map((x) => {
     const rv = getReview(a.id, x.student.id);
-    return rv ? { ...x, grade: rv.grade ?? undefined, feedback: rv.feedback || x.feedback, returned: rv.state === 'returned' } : x;
+    return rv ? { ...x, grade: rv.grade ?? undefined, feedback: rv.feedback || x.feedback, returned: rv.state === 'returned', draft: rv.state === 'draft' && rv.grade !== null } : x;
   });
   const s = summary(subs);
   const due = a.due!;
@@ -86,9 +86,9 @@ function assignView(c: ActivityCtx): string {
     return `<tr data-status="${x.status}" data-graded="${x.grade !== undefined}">
       <td><div class="person">${avatar(x.student.name, i)}<span><b>${esc(x.student.name)}</b><small>${x.student.code}</small></span></div></td>
       <td><span class="chip ${tone}">${lbl}</span>${x.when ? `<small class="when">${x.when}</small>` : ''}</td>
-      <td>${x.file ? `<a href="#" class="file-link" data-fake-download="${x.file}">${ico('file', 'ico-sm')}${x.file}</a>` : '<span class="muted">—</span>'}</td>
+      <td>${x.file ? `<a href="#r-${a.id}-${i}" class="file-link" title="Abrir el PDF para revisarlo aquí">${ico('file', 'ico-sm')}${x.file}</a>` : '<span class="muted">—</span>'}</td>
       <td><input class="nota ${x.grade !== undefined ? gradeClass(x.grade) : 'g-x'}" type="number" min="0" max="20" inputmode="numeric" value="${x.grade ?? ''}" ${canGrade ? '' : 'disabled'} aria-label="Nota de ${esc(shortName(x.student))}"></td>
-      <td><a class="btn ${canGrade && x.grade === undefined ? 'btn-primary' : 'btn-ghost'} rv-btn" href="#r-${a.id}-${i}">${canGrade ? (x.grade === undefined ? 'Calificar' : 'Revisar') : 'Ver'}</a>${x.feedback ? `<small class="when fb" title="${esc(x.feedback)}">“${esc(x.feedback.length > 34 ? x.feedback.slice(0, 32) + '…' : x.feedback)}”</small>` : ''}${(x as { returned?: boolean }).returned ? '<small class="when">Devuelta</small>' : ''}</td>
+      <td><a class="btn ${canGrade && x.grade === undefined ? 'btn-primary' : 'btn-ghost'} rv-btn" href="#r-${a.id}-${i}">${canGrade ? (x.grade === undefined ? 'Calificar' : 'Revisar') : 'Ver'}</a>${x.feedback ? `<small class="when fb" title="${esc(x.feedback)}">“${esc(x.feedback.length > 34 ? x.feedback.slice(0, 32) + '…' : x.feedback)}”</small>` : ''}${(x as { returned?: boolean }).returned ? '<small class="when">Devuelta</small>' : (x as { draft?: boolean }).draft ? '<small class="when draft">Borrador · no publicada</small>' : x.grade !== undefined && canGrade ? '<small class="when pub">Publicada</small>' : ''}</td>
     </tr>`;
   }).join('');
   const chips = chip('calendar', `Abre: ${fechaHora(a.open ?? due)}`) + chip('clock', `Vence: ${fechaHora(due)}`, isOpen ? 'warn' : '') +

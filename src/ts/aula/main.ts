@@ -10,7 +10,9 @@ import {
 } from './render';
 import { activityView } from './views/activity';
 import { effectiveReview, reviewView } from './views/review';
-import { getReview, rubricTotal, saveReview } from './reviews';
+import { PDF_EJEMPLO, getReview, pdfUrl, rubricTotal, saveReview } from './reviews';
+import { InkViewer } from './pdfink';
+import { studentView } from './views/student';
 import type { Review } from './reviews';
 import { bankRow, bankView, csv, gradebookView, gradedColumns, participantsView, questionDialog, reportsView } from './views/tabs';
 import { Store, allWeeks } from './store';
@@ -132,11 +134,12 @@ function render(): void {
   const r = state.route;
   let body = '';
   let tab = 'curso';
-  if (r.startsWith('r-')) {
-    const html = renderReview();
-    if (html) { root.innerHTML = html; setEditing(state.editing, false); return; }
+  if (r.startsWith('r-') || r.startsWith('e-')) {
+    const html = r.startsWith('r-') ? renderReview() : renderStudent();
+    if (html) { root.innerHTML = html; setEditing(state.editing, false); mountViewer(); return; }
     state.route = 'curso'; render(); return;
   }
+  dropViewer();
   if (r.startsWith('a-')) {
     const list = flatActivities();
     const i = list.findIndex((x) => x.a.id === r.slice(2));
@@ -169,7 +172,7 @@ const scrollTo = (id: string, smooth = true) => requestAnimationFrame(() =>
 
 function route(smooth: boolean): void {
   const h = decodeURIComponent(location.hash.slice(1));
-  if (h.startsWith('r-')) { openReviewRoute(h); return; }
+  if (h.startsWith('r-') || h.startsWith('e-')) { openReviewRoute(h); return; }
   if (h.startsWith('a-') || ['participantes', 'calificaciones', 'banco', 'informes'].includes(h)) {
     state.route = h; render();
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -444,8 +447,32 @@ function updateShareSummary(): void {
 // ---------- Revisión de tareas ----------
 const rvState = {
   aid: '', index: 0, work: null as Review | null, dirty: false,
-  onlyPending: ls.get('ef-rv-pending') !== '0', zoom: 1, tool: 'none',
+  onlyPending: ls.get('ef-rv-pending') !== '0',
 };
+
+// Visor de PDF: se conserva entre redibujos del panel (no se vuelve a abrir el PDF al tocar la rúbrica)
+let viewer: InkViewer | null = null;
+let viewerKey = '';
+function dropViewer(): void { viewer?.destroy(); viewer = null; viewerKey = ''; }
+function mountViewer(): void {
+  const host = $('#pdf-host');
+  const ctx = rvContext();
+  if (!host || !ctx || !rvState.work) { dropViewer(); return; }
+  const sub = ctx.subs[rvState.index];
+  const ro = state.route.startsWith('e-');
+  const key = `${state.route.slice(0, 1)}:${ctx.f.a.id}:${sub.student.id}`;
+  if (viewer && viewerKey === key) { host.appendChild(viewer.el); return; }
+  dropViewer();
+  if (!rvState.work.ink) rvState.work.ink = [];
+  viewer = new InkViewer({
+    url: pdfUrl(ctx.f.a.id, sub.student.id), fallbackUrl: PDF_EJEMPLO, fileName: sub.file,
+    ink: ro ? structuredCloneSafe(rvState.work.ink) : rvState.work.ink, readOnly: ro,
+    onChange: () => { rvState.dirty = true; },
+    onInfo: toast,
+  });
+  viewerKey = key;
+  host.appendChild(viewer.el);
+}
 
 function rvContext() {
   const f = findActivity(rvState.aid);
@@ -455,9 +482,9 @@ function rvContext() {
 }
 
 function openReviewRoute(h: string): void {
-  const m = h.match(/^r-(.+)-(\d+)$/);
+  const m = h.match(/^[re]-(.+)-(\d+)$/);
   if (!m) return;
-  if (rvState.dirty) saveWork('draft', true);
+  if (rvState.dirty) saveWork('keep', true);
   rvState.aid = m[1]; rvState.index = Number(m[2]); rvState.work = null; rvState.dirty = false;
   state.route = h;
   render();
@@ -474,32 +501,50 @@ function renderReview(): string | null {
   return reviewView({
     a: f.a, week: f.w, subs, index: i, review: rvState.work,
     reviews: subs.map((x) => getReview(f.a.id, x.student.id)),
-    onlyPending: rvState.onlyPending, zoom: rvState.zoom, tool: rvState.tool,
+    onlyPending: rvState.onlyPending,
   });
+}
+
+function renderStudent(): string | null {
+  const ctx = rvContext();
+  if (!ctx) return null;
+  const { f, subs } = ctx;
+  const i = Math.min(rvState.index, subs.length - 1);
+  const sub = subs[i];
+  const saved = getReview(f.a.id, sub.student.id);
+  rvState.work = structuredCloneSafe(effectiveReview(sub, saved));
+  return studentView({ a: f.a, week: f.w, course, sub, index: i, review: rvState.work, published: saved ? saved.state === 'graded' : sub.grade != null, now: NOW });
 }
 const structuredCloneSafe = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
 
 function rerenderReview(keepScroll = true): void {
   const y = window.scrollY;
-  const vy = $('#viewer')?.scrollTop ?? 0;
+  const sc = viewer?.el.querySelector('.pdfv-scroll');
+  const vy = sc?.scrollTop ?? 0, vx = sc?.scrollLeft ?? 0;
   const html = renderReview();
-  if (html) root.innerHTML = html;
-  if (keepScroll) { window.scrollTo(0, y); const v = $('#viewer'); if (v) v.scrollTop = vy; }
+  if (html) { root.innerHTML = html; mountViewer(); }
+  if (keepScroll) { window.scrollTo(0, y); if (sc) { sc.scrollTop = vy; sc.scrollLeft = vx; } }
 }
 
-function saveWork(kind: 'draft' | 'returned' | 'next' | 'graded', silent = false): void {
+/** draft = borrador (no lo ve el estudiante) · publish = publica la nota · keep = guarda sin cambiar el estado (autoguardado) */
+function saveWork(kind: 'draft' | 'returned' | 'publish' | 'keep', silent = false): void {
   const ctx = rvContext();
   if (!ctx || !rvState.work) return;
   const sub = ctx.subs[rvState.index];
   const w = rvState.work;
-  w.state = kind === 'returned' ? 'returned' : w.grade !== null ? 'graded' : 'draft';
+  const before = getReview(ctx.f.a.id, sub.student.id)?.state ?? (sub.grade != null ? 'graded' : 'draft');
+  if (kind === 'keep') w.state = before === 'graded' && w.grade === null ? 'draft' : before;
+  else if (kind === 'publish') { w.state = 'graded'; w.published = new Date().toISOString(); }
+  else w.state = kind;
   w.updated = new Date().toISOString();
   saveReview(ctx.f.a.id, sub.student.id, w);
   derive(ctx.f.a);
   rvState.dirty = false;
   if (!silent) {
     const who = shortName(sub.student);
-    toast(kind === 'returned' ? `Devuelta a ${who} para que corrija y vuelva a entregar` : w.grade !== null ? `Guardado: ${who} · ${w.grade}/20` : `Borrador guardado: ${who}`);
+    toast(kind === 'returned' ? `Devuelta a ${who}: verá tus comentarios y marcas para corregir`
+      : kind === 'publish' ? `Nota publicada: ${who} ya ve «Calificado» · ${w.grade}/20`
+      : `Borrador guardado: ${who} todavía no lo ve`);
   }
 }
 
@@ -521,20 +566,6 @@ function goStudent(step: number, fromSave = false): void {
   else toast('No hay más entregas por calificar.');
 }
 
-function placeMark(paper: HTMLElement, ev: MouseEvent): void {
-  if (!rvState.work || !['ok', 'bad', 'note'].includes(rvState.tool)) return;
-  const box = paper.getBoundingClientRect();
-  const x = Math.round(((ev.clientX - box.left) / box.width) * 1000) / 10;
-  const y = Math.round(((ev.clientY - box.top) / box.height) * 1000) / 10;
-  rvState.work.marks.push({ x, y, page: Number(paper.dataset.page), kind: rvState.tool as 'ok' | 'bad' | 'note', text: '' });
-  rvState.dirty = true;
-  rerenderReview();
-  if (rvState.tool === 'note') {
-    const bubbles = $$<HTMLElement>('.note-bubble');
-    bubbles[bubbles.length - 1]?.focus();
-  }
-}
-
 function setRubric(ci: number, pts: number): void {
   const w = rvState.work!;
   w.rubric[ci] = pts;
@@ -546,18 +577,9 @@ function setRubric(ci: number, pts: number): void {
 
 function handleReviewClick(el: HTMLElement, e: MouseEvent): boolean {
   if (!state.route.startsWith('r-')) return false;
+  if (el.closest('.pdfv')) return true;   // el visor maneja sus propios clics
   const w = rvState.work;
-  const tool = el.closest<HTMLElement>('[data-tool]');
-  if (tool) { rvState.tool = tool.dataset.tool!; rerenderReview(); return true; }
-  const z = el.closest<HTMLElement>('[data-zoom]');
-  if (z) { rvState.zoom = Math.min(1.6, Math.max(0.6, Math.round((rvState.zoom + Number(z.dataset.zoom) * 0.1) * 10) / 10)); rerenderReview(); return true; }
-  const mk = el.closest<HTMLElement>('[data-mark]');
-  if (mk && w) {
-    if (rvState.tool === 'erase') { w.marks.splice(Number(mk.dataset.mark), 1); rvState.dirty = true; rerenderReview(); }
-    return true;
-  }
-  const paper = el.closest<HTMLElement>('.paper');
-  if (paper) { placeMark(paper, e); return true; }
+  if (el.closest('[data-rv-preview]') && rvState.dirty) { saveWork('keep', true); return false; }
   const lvl = el.closest<HTMLElement>('.lvl');
   if (lvl && w) { setRubric(Number(lvl.dataset.crit), Number(lvl.dataset.pts)); return true; }
   if (el.closest('[data-use-rubric]') && w) { w.grade = rubricTotal(w.rubric); w.manual = false; rvState.dirty = true; rerenderReview(); return true; }
@@ -567,14 +589,16 @@ function handleReviewClick(el: HTMLElement, e: MouseEvent): boolean {
     w.feedback = (ta.value.trim() ? ta.value.trim() + ' ' : '') + qc.dataset.quick;
     ta.value = w.feedback; ta.focus(); rvState.dirty = true; return true;
   }
-  if (el.closest('[data-grade-zero]') && w) { w.grade = 0; w.manual = true; w.feedback = w.feedback || 'No entregó (NE).'; saveWork('graded'); rerenderReview(); return true; }
+  if (el.closest('[data-grade-zero]') && w) { w.grade = 0; w.manual = true; w.feedback = w.feedback || 'No entregó (NE).'; saveWork('publish'); rerenderReview(); return true; }
   const sv = el.closest<HTMLElement>('[data-rv-save]');
   if (sv) {
-    const kind = sv.dataset.rvSave as 'draft' | 'returned' | 'next';
-    if (kind === 'next' && w && w.grade === null && rvContext()!.subs[rvState.index].status !== 'open' && rvContext()!.subs[rvState.index].status !== 'missing') {
+    const kind = sv.dataset.rvSave as 'draft' | 'returned' | 'publish' | 'next';
+    const st = rvContext()!.subs[rvState.index].status;
+    if ((kind === 'next' || kind === 'publish') && w && w.grade === null) {
+      if (kind === 'next' && (st === 'open' || st === 'missing')) { goStudent(1, true); return true; }
       toast('Falta la nota: completa la rúbrica o escribe la nota final.'); ($('#rv-grade') as HTMLInputElement)?.focus(); return true;
     }
-    saveWork(kind === 'next' ? 'graded' : kind);
+    saveWork(kind === 'next' ? 'publish' : kind);
     if (kind === 'next') goStudent(1, true); else rerenderReview();
     return true;
   }
@@ -602,7 +626,6 @@ document.addEventListener('input', (e) => {
   }
   if (el.id === 'rv-feedback') { w.feedback = (el as HTMLTextAreaElement).value; rvState.dirty = true; }
   if (el.id === 'rv-private') { w.privateNote = (el as HTMLTextAreaElement).value; rvState.dirty = true; }
-  if (el.classList.contains('note-bubble')) { const m = w.marks[Number(el.dataset.note)]; if (m) { m.text = el.textContent ?? ''; rvState.dirty = true; } }
 });
 
 document.addEventListener('keydown', (e) => {
@@ -610,7 +633,7 @@ document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); ($('[data-rv-save="next"]') as HTMLButtonElement)?.click(); }
   if (e.altKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); goStudent(e.key === 'ArrowRight' ? 1 : -1); }
 });
-window.addEventListener('beforeunload', () => { if (rvState.dirty) saveWork('draft', true); });
+window.addEventListener('beforeunload', () => { if (rvState.dirty) saveWork('keep', true); });
 
 // ---------- Eventos ----------
 function closeMenus(except?: Element): void {

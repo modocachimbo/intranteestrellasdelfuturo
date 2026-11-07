@@ -4,6 +4,7 @@ import { fechaHora } from '../calendar';
 import { rng, shortName } from '../data/students';
 import { esc } from '../render';
 import { COMENTARIOS_RAPIDOS, RUBRICA, rubricFromGrade, rubricTotal } from '../reviews';
+import { marksToInk } from '../pdfink';
 import type { Review } from '../reviews';
 import type { Activity, Submission, Week } from '../types';
 
@@ -11,12 +12,12 @@ const gradeClass = (g: number | null) => (g === null ? 'g-x' : g >= 18 ? 'g-ad' 
 
 /** Revisión efectiva: la guardada o una creada a partir de la nota de ejemplo. */
 export function effectiveReview(sub: Submission, saved?: Review): Review {
-  if (saved) return saved;
+  if (saved) return { ...saved, ink: saved.ink ?? marksToInk(saved.marks ?? []) };
   const g = sub.grade ?? null;
   return {
     rubric: g !== null ? rubricFromGrade(g) : [null, null, null, null],
     grade: g, manual: g !== null && rubricTotal(rubricFromGrade(g)) !== g,
-    feedback: sub.feedback ?? '', privateNote: '', marks: [],
+    feedback: sub.feedback ?? '', privateNote: '', marks: [], ink: [],
     state: g !== null ? 'graded' : 'draft', updated: '',
   };
 }
@@ -30,7 +31,7 @@ function paperHead(sub: Submission, a: Activity, page: number, pages: number): s
     <div class="paper-title hand">${esc(a.name)}</div>`;
 }
 
-function workPages(a: Activity, sub: Submission): string[] {
+export function workPages(a: Activity, sub: Submission): string[] {
   const r = rng(a.id + sub.student.id + 'work');
   const errRate = Math.max(0.03, (16 - sub.student.ability) / 22);
   const n = a.name.toLowerCase();
@@ -73,10 +74,6 @@ function workPages(a: Activity, sub: Submission): string[] {
   return [p1, p2];
 }
 
-function marksHtml(rv: Review, page: number): string {
-  return rv.marks.map((m, i) => m.page !== page ? '' : `<span class="mark ${m.kind}" style="left:${m.x}%;top:${m.y}%" data-mark="${i}">${m.kind === 'ok' ? ico('checkc', 'ico-sm') : m.kind === 'bad' ? ico('close', 'ico-sm') : ico('chat', 'ico-sm')}${m.kind === 'note' ? `<span class="note-bubble" contenteditable="true" data-note="${i}" aria-label="Comentario">${esc(m.text ?? '')}</span>` : ''}</span>`).join('');
-}
-
 // ---------- Vista ----------
 export interface ReviewCtx {
   a: Activity;
@@ -86,8 +83,14 @@ export interface ReviewCtx {
   review: Review;
   reviews: (Review | undefined)[];
   onlyPending: boolean;
-  zoom: number;
-  tool: string;
+}
+
+/** ✓ publicada · ✎ borrador · • por calificar · ○ sin entrega */
+export function reviewMark(s: Submission, r?: Review): string {
+  if (s.status === 'missing' || s.status === 'open') return r?.grade != null ? '✓' : '○';
+  const g = r ? r.grade : s.grade;
+  if (g == null) return '•';
+  return r && r.state === 'draft' ? '✎' : '✓';
 }
 
 export function reviewView(c: ReviewCtx): string {
@@ -99,32 +102,18 @@ export function reviewView(c: ReviewCtx): string {
   const pct = sentCount ? Math.round((gradedCount / sentCount) * 100) : 0;
   const options = c.subs.map((s, i) => {
     const g = c.reviews[i]?.grade ?? s.grade;
-    const mark = s.status === 'missing' || s.status === 'open' ? '○ ' : g != null ? '✓ ' : '• ';
-    return `<option value="${i}"${i === c.index ? ' selected' : ''}>${mark}${esc(s.student.name)}${g != null ? ` — ${g}` : s.status === 'missing' ? ' — no entregó' : ''}</option>`;
+    const mark = reviewMark(s, c.reviews[i]);
+    return `<option value="${i}"${i === c.index ? ' selected' : ''}>${mark} ${esc(s.student.name)}${g != null ? ` — ${g}${mark === '✎' ? ' (borrador)' : ''}` : s.status === 'missing' ? ' — no entregó' : ''}</option>`;
   }).join('');
   const sugg = rubricTotal(rv.rubric);
   const statusChip = sub.status === 'ontime' ? `<span class="chip green">Entregó a tiempo</span>` : sub.status === 'late' ? `<span class="chip yellow">Entregó tarde</span>` : sub.status === 'missing' ? `<span class="chip red">No entregó</span>` : `<span class="chip gray">Aún no entrega</span>`;
-  const stateChip = rv.state === 'returned' ? '<span class="chip yellow">Devuelta para corregir</span>' : rv.grade !== null ? '<span class="chip blue">Calificada</span>' : sent ? '<span class="chip gray">Por calificar</span>' : '';
-  const pages = sent ? workPages(c.a, sub) : [];
+  const saved = c.reviews[c.index];
+  const stateChip = (saved?.state ?? (sub.grade != null ? 'graded' : 'draft')) === 'returned' ? '<span class="chip yellow">Devuelta para corregir</span>'
+    : saved?.state === 'graded' || (!saved && sub.grade != null) ? '<span class="chip blue">Nota publicada</span>'
+    : saved && saved.grade !== null ? '<span class="chip gray">Borrador · el estudiante no lo ve</span>' : sent ? '<span class="chip gray">Por calificar</span>' : '';
 
-  const viewer = sent ? `
-    <div class="viewer-tools" role="toolbar" aria-label="Herramientas de revisión">
-      <div class="tool-group">
-        <button type="button" class="vt${c.tool === 'none' ? ' on' : ''}" data-tool="none" aria-pressed="${c.tool === 'none'}" title="Solo mirar">${ico('eye', 'ico-sm')}<span>Mirar</span></button>
-        <button type="button" class="vt ok${c.tool === 'ok' ? ' on' : ''}" data-tool="ok" aria-pressed="${c.tool === 'ok'}" title="Marcar correcto">${ico('checkc', 'ico-sm')}<span>Correcto</span></button>
-        <button type="button" class="vt bad${c.tool === 'bad' ? ' on' : ''}" data-tool="bad" aria-pressed="${c.tool === 'bad'}" title="Marcar error">${ico('close', 'ico-sm')}<span>Error</span></button>
-        <button type="button" class="vt note${c.tool === 'note' ? ' on' : ''}" data-tool="note" aria-pressed="${c.tool === 'note'}" title="Agregar comentario">${ico('chat', 'ico-sm')}<span>Comentario</span></button>
-        <button type="button" class="vt${c.tool === 'erase' ? ' on' : ''}" data-tool="erase" aria-pressed="${c.tool === 'erase'}" title="Borrar marcas">${ico('trash', 'ico-sm')}<span>Borrar</span></button>
-      </div>
-      <div class="tool-group">
-        <button type="button" class="vt icon" data-zoom="-1" aria-label="Alejar">−</button><span class="zoom-v">${Math.round(c.zoom * 100)} %</span><button type="button" class="vt icon" data-zoom="1" aria-label="Acercar">+</button>
-        <button type="button" class="vt" data-fake-download="${esc(sub.file ?? 'entrega.pdf')}">${ico('download', 'ico-sm')}<span>Original</span></button>
-      </div>
-    </div>
-    <div class="viewer${c.tool !== 'none' ? ' tool-' + c.tool : ''}" id="viewer">
-      <div class="pages" style="--z:${c.zoom}">${pages.map((p, i) => `<div class="paper" data-page="${i + 1}">${p}<div class="marks">${marksHtml(rv, i + 1)}</div></div>`).join('')}</div>
-    </div>
-    <p class="viewer-hint">${c.tool === 'none' ? 'Elige una herramienta y toca la hoja para marcar.' : c.tool === 'erase' ? 'Toca una marca para borrarla.' : 'Toca la hoja donde quieras poner la marca.'} Las marcas las verá el estudiante al recibir su nota.</p>`
+  const viewer = sent ? `<div class="pdf-host" id="pdf-host"></div>
+    <p class="viewer-hint">${ico('pen', 'ico-sm')} Escribe sobre el PDF con el lápiz de tu tablet, el mouse o el dedo. El estudiante verá tus marcas cuando publiques la nota.</p>`
     : `<div class="viewer empty"><div class="empty-work">${ico('folder', 'ico-lg')}<h3>${sub.status === 'missing' ? 'No entregó este trabajo' : 'Todavía no entrega'}</h3>
         <p>${sub.status === 'missing' ? `La fecha límite fue el ${fechaHora(c.a.due!)}` : 'Aún está dentro del plazo.'}</p>
         <div class="row">${sub.status === 'missing' ? `<button class="btn btn-ghost" type="button" data-grade-zero>${ico('grade', 'ico-sm')}Registrar NE (0)</button>` : ''}
@@ -155,6 +144,7 @@ export function reviewView(c: ReviewCtx): string {
           <div class="person"><span class="avatar">${(sub.student.name.split(', ')[1][0] + sub.student.name[0]).toUpperCase()}</span><span><b>${esc(sub.student.name)}</b><small>${sub.student.code} · Grupo ${sub.student.group}</small></span></div>
           <div class="chips">${statusChip}${stateChip}</div>
           ${sub.when ? `<span class="muted small">${ico('clock', 'ico-sm')} ${sub.when}${sub.file ? ` · ${esc(sub.file)}` : ''}</span>` : ''}
+          <a class="btn btn-ghost preview-btn" href="#e-${c.a.id}-${c.index}" data-rv-preview>${ico('eye', 'ico-sm')}Ver como estudiante</a>
         </div>
         ${viewer}
       </section>
@@ -176,11 +166,12 @@ export function reviewView(c: ReviewCtx): string {
           <textarea id="rv-private" class="sm" placeholder="Ej. conversar con el apoderado…">${esc(rv.privateNote)}</textarea>
         </section>
         <div class="rv-actions">
-          <button class="btn btn-ghost" type="button" data-rv-save="draft">${ico('save', 'ico-sm')}Guardar</button>
-          <button class="btn btn-ghost" type="button" data-rv-save="returned" ${sent ? '' : 'disabled'}>${ico('upload', 'ico-sm', 'transform:rotate(180deg)')}Devolver para corregir</button>
-          <button class="btn btn-primary" type="button" data-rv-save="next">${ico('checkc', 'ico-sm')}Guardar y siguiente</button>
+          <button class="btn btn-ghost" type="button" data-rv-save="draft" title="El estudiante todavía no ve la nota">${ico('save', 'ico-sm')}Guardar borrador</button>
+          <button class="btn btn-ghost" type="button" data-rv-save="returned" ${sent ? '' : 'disabled'} title="El estudiante ve tus comentarios y vuelve a entregar">${ico('upload', 'ico-sm', 'transform:rotate(180deg)')}Devolver para corregir</button>
+          <button class="btn btn-ghost" type="button" data-rv-save="publish">${ico('megaphone', 'ico-sm')}Publicar nota</button>
+          <button class="btn btn-primary" type="button" data-rv-save="next">${ico('checkc', 'ico-sm')}Publicar y siguiente</button>
         </div>
-        <p class="muted small kbd-hint">Atajos: <kbd>Ctrl</kbd> + <kbd>Enter</kbd> guarda y pasa al siguiente · <kbd>Alt</kbd> + <kbd>←</kbd>/<kbd>→</kbd> cambia de estudiante.</p>
+        <p class="muted small kbd-hint">Al publicar, el estudiante ve <b>Calificado</b>, su nota, tu retroalimentación, la rúbrica y su PDF con tus marcas. El borrador solo lo ves tú.<br>Atajos: <kbd>Ctrl</kbd> + <kbd>Enter</kbd> publica y pasa al siguiente · <kbd>Ctrl</kbd> + <kbd>Z</kbd> deshace un trazo · <kbd>Alt</kbd> + <kbd>←</kbd>/<kbd>→</kbd> cambia de estudiante.</p>
       </aside>
     </div>
   </div>`;

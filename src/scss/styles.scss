@@ -566,3 +566,7 @@ input.nota.g-x { background: #fff; border: 1.5px dashed #9AA4BF; }
 .cover .top h3, .cover .top .kicker { position: relative; z-index: 1; }
 .cover .top .wm { right: 18px; bottom: -34px; width: 112px; height: 112px; opacity: .2; }
 @media (max-width: 720px) { .band-art { display: none; } }
+
+// Letra manuscrita (Caveat, licencia OFL) servida desde el propio sitio
+@font-face { font-family: 'Caveat'; font-style: normal; font-weight: 500; font-display: swap; src: url('../fonts/caveat-500.woff2') format('woff2'); }
+@font-face { font-family: 'Caveat'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/caveat-700.woff2') format('woff2'); }

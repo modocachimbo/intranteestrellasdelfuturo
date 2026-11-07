@@ -101,3 +101,4 @@ export function summary(subs: Submission[]) {
     approved: grades.filter((g) => g >= 11).length,
   };
 }
+
