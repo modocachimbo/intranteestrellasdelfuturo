@@ -9,6 +9,9 @@ import { getInst, gradoInfo } from '../core/institucion';
 import { avisoTexto, hora, marcasDe } from '../core/asistencia';
 import { carneHtml } from '../core/carne';
 import { DOCS_MAT, ESTADOS_MAT, MOTIVOS, getMat, gradoTxt, saveMat } from '../core/matricula';
+import { fichaHtml as fichaDoc, mostrarFicha, numeroMatricula } from '../core/ficha';
+import { getAdm } from '../core/admision';
+import { getUsuarios } from '../core/usuarios';
 import type { Curso, EstadoTarea, Tarea } from './data';
 
 const acc = currentAccount();
@@ -70,7 +73,27 @@ function matriculaCard(): string {
     : r.estado === 'no_continua' ? `Registramos que ${nom} no continuará el próximo año.`
     : `${esPadre() ? `Confirma que ${nom} continúa` : 'Tu apoderado debe confirmar tu matrícula'} en ${gradoTxt(inst, r.grado)}. Plazo: ${fin}.`;
   return `<section class="mat-card ${r.estado}" role="status">${ico('idcard')}<div><b>Matrícula ${d.cfg.anio} · <span class="chip ${e.tone}">${e.name}</span></b><p>${txt}</p></div>
-    ${puede ? `<button type="button" class="btn btn-primary" data-mat-confirm>Confirmar matrícula</button>` : ''}</section>`;
+    ${puede ? `<button type="button" class="btn btn-primary" data-mat-confirm>Confirmar matrícula</button>` : ''}${r.estado === 'matriculado' ? `<button type="button" class="btn btn-ghost" data-ficha="${d.cfg.anio}">${ico('file', 'ico-sm')}Ficha de matrícula ${d.cfg.anio}</button>` : ''}</section>`;
+}
+
+/** Ficha de matrícula del año actual (según su sección) o del próximo (según Matrícula). */
+function verFicha(anio: number): void {
+  if (!ALUMNO) return;
+  const inst = getInst(); const m = getMat();
+  const apo = getUsuarios().users.find((a) => a.tipo === 'apoderado' && (a.hijos ?? []).includes(ALUMNO!.id));
+  const llegada = getAdm().postulantes.find((p) => p.matricula?.estCode === ALUMNO!.code);
+  const proximo = anio === m.cfg.anio;
+  const reg = m.regs[ALUMNO.id];
+  const sec = inst.secciones.find((s) => s.id === (proximo ? reg?.seccion : ALUMNO!.seccion));
+  mostrarFicha(fichaDoc(inst, {
+    numero: numeroMatricula(anio, ALUMNO.code), anio, fecha: proximo ? reg?.at ?? '' : llegada?.matricula?.at ?? `${anio}-03-02`,
+    tipo: proximo ? (reg?.nuevo ? 'Ingresante (nuevo)' : 'Promovido') : llegada?.ingreso === 'durante' ? 'Ingreso durante el año (traslado)' : llegada ? 'Ingresante (nuevo)' : 'Promovido',
+    inicio: !proximo && llegada?.ingreso === 'durante' ? llegada.bimestre : undefined,
+    est: { code: ALUMNO.code, dni: ALUMNO.dni, apellidos: ALUMNO.apellidos, nombres: ALUMNO.nombres },
+    grado: proximo ? reg?.grado ?? '' : sec?.grado ?? '', seccion: sec?.id ?? '', sede: sec?.sede ?? ALUMNO.sede,
+    apoderado: apo ? { nombre: `${apo.nombres} ${apo.apellidos}`, dni: apo.dni, parentesco: apo.parentesco ?? 'Apoderado', celular: apo.phone } : undefined,
+    procesadoPor: 'Portal del estudiante',
+  }), `Ficha de matrícula ${anio} · ${ALUMNO.nombres} ${ALUMNO.apellidos}`);
 }
 
 function confirmarMatricula(): void {
@@ -199,6 +222,7 @@ function inicio(now: Date): string {
 function cursos(): string {
   return `${band('book', 'Mis cursos', `${SEC.corto} · Año escolar 2026`)}
   <main class="content overlap stu">${padreBar()}
+    ${ALUMNO?.seccion ? `<div class="stu-ficha-row"><span class="muted small">Tus cursos de este año y sus horas están en tu ficha de matrícula.</span><button type="button" class="btn btn-soft sm" data-ficha="${getMat().cfg.anio - 1}">${ico('file', 'ico-sm')}Ficha de matrícula ${getMat().cfg.anio - 1}</button></div>` : ''}
     <section class="stu-courses">${CURSOS.map((c: Curso) => { const p = promedio(c.notas); return `<${c.aula ? 'a href="#tareas"' : 'div'} class="card stu-course" style="--c:${c.color}">
       <div class="sc-top"><span class="tile">${ico(c.icon)}</span>${c.aula ? '<span class="chip green">Aula virtual</span>' : ''}</div>
       <b>${c.name}</b><small>${c.teacher}</small>
@@ -286,6 +310,8 @@ function start(): void {
     const hj = (e.target as HTMLElement).closest<HTMLElement>('[data-hijo]');
     if (hj) { try { localStorage.setItem('ef-hijo', hj.dataset.hijo!); } catch { /* sin almacenamiento */ } location.reload(); return; }
     if ((e.target as HTMLElement).closest('[data-mat-confirm]')) { confirmarMatricula(); return; }
+    const fc = (e.target as HTMLElement).closest<HTMLElement>('[data-ficha]');
+    if (fc) { verFicha(Number(fc.dataset.ficha)); return; }
     const t = (e.target as HTMLElement).closest<HTMLElement>('[data-toast]');
     if (!t) return;
     let el = document.querySelector<HTMLElement>('.toast');

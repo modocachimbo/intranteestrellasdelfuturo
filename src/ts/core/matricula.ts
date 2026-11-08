@@ -36,6 +36,7 @@ export interface RegMat {
   motivo?: string;
   autorizaDeuda?: string;  // quién autorizó matricular con deuda
   enLinea?: string;        // fecha en que el padre confirmó en línea
+  nuevo?: boolean;         // viene de Admisión (no estudiaba en el colegio)
   at: string;
 }
 export interface MatCfg { anio: number; inicioAntiguos: string; finAntiguos: string; inicioNuevos: string; cierre: string; costo: number; reserva: number }
@@ -90,7 +91,7 @@ export function getMat(): MatStore {
   d ??= semilla();
   // Estudiantes nuevos en el sistema (por ejemplo, creados en Usuarios) reciben su registro
   const inst = getInst();
-  for (const u of getUsuarios().users) if (u.tipo === 'estudiante' && u.estado === 'activo' && !d.regs[u.id]) d.regs[u.id] = base(u, inst);
+  for (const u of getUsuarios().users) if (u.tipo === 'estudiante' && u.estado === 'activo' && u.seccion && !d.regs[u.id]) d.regs[u.id] = base(u, inst);
   return d;
 }
 export function saveMat(d: MatStore): boolean { try { localStorage.setItem(KEY, JSON.stringify(d)); return true; } catch { return false; } }

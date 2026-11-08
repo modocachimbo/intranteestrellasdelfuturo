@@ -1,6 +1,8 @@
 /* Admisión (Secretaría): resumen, postulantes por etapa, vacantes y proceso. Incluye la ficha de cada postulante
    y la matrícula, que crea las cuentas del estudiante y del apoderado (entran con su DNI). */
-import { CANALES, DOCS, ETAPAS, aid, cupos, docsFaltan, edadAl31Marzo, getAdm, gradoLabel, pNombre, resetAdm, saveAdm, vacKey } from '../core/admision';
+import { BIMESTRES, CANALES, DOCS, ETAPAS, aid, anioDe, cupos, cuposActual, docsDe, docsFaltan, edadAl31Marzo, getAdm, gradoLabel, pNombre, resetAdm, saveAdm, vacKey } from '../core/admision';
+import { fichaHtml as fichaDoc, mostrarFicha, numeroMatricula } from '../core/ficha';
+import { getMat, saveMat } from '../core/matricula';
 import type { AdmisionStore, Etapa, Postulante } from '../core/admision';
 import { ico } from '../core/icons';
 import { clone, getInst, gradoInfo, seccionLabel } from '../core/institucion';
@@ -25,6 +27,9 @@ interface Opts { canEdit: boolean }
 const ORDEN: Etapa[] = ['interesado', 'postulante', 'evaluado', 'admitido', 'espera', 'no_admitido', 'matriculado'];
 const fecha = (iso?: string) => (iso ? new Date(iso.length === 10 ? `${iso}T12:00` : iso).toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' }) : '—');
 const etapa = (id: Etapa) => ETAPAS.find((e) => e.id === id)!;
+/** Vacantes que aplican al postulante: las del próximo año o las de este año si llega a mitad de año. */
+const kFor = (d: AdmisionStore, inst: Institucion, p: Postulante) => (p.ingreso === 'durante' ? cuposActual(inst, p.sede, p.grado, getUsuarios().users, d) : cupos(d, p.sede, p.grado));
+const ingresoTxt = (p: Postulante, d: AdmisionStore) => (p.ingreso === 'durante' ? `Este año (${d.proceso.anio - 1}) · desde el ${p.bimestre ?? 'próximo bimestre'}` : `Año escolar ${d.proceso.anio}`);
 /** Edad esperada al 31 de marzo para cada grado (Inicial 3 años … 5.º de secundaria 16). */
 function edadEsperada(inst: Institucion, grado: string): number | null {
   const gi = gradoInfo(inst, grado);
@@ -56,6 +61,7 @@ function resumen(d: AdmisionStore, st: AdmState, inst: Institucion): string {
   const conv = c('interesado') + ps.length ? Math.round(((c('admitido') + c('matriculado')) / Math.max(1, ps.length)) * 100) : 0;
   return `<section class="kpis adm-kpis">
       <div class="card kpi adm-kpi"><span class="ico-tile">${ico('users')}</span><span class="kpi-body"><span class="lbl">En el proceso</span><span class="num">${ps.length}</span><span class="sub">${c('interesado')} interesados · ${c('postulante')} postulantes</span></span></div>
+      <div class="card kpi adm-kpi"><span class="ico-tile y">${ico('swap')}</span><span class="kpi-body"><span class="lbl">Llegan este año (${d.proceso.anio - 1})</span><span class="num">${ps.filter((p) => p.ingreso === 'durante' && p.etapa !== 'no_admitido').length}</span><span class="sub">traslados a mitad de año</span></span></div>
       <div class="card kpi adm-kpi"><span class="ico-tile g">${ico('checkc')}</span><span class="kpi-body"><span class="lbl">Admitidos y matriculados</span><span class="num">${c('admitido') + c('matriculado')}</span><span class="sub">${conv} % de todos los que llegaron</span></span></div>
       <div class="card kpi adm-kpi"><span class="ico-tile y">${ico('grid')}</span><span class="kpi-body"><span class="lbl">Vacantes libres</span><span class="num">${Math.max(0, totalVac - ocup)}</span><span class="sub">de ${totalVac} para ${d.proceso.anio}</span><span class="progress mini"><span style="width:${totalVac ? (ocup / totalVac) * 100 : 0}%"></span></span></span></div>
       <div class="card kpi adm-kpi"><span class="ico-tile">${ico('cash')}</span><span class="kpi-body"><span class="lbl">Derecho de admisión</span><span class="num">S/ ${recaudado.toLocaleString('es-PE')}</span><span class="sub">${ps.filter((p) => p.pago).length} pagos de S/ ${d.proceso.costo}</span></span></div>
@@ -89,6 +95,7 @@ function card(p: Postulante, d: AdmisionStore, inst: Institucion): string {
   return `<button type="button" class="pcard" data-adm-open="${p.id}">
     <b>${esc(pNombre(p))}</b><small>${esc(gradoLabel(inst, p.grado))} · ${esc(sede)}</small>
     <span class="pc-tags">
+      ${p.ingreso === 'durante' ? `<span class="tg year" title="Llega a mitad de año">${ico('swap', 'ico-sm')}${d.proceso.anio - 1} · ${esc((p.bimestre ?? '').replace(' Bimestre', ' bim.'))}</span>` : ''}
       ${p.pago ? `<span class="tg ok" title="Pagó el derecho">${ico('cash', 'ico-sm')}Pagó</span>` : p.etapa === 'interesado' ? '' : '<span class="tg bad">Sin pago</span>'}
       ${p.etapa !== 'interesado' ? `<span class="tg ${falt ? 'warn' : 'ok'}" title="Documentos obligatorios">${ico('file', 'ico-sm')}${falt ? `Faltan ${falt}` : 'Docs'}</span>` : ''}
       ${p.examen !== null && p.examen !== undefined ? `<span class="tg ${p.examen >= d.proceso.minimo ? 'ok' : 'bad'}">${ico('grade', 'ico-sm')}${p.examen}</span>` : ''}
@@ -148,6 +155,7 @@ function proceso(d: AdmisionStore, o: Opts): string {
       <div class="link-box"><code>${esc(url.replace(/^https?:\/\//, ''))}</code><button type="button" class="btn btn-soft sm" data-adm="copy-link" data-url="${esc(url)}">${ico('copy', 'ico-sm')}Copiar</button><a class="btn btn-ghost sm" href="postula.html" target="_blank" rel="noopener">${ico('eye', 'ico-sm')}Abrir</a></div>
       <h3 class="h3">Requisitos que se piden</h3>
       <ul class="checks">${DOCS.map((x) => `<li>${ico('checkc', 'ico-sm')}<span>${esc(x.name)}${x.obligatorio ? '' : ' <small class="muted">(opcional)</small>'}</span></li>`).join('')}</ul>
+      <p class="muted small"><b>Si llega a mitad de año</b> (traslado), además: resolución o constancia de traslado del colegio anterior y las notas de los bimestres ya cursados. Entra a una sección de este año si hay vacante.</p>
       ${o.canEdit ? '<button type="button" class="link-btn" data-adm="reset">Volver a los datos de ejemplo</button>' : ''}
     </section>
   </div>`;
@@ -202,7 +210,9 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
       { k: 'dni', label: 'DNI del estudiante', type: 'text', max: 12, half: true, hint: 'Puede completarse después' },
       { k: 'nacimiento', label: 'Fecha de nacimiento', type: 'date', half: true },
       { k: 'sede', label: 'Sede', type: 'select', options: inst.sedes.map((s) => [s.id, s.name]), half: true },
-      { k: 'grado', label: `Grado al que postula (${getAdm().proceso.anio})`, type: 'select', options: grados, half: true },
+      { k: 'ingreso', label: '¿Cuándo empieza?', type: 'select', options: [['siguiente', `Año escolar ${getAdm().proceso.anio}`], ['durante', `Este año (${getAdm().proceso.anio - 1}), a mitad de año`]], half: true, hint: 'A mitad de año se piden la constancia de traslado y sus notas.' },
+      { k: 'bimestre', label: 'Si llega este año: desde', type: 'select', options: BIMESTRES.map((b) => [b, b]), half: true },
+      { k: 'grado', label: 'Grado al que postula', type: 'select', options: grados, half: true },
       { k: 'procedencia', label: 'Colegio de procedencia', type: 'text', max: 80, half: true },
       { k: 'canal', label: '¿Cómo nos conoció?', type: 'select', options: CANALES.map((c) => [c, c]), half: true },
       { k: 'apo_nombres', label: 'Apoderado: nombres y apellidos', type: 'text', required: true, max: 80 },
@@ -213,7 +223,8 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
       ...(!p ? [{ k: 'visita', label: 'Visita guiada (opcional)', type: 'date', half: true } as Field] : []),
     ];
     const v0: Values = p ? { ...p, apo_nombres: p.apoderado.nombres, apo_dni: p.apoderado.dni, apo_celular: p.apoderado.celular, apo_parentesco: p.apoderado.parentesco, apo_correo: p.apoderado.correo } as unknown as Values
-      : { sede: st.sede !== 'todas' ? st.sede : inst.sedes[0].id, grado: st.grado || inst.niveles[0].grados[0].id, canal: 'Recomendación', apo_parentesco: 'Madre' };
+      : { sede: st.sede !== 'todas' ? st.sede : inst.sedes[0].id, grado: st.grado || inst.niveles[0].grados[0].id, canal: 'Recomendación', apo_parentesco: 'Madre', ingreso: 'siguiente', bimestre: 'IV Bimestre' };
+    if (p) { v0.ingreso = p.ingreso ?? 'siguiente'; v0.bimestre = p.bimestre ?? 'IV Bimestre'; }
     form(dialog, p ? `Editar a ${pNombre(p)}` : 'Nuevo interesado', 'megaphone', fields, v0, (v) => {
       const dni = normDni(String(v.dni ?? ''));
       if (dni && !/^\d{8}$/.test(dni) && !/^[A-Z0-9]{9,12}$/.test(dni)) return 'El DNI del estudiante debe tener 8 dígitos (o carné de 9 a 12).';
@@ -224,10 +235,12 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
       const d = getAdm();
       if (dni && d.postulantes.some((x) => x.id !== p?.id && x.dni === dni)) return 'Ya hay un postulante con ese DNI. Búscalo en la lista.';
       if (dni && getUsuarios().users.some((u) => u.tipo === 'estudiante' && u.dni === dni)) return 'Ese DNI ya es de un estudiante del colegio.';
-      const data = { nombres: String(v.nombres), apellidos: String(v.apellidos), dni, nacimiento: String(v.nacimiento ?? ''), sede: String(v.sede), grado: String(v.grado), procedencia: String(v.procedencia ?? ''), canal: String(v.canal),
+      const ingreso = v.ingreso === 'durante' ? 'durante' as const : 'siguiente' as const;
+      if (ingreso === 'durante' && !String(v.procedencia ?? '').trim()) return 'Si llega a mitad de año, escribe el colegio del que viene (para el traslado).';
+      const data = { ingreso, bimestre: ingreso === 'durante' ? String(v.bimestre) : undefined, nombres: String(v.nombres), apellidos: String(v.apellidos), dni, nacimiento: String(v.nacimiento ?? ''), sede: String(v.sede), grado: String(v.grado), procedencia: String(v.procedencia ?? ''), canal: String(v.canal),
         apoderado: { nombres: String(v.apo_nombres), dni: adni, celular: String(v.apo_celular), correo: String(v.apo_correo ?? ''), parentesco: String(v.apo_parentesco) } };
       const esperada = edadEsperada(getInst(), data.grado);
-      const edad = edadAl31Marzo(data.nacimiento, d.proceso.anio);
+      const edad = edadAl31Marzo(data.nacimiento, ingreso === 'durante' ? d.proceso.anio - 1 : d.proceso.anio);
       const aviso = esperada !== null && edad !== null && edad !== esperada ? ` Ojo: al 31 de marzo tendrá ${edad} años y para ese grado se pide ${esperada}.` : '';
       if (p) commit((x) => { Object.assign(x.postulantes.find((y) => y.id === p.id)!, data); }, `Datos actualizados: ${data.nombres} ${data.apellidos}.${aviso}`);
       else commit((x) => { const np: Postulante = { id: aid(), creado: new Date().toISOString(), ...data, sexo: '', etapa: 'interesado', docs: [], notas: [], examen: null, entrevista: '', visita: String(v.visita ?? '') }; nota(np, `Registrado por ${by()}. Canal: ${data.canal.toLowerCase()}.`); x.postulantes.push(np); }, `Interesado registrado: ${data.nombres} ${data.apellidos}.${aviso}`);
@@ -261,9 +274,9 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
 
   function decidir(p: Postulante, a: 'admitir' | 'espera' | 'no'): void {
     const d = getAdm();
-    const k = cupos(d, p.sede, p.grado);
+    const k = kFor(d, getInst(), p);
     if (a === 'admitir') {
-      if (!k.libres) { toast(`No quedan vacantes en ${gradoLabel(getInst(), p.grado)}. Puedes ponerlo en lista de espera o aumentar las vacantes.`); return; }
+      if (!k.libres) { toast(p.ingreso === 'durante' ? `Las secciones de ${gradoLabel(getInst(), p.grado)} ya están llenas este año. Puedes ponerlo en lista de espera o ampliar las vacantes en Institución.` : `No quedan vacantes en ${gradoLabel(getInst(), p.grado)}. Puedes ponerlo en lista de espera o aumentar las vacantes.`); return; }
       const bajo = p.examen != null && p.examen < d.proceso.minimo;
       const obs = p.entrevista === 'observado';
       if (bajo || obs) {
@@ -276,24 +289,49 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
     else commit((x) => { const y = x.postulantes.find((z) => z.id === p.id)!; y.etapa = 'no_admitido'; nota(y, 'No admitido.'); }, `${pNombre(p)} quedó como no admitido.`);
   }
 
-  /** Matrícula: crea la cuenta del estudiante y la del apoderado (o le agrega el hijo si ya tiene cuenta). */
+  /** Ficha de matrícula de un postulante ya matriculado. */
+  function verFicha(p: Postulante): void {
+    const d = getAdm(); const inst = getInst();
+    const est = getUsuarios().users.find((u) => u.code === p.matricula?.estCode);
+    const anio = p.matricula?.anio ?? anioDe(p, d);
+    mostrarFicha(fichaDoc(inst, {
+      numero: numeroMatricula(anio, p.matricula?.estCode || 'EST0'), anio, fecha: p.matricula?.at ?? new Date().toISOString(),
+      tipo: p.ingreso === 'durante' ? 'Ingreso durante el año (traslado)' : 'Ingresante (nuevo)', inicio: p.ingreso === 'durante' ? p.bimestre : undefined,
+      est: { code: est?.code ?? p.matricula?.estCode ?? '—', dni: p.dni, apellidos: p.apellidos, nombres: p.nombres, nacimiento: p.nacimiento },
+      grado: p.grado, seccion: p.matricula?.seccion ?? '', sede: p.sede, procedencia: p.procedencia || undefined,
+      apoderado: { nombre: p.apoderado.nombres, dni: p.apoderado.dni, parentesco: p.apoderado.parentesco, celular: p.apoderado.celular },
+      procesadoPor: by(),
+    }), `Ficha de matrícula · ${pNombre(p)}`);
+  }
+
+  /** Matrícula: crea la cuenta del estudiante y la del apoderado (o le agrega el hijo si ya tiene cuenta).
+      - Llega a mitad de año: queda en una sección de ESTE año desde el bimestre indicado.
+      - Próximo año: queda matriculado para ese año (su sección se ve en Matrícula). */
   function matricular(p: Postulante): void {
     const inst = getInst();
+    const d0 = getAdm();
     const falt = docsFaltan(p);
     if (falt.length) { toast(`Antes de matricular faltan documentos: ${falt.map((x) => x.name.replace(/^Copia de /, '')).join(', ')}.`); return; }
     if (!p.dni) { toast('Falta el DNI del estudiante: será su usuario para entrar. Complétalo en "Editar datos".'); return; }
     if (!p.apoderado.dni) { toast('Falta el DNI del apoderado: será su usuario para entrar. Complétalo en "Editar datos".'); return; }
+    if (getUsuarios().users.some((u) => u.tipo === 'estudiante' && u.dni === p.dni)) { toast('Ya existe un estudiante con ese DNI.'); return; }
     const secs = inst.secciones.filter((s) => s.sede === p.sede && s.grado === p.grado);
     if (!secs.length) { toast(`${gradoLabel(inst, p.grado)} no tiene secciones en esa sede. Ábrela en Institución → Secciones.`); return; }
+    const durante = p.ingreso === 'durante';
+    const anio = anioDe(p, d0);
     const us = getUsuarios();
+    const mat = getMat();
+    const ocup = (sid: string) => (durante ? us.users.filter((u) => u.estado === 'activo' && u.seccion === sid).length : Object.values(mat.regs).filter((r) => r.seccion === sid && r.estado !== 'no_continua' && r.estado !== 'egresa').length);
     const apoExiste = us.users.find((u) => u.tipo === 'apoderado' && u.dni === p.apoderado.dni);
-    form(dialog, `Matricular a ${pNombre(p)}`, 'idcard', [
-      { k: 'seccion', label: 'Sección', type: 'select', options: secs.map((s) => [s.id, `${seccionLabel(inst, s)} (${us.users.filter((u) => u.seccion === s.id).length}/${s.vacantes})`]) },
-    ], { seccion: secs[0].id }, (v) => {
+    form(dialog, `Matricular a ${pNombre(p)} · ${anio}`, 'idcard', [
+      { k: 'seccion', label: `Sección ${anio}`, type: 'select', options: secs.map((s) => [s.id, `${seccionLabel(inst, s)} (${ocup(s.id)}/${s.vacantes})`]) },
+    ], { seccion: [...secs].sort((a, b) => ocup(a.id) / a.vacantes - ocup(b.id) / b.vacantes)[0].id }, (v) => {
+      const sec = inst.secciones.find((s) => s.id === v.seccion)!;
+      if (ocup(sec.id) >= sec.vacantes) return `La sección ${sec.name} está llena (${sec.vacantes}). Elige otra.`;
       const d2 = clone(getUsuarios());
       const [apNom, ...apApe] = p.apoderado.nombres.split(' ');
       const estCode = nextCode(d2, 'EST');
-      const est: Usuario = { id: `${estCode.toLowerCase()}${Date.now().toString(36).slice(-3)}`, code: estCode, tipo: 'estudiante', role: 'estudiante', nombres: p.nombres, apellidos: p.apellidos, dni: p.dni, email: '', phone: '', sede: p.sede, seccion: String(v.seccion), estado: 'activo', creado: new Date().toISOString() };
+      const est: Usuario = { id: `${estCode.toLowerCase()}${Date.now().toString(36).slice(-3)}`, code: estCode, tipo: 'estudiante', role: 'estudiante', nombres: p.nombres, apellidos: p.apellidos, dni: p.dni, email: '', phone: '', sede: p.sede, seccion: durante ? sec.id : '', estado: 'activo', creado: new Date().toISOString() };
       d2.users.push(est);
       let apoCode = apoExiste?.code ?? '';
       if (apoExiste) { const a = d2.users.find((u) => u.id === apoExiste.id)!; a.hijos = [...new Set([...(a.hijos ?? []), est.id])]; }
@@ -301,17 +339,23 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
         apoCode = nextCode(d2, 'APO');
         d2.users.push({ id: `${apoCode.toLowerCase()}${Date.now().toString(36).slice(-3)}`, code: apoCode, tipo: 'apoderado', role: 'apoderado', nombres: apNom, apellidos: apApe.join(' '), dni: p.apoderado.dni, email: p.apoderado.correo, phone: p.apoderado.celular, sede: p.sede, hijos: [est.id], parentesco: p.apoderado.parentesco, estado: 'activo', creado: new Date().toISOString() });
       }
-      d2.historial = [...d2.historial, { at: new Date().toISOString(), by: by(), summary: `Matrícula desde Admisión: ${fullName(est)} (${estCode})${apoExiste ? ` vinculado a ${apoExiste.code}` : ` y apoderado ${apoCode}`}.` }];
+      d2.historial = [...d2.historial, { at: new Date().toISOString(), by: by(), summary: `Matrícula ${anio} desde Admisión: ${fullName(est)} (${estCode})${apoExiste ? ` vinculado a ${apoExiste.code}` : ` y apoderado ${apoCode}`}${durante ? ` · ingresa en el ${p.bimestre}` : ''}.` }];
       if (!saveUsuarios(d2)) return 'No se pudo guardar las cuentas.';
-      commit((x) => { const y = x.postulantes.find((z) => z.id === p.id)!; y.etapa = 'matriculado'; y.matricula = { at: new Date().toISOString(), seccion: String(v.seccion), estCode, apoCode }; nota(y, `Matriculado en ${seccionLabel(inst, inst.secciones.find((s) => s.id === v.seccion)!)}. Cuentas: ${estCode} y ${apoCode}.`); }, '', true);
-      setTimeout(() => dialog(`<div class="dlg-body">
-        <header class="dlg-h">${ico('checkc', '', 'color:#1E9E5A')}<div><h2>¡Matrícula lista!</h2><p class="muted small">${esc(pNombre(p))} ya es estudiante. Estas son sus cuentas (usuario y contraseña inicial: el DNI).</p></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
-        <div class="created-box"><span>${esc(pNombre(p))} · estudiante</span><dl><div><dt>Usuario (DNI)</dt><dd>${esc(p.dni)}</dd></div><div><dt>Código interno</dt><dd>${estCode}</dd></div></dl></div>
-        <div class="created-box"><span>${esc(p.apoderado.nombres)} · ${esc(p.apoderado.parentesco.toLowerCase())}${apoExiste ? ' (ya tenía cuenta; se le agregó este hijo)' : ''}</span><dl><div><dt>Usuario (DNI)</dt><dd>${esc(p.apoderado.dni)}</dd></div><div><dt>Código interno</dt><dd>${apoCode}</dd></div></dl></div>
-        <footer class="dlg-f"><a class="btn btn-ghost" href="#carnes">${ico('idcard', 'ico-sm')}Hacer su carné</a><a class="btn btn-primary" href="#usuarios-credenciales">${ico('print', 'ico-sm', '--ico-fill:#fff')}Imprimir credenciales</a></footer>
-      </div>`), 50);
+      // Próximo año: queda registrado en Matrícula con su sección
+      if (!durante) { const m = getMat(); m.regs[est.id] = { userId: est.id, estado: 'matriculado', grado: p.grado, sede: p.sede, seccion: sec.id, docs: ['ficha', 'contrato', 'reglamento', 'imagen'], nuevo: true, at: new Date().toISOString() }; saveMat(m); }
+      commit((x) => { const y = x.postulantes.find((z) => z.id === p.id)!; y.etapa = 'matriculado'; y.matricula = { at: new Date().toISOString(), seccion: sec.id, estCode, apoCode, anio }; nota(y, `Matriculado para ${anio} en ${seccionLabel(inst, sec)}${durante ? ` desde el ${p.bimestre}` : ''}. Cuentas: ${estCode} y ${apoCode}.`); }, '', true);
+      setTimeout(() => {
+        const ok = dialog(`<div class="dlg-body">
+        <header class="dlg-h">${ico('checkc', '', 'color:#1E9E5A')}<div><h2>¡Matrícula ${anio} lista!</h2><p class="muted small">${esc(pNombre(p))} · ${esc(seccionLabel(inst, sec))}${durante ? ` · desde el ${esc(p.bimestre ?? '')}` : ''}. Sus cuentas (usuario y contraseña inicial: el DNI):</p></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
+        <div class="created-box"><span>${esc(pNombre(p))} · estudiante</span><dl><div><dt>Usuario (DNI)</dt><dd>${esc(p.dni)}</dd></div><div><dt>Código</dt><dd>${estCode}</dd></div></dl></div>
+        <div class="created-box"><span>${esc(p.apoderado.nombres)} · ${esc(p.apoderado.parentesco.toLowerCase())}${apoExiste ? ' (ya tenía cuenta; se le agregó este hijo)' : ''}</span><dl><div><dt>Usuario (DNI)</dt><dd>${esc(p.apoderado.dni)}</dd></div><div><dt>Código</dt><dd>${apoCode}</dd></div></dl></div>
+        ${durante ? `<p class="sec-alert info">${ico('grade')}<span>Sus notas de los bimestres ya cursados se registran como <b>notas de procedencia</b> en el registro de notas.</span></p>` : ''}
+        <footer class="dlg-f"><a class="btn btn-ghost" href="#carnes">${ico('idcard', 'ico-sm')}Hacer su carné</a><a class="btn btn-ghost" href="#usuarios-credenciales">${ico('print', 'ico-sm')}Credenciales</a><button type="button" class="btn btn-primary" data-ver-ficha>${ico('file', 'ico-sm', '--ico-fill:#fff')}Ficha de matrícula</button></footer>
+      </div>`);
+        ok.querySelector('[data-ver-ficha]')?.addEventListener('click', () => { ok.close(); const pp = getAdm().postulantes.find((z) => z.id === p.id); if (pp) verFicha(pp); });
+      }, 50);
       return null;
-    }, 'Matricular', apoExiste ? `El apoderado ya tiene cuenta (${apoExiste.code}): se le agregará este hijo.` : 'Se crean la cuenta del estudiante y la del apoderado.');
+    }, 'Matricular', `${durante ? `Llega a mitad de año: entra a una sección de ${anio} desde el ${p.bimestre}.` : `Queda matriculado para ${anio}.`} ${apoExiste ? `El apoderado ya tiene cuenta (${apoExiste.code}): se le agrega este hijo.` : 'Se crean la cuenta del estudiante y la del apoderado.'}`);
   }
 
   function retroceder(p: Postulante): void {
@@ -326,7 +370,7 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
     const d = getAdm();
     const inst = getInst();
     const ed = edadAl31Marzo(p.nacimiento, d.proceso.anio), esp = edadEsperada(inst, p.grado);
-    const k = cupos(d, p.sede, p.grado);
+    const k = kFor(d, inst, p);
     const canEdit = ctx.canEdit();
     const step = (e: Etapa, i: number) => { const cur = ORDEN.indexOf(p.etapa === 'espera' || p.etapa === 'no_admitido' ? 'evaluado' : p.etapa); return `<li class="${i < cur ? 'done' : i === cur ? 'cur' : ''}"><span>${i + 1}</span>${['Interesado', 'Postulante', 'Evaluado', 'Admitido', 'Matriculado'][i]}</li>`; };
     const acciones: string[] = [];
@@ -336,6 +380,7 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
       if (p.etapa === 'evaluado' || p.etapa === 'espera') acciones.push(`<button type="button" class="btn btn-primary" data-f="admitir"${k.libres ? '' : ' disabled title="No quedan vacantes"'}>${ico('checkc', 'ico-sm', '--ico-fill:#fff')}Admitir</button>`);
       if (p.etapa === 'evaluado') acciones.push(`<button type="button" class="btn btn-ghost" data-f="espera">Lista de espera</button><button type="button" class="btn btn-ghost danger-t" data-f="no">No admitir</button>`);
       if (p.etapa === 'admitido') acciones.push(`<button type="button" class="btn btn-primary" data-f="matricular">${ico('idcard', 'ico-sm', '--ico-fill:#fff')}Matricular</button>`);
+      if (p.etapa === 'matriculado') acciones.push(`<button type="button" class="btn btn-primary" data-f="ficha">${ico('file', 'ico-sm', '--ico-fill:#fff')}Descargar ficha de matrícula</button>`);
       if (['postulante', 'evaluado', 'admitido', 'espera', 'no_admitido'].includes(p.etapa)) acciones.push(`<button type="button" class="btn btn-ghost" data-f="atras">${ico('arrow', 'ico-sm', 'transform:rotate(180deg)')}Etapa anterior</button>`);
     }
     return `<div class="dlg-body ficha">
@@ -343,22 +388,23 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
         <button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
       <ol class="steps-track">${['interesado', 'postulante', 'evaluado', 'admitido', 'matriculado'].map((e, i) => step(e as Etapa, i)).join('')}</ol>
       ${p.etapa === 'espera' ? `<div class="sec-alert info">${ico('clock')}<div>En lista de espera. ${k.libres ? `<b>Ahora hay ${k.libres} vacante${k.libres === 1 ? '' : 's'} libre${k.libres === 1 ? '' : 's'}:</b> ya puedes admitirlo.` : 'Cuando se libere una vacante podrás admitirlo.'}</div></div>` : ''}
-      ${p.etapa === 'matriculado' && p.matricula ? `<div class="sec-alert info">${ico('checkc')}<div><b>Matriculado</b> el ${fecha(p.matricula.at)} en ${esc(seccionLabel(inst, inst.secciones.find((s) => s.id === p.matricula!.seccion) ?? inst.secciones[0]))}.${p.matricula.estCode ? ` Cuenta ${p.matricula.estCode}.` : ''}</div></div>` : ''}
+      ${p.etapa === 'matriculado' && p.matricula ? `<div class="sec-alert info">${ico('checkc')}<div><b>Matriculado para ${p.matricula.anio ?? anioDe(p, d)}</b> el ${fecha(p.matricula.at)} en ${esc(seccionLabel(inst, inst.secciones.find((s) => s.id === p.matricula!.seccion) ?? inst.secciones[0]))}${p.ingreso === 'durante' ? ` desde el ${esc(p.bimestre ?? '')}` : ''}.${p.matricula.estCode ? ` Cuenta ${p.matricula.estCode}.` : ''}</div></div>` : ''}
       ${acciones.length ? `<div class="ficha-actions">${acciones.join('')}</div>` : ''}
       <div class="ficha-grid">
         <section><h3>Estudiante ${canEdit && p.etapa !== 'matriculado' ? `<button type="button" class="link-btn" data-f="editar">Editar datos</button>` : ''}</h3>
           <dl class="kv"><div><dt>DNI</dt><dd>${esc(p.dni) || '<span class="bad-t">Falta</span>'}</dd></div><div><dt>Nacimiento</dt><dd>${fecha(p.nacimiento)}${ed !== null ? ` · ${ed} años al 31/3` : ''}${ed !== null && esp !== null && ed !== esp ? ` <span class="chip yellow" title="Para ese grado se pide ${esp} años al 31 de marzo">Edad: revisar</span>` : ''}</dd></div>
-          <div><dt>Procedencia</dt><dd>${esc(p.procedencia) || '—'}</dd></div><div><dt>Canal</dt><dd>${esc(p.canal)}</dd></div></dl></section>
+          <div><dt>Procedencia</dt><dd>${esc(p.procedencia) || '—'}</dd></div><div><dt>Canal</dt><dd>${esc(p.canal)}</dd></div>
+          <div><dt>Empieza</dt><dd>${p.ingreso === 'durante' ? `<span class="chip yellow">${esc(ingresoTxt(p, d))}</span>` : esc(ingresoTxt(p, d))}</dd></div></dl></section>
         <section><h3>Apoderado</h3>
           <dl class="kv"><div><dt>Nombre</dt><dd>${esc(p.apoderado.nombres)} · ${esc(p.apoderado.parentesco)}</dd></div><div><dt>DNI</dt><dd>${esc(p.apoderado.dni) || '<span class="bad-t">Falta</span>'}</dd></div>
           <div><dt>Celular</dt><dd><a href="https://wa.me/51${esc(p.apoderado.celular)}" target="_blank" rel="noopener">${esc(p.apoderado.celular)}</a></dd></div><div><dt>Correo</dt><dd>${esc(p.apoderado.correo) || '—'}</dd></div></dl></section>
         <section><h3>Documentos</h3>
-          <ul class="doc-list">${DOCS.map((x) => `<li><label class="check"><input type="checkbox" data-doc="${x.id}"${p.docs.includes(x.id) ? ' checked' : ''}${canEdit ? '' : ' disabled'}><span>${esc(x.name)}${x.obligatorio ? '' : ' <small class="muted">(opcional)</small>'}</span></label></li>`).join('')}</ul></section>
+          <ul class="doc-list">${docsDe(p).map((x) => `<li><label class="check"><input type="checkbox" data-doc="${x.id}"${p.docs.includes(x.id) ? ' checked' : ''}${canEdit ? '' : ' disabled'}><span>${esc(x.name)}${x.obligatorio ? '' : ' <small class="muted">(opcional)</small>'}</span></label></li>`).join('')}</ul></section>
         <section><h3>Pago y evaluación</h3>
           <dl class="kv"><div><dt>Derecho de admisión</dt><dd>${p.pago ? `S/ ${p.pago.monto} · ${esc(p.pago.medio)} · ${fecha(p.pago.fecha)}${p.pago.recibo ? ` · ${esc(p.pago.recibo)}` : ''}` : '<span class="bad-t">Sin pago</span>'}</dd></div>
           <div><dt>Examen</dt><dd>${p.examen != null ? `<b class="${p.examen >= d.proceso.minimo ? 'ok-t' : 'bad-t'}">${p.examen}</b> de 20` : '—'}</dd></div>
           <div><dt>Entrevista</dt><dd>${p.entrevista === 'apto' ? '<span class="ok-t">Apto</span>' : p.entrevista === 'observado' ? '<span class="bad-t">Observado</span>' : '—'}${p.evalNota ? ` · ${esc(p.evalNota)}` : ''}</dd></div>
-          <div><dt>Vacantes del grado</dt><dd>${k.ocupadas} de ${k.total} ocupadas${k.espera ? ` · ${k.espera} en espera` : ''}</dd></div></dl>
+          <div><dt>Vacantes del grado (${p.ingreso === 'durante' ? `este año` : d.proceso.anio})</dt><dd>${k.ocupadas} de ${k.total} ocupadas${k.espera ? ` · ${k.espera} en espera` : ''}</dd></div></dl>
           ${canEdit && p.etapa !== 'interesado' && p.etapa !== 'matriculado' ? `<div class="row-actions" style="margin:8px 0 0">${p.pago ? '' : `<button type="button" class="btn btn-ghost sm" data-f="pago">Registrar pago</button>`}${p.etapa !== 'postulante' ? `<button type="button" class="btn btn-ghost sm" data-f="eval">Cambiar evaluación</button>` : ''}</div>` : ''}</section>
       </div>
       <section class="seguimiento"><h3>Seguimiento</h3>
@@ -390,6 +436,7 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
       else if (f === 'espera') decidir(cur, 'espera');
       else if (f === 'no') decidir(cur, 'no');
       else if (f === 'matricular') matricular(cur);
+      else if (f === 'ficha') verFicha(cur);
       else if (f === 'atras') retroceder(cur);
       else if (f === 'editar') datosForm(cur);
       else if (f === 'nota') { const i = ficha!.querySelector<HTMLInputElement>('#adm-note'); const t = i?.value.trim(); if (!t) { i?.focus(); return; } commit((x) => { nota(x.postulantes.find((z) => z.id === cur.id)!, t); }, 'Nota agregada.', true); }

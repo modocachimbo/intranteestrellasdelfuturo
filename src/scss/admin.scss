@@ -1,4 +1,5 @@
 @use "carne";
+@use "ficha";
 // Panel de administración (admin.html)
 $bp-md: 720px;
 $bp-lg: 1180px;
@@ -519,3 +520,6 @@ dialog.adm-dlg.wide { width: min(880px, calc(100vw - 24px)); }
   .sec-letter { min-width: 36px; height: 36px; border-radius: 11px; background: var(--azul-600); color: #fff; font-family: var(--f-titulo); font-weight: 600; font-size: 17px; display: grid; place-items: center; }
   &.none .sec-letter { background: var(--tinta-3); }
   ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; font-size: 13px; li { display: flex; align-items: center; gap: 6px; } } }
+
+.tg.year { background: #FFF1D6; color: #8A5A00; }
+.sec-alert span { flex: 1; }

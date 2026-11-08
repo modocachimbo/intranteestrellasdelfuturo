@@ -7,6 +7,7 @@ import type { Institucion } from '../core/institucion';
 import { DOCS_MAT, ESTADOS_MAT, MOTIVOS, deuda2026, docsFaltanMat, getMat, gradoTxt, resetMat, saveMat } from '../core/matricula';
 import type { EstadoMat, MatStore, RegMat } from '../core/matricula';
 import { rng } from '../aula/data/students';
+import { fichaHtml as fichaDoc, mostrarFicha, numeroMatricula } from '../core/ficha';
 import type { Account } from '../core/session';
 import { ROLE_NAME } from '../core/session';
 import { fullName, getUsuarios } from '../core/usuarios';
@@ -107,13 +108,13 @@ function antiguos(d: MatStore, st: MatState, inst: Institucion, canEdit: boolean
       <thead><tr><th>Estudiante</th><th>${d.cfg.anio - 1}</th><th>${d.cfg.anio}</th><th>Apoderado</th><th>Documentos</th><th>Pago</th><th>Estado</th>${canEdit ? '<th><span class="sr-only">Acciones</span></th>' : ''}</tr></thead>
       <tbody>${rows.map(({ u, r }) => { const apo = apoderadosDe(u)[0]; const deuda = deuda2026(u.id); const falt = docsFaltanMat(r).length; const sec = inst.secciones.find((s) => s.id === r.seccion); return `<tr class="${r.estado === 'no_continua' || r.estado === 'egresa' ? 'off' : ''}">
         <td><button type="button" class="person-btn" data-mat-open="${u.id}"><span class="avatar sm t-estudiante">${esc((u.nombres[0] + u.apellidos[0]).toUpperCase())}</span><span><b>${esc(fullName(u))}</b><small>DNI ${esc(u.dni)}${deuda && r.estado !== 'matriculado' && r.estado !== 'egresa' ? ` · <span class="bad-t">Debe ${soles(deuda)}</span>` : ''}</small></span></button></td>
-        <td class="det">${esc(seccionActual(inst, u))}</td>
+        <td class="det">${r.nuevo ? '<span class="chip blue">Nuevo</span>' : esc(seccionActual(inst, u))}</td>
         <td class="det">${r.estado === 'egresa' ? '<span class="muted">Egresa</span>' : `${esc(gradoTxt(inst, r.grado))}${sec ? ` · <b>${esc(sec.name)}</b>` : ' · <span class="muted">sin sección</span>'}`}</td>
         <td class="det">${apo ? esc(`${apo.nombres.split(' ')[0]} ${apo.apellidos.split(' ')[0]}`) : '<span class="muted">Sin apoderado</span>'}</td>
         <td>${r.estado === 'egresa' || r.estado === 'no_continua' ? '—' : `<span class="tg ${falt ? 'warn' : 'ok'}">${ico('file', 'ico-sm')}${DOCS_MAT.length - falt}/${DOCS_MAT.length}</span>`}</td>
         <td class="det">${r.pago ? `${soles(r.pago.monto)} <small class="muted">${r.pago.tipo === 'reserva' ? 'reserva' : ''}</small>` : '—'}</td>
         <td class="est"><span class="chip ${est(r.estado).tone}">${est(r.estado).name}</span>${r.enLinea && r.estado === 'solicitada' ? `<small>${fecha(r.enLinea)}</small>` : r.motivo ? `<small>${esc(r.motivo)}</small>` : ''}</td>
-        ${canEdit ? `<td class="row-actions">${r.estado !== 'matriculado' && r.estado !== 'egresa' && r.estado !== 'no_continua' ? `<button type="button" class="btn btn-primary sm" data-mat-act="matricular" data-id="${u.id}">Matricular</button>` : ''}<button type="button" class="icon-btn sm" data-mat-open="${u.id}" aria-label="Ver ficha" title="Ver ficha">${ico('dots', 'ico-sm')}</button></td>` : ''}
+        ${canEdit ? `<td class="row-actions">${r.estado === 'matriculado' ? `<button type="button" class="icon-btn sm" data-mat-act="ficha" data-id="${u.id}" aria-label="Ficha de matrícula" title="Ficha de matrícula">${ico('file', 'ico-sm')}</button>` : ''}${r.estado !== 'matriculado' && r.estado !== 'egresa' && r.estado !== 'no_continua' ? `<button type="button" class="btn btn-primary sm" data-mat-act="matricular" data-id="${u.id}">Matricular</button>` : ''}<button type="button" class="icon-btn sm" data-mat-open="${u.id}" aria-label="Ver ficha" title="Ver ficha">${ico('dots', 'ico-sm')}</button></td>` : ''}
       </tr>`; }).join('')}</tbody></table></div>` : `<div class="empty-state">${ico('search', 'ico-lg')}<h2>No hay estudiantes con esos filtros</h2></div>`}
   </section>`;
 }
@@ -127,7 +128,7 @@ function nuevos(st: MatState, inst: Institucion, canEdit: boolean): string {
     <tbody>${ps.map((p) => `<tr><td><button type="button" class="person-btn" data-mat-adm="${p.id}"><span class="avatar sm t-estudiante">${esc((p.nombres[0] + p.apellidos[0]).toUpperCase())}</span><span><b>${esc(pNombre(p))}</b><small>${p.dni ? `DNI ${esc(p.dni)}` : '<span class="bad-t">Falta DNI</span>'}</small></span></button></td>
       <td class="det">${esc(gradoTxt(inst, p.grado))}</td><td class="det">${esc(inst.sedes.find((s) => s.id === p.sede)?.name ?? '')}</td><td class="det">${esc(p.apoderado.nombres)}</td>
       <td class="est"><span class="chip ${p.etapa === 'matriculado' ? 'green' : 'blue'}">${p.etapa === 'matriculado' ? 'Matriculado' : 'Admitido'}</span></td>
-      ${canEdit ? `<td class="row-actions">${p.etapa === 'admitido' ? `<button type="button" class="btn btn-primary sm" data-mat-adm="${p.id}">Matricular</button>` : ''}</td>` : ''}</tr>`).join('')}</tbody></table></div>`
+      ${canEdit ? `<td class="row-actions">${p.etapa === 'admitido' ? `<button type="button" class="btn btn-primary sm" data-mat-adm="${p.id}">Matricular</button>` : `<button type="button" class="btn btn-ghost sm" data-mat-adm="${p.id}">${ico('file', 'ico-sm')}Ficha</button>`}</td>` : ''}</tr>`).join('')}</tbody></table></div>`
     : `<div class="empty-state">${ico('users', 'ico-lg')}<h2>No hay admitidos por ahora</h2><p class="muted">Cuando Admisión admita postulantes, aparecerán aquí.</p></div>`}
   </section>`;
 }
@@ -289,6 +290,7 @@ export function matriculaController(ctx: { me: Account; dialog: DialogFn; render
         ${r.motivo ? `<div><dt>Motivo</dt><dd>${esc(r.motivo)}</dd></div>` : ''}
       </dl>
       ${canEdit && r.estado !== 'egresa' ? `<footer class="dlg-f">
+        ${r.estado === 'matriculado' ? `<button type="button" class="btn btn-primary" data-x="ficha">${ico('file', 'ico-sm', '--ico-fill:#fff')}Ficha de matrícula</button>` : ''}
         ${r.estado === 'matriculado' || r.estado === 'no_continua' ? `<button type="button" class="btn btn-ghost" data-x="reabrir">Volver a pendiente</button>` : `<button type="button" class="btn btn-ghost danger-t" data-x="no">No continúa</button>${r.estado !== 'reserva' ? '<button type="button" class="btn btn-ghost" data-x="reserva">Reservar vacante</button>' : ''}<button type="button" class="btn btn-ghost" data-x="remind">Recordar al apoderado</button><button type="button" class="btn btn-primary" data-x="matricular">Matricular</button>`}
       </footer>` : ''}
     </div>`);
@@ -301,8 +303,22 @@ export function matriculaController(ctx: { me: Account; dialog: DialogFn; render
       else if (a === 'reserva') reservar(id);
       else if (a === 'no') noContinua(id);
       else if (a === 'remind') toast(`Recordatorio enviado a ${apos[0]?.nombres.split(' ')[0] ?? 'el apoderado'} por la app${apos[0]?.phone ? ' y WhatsApp' : ''}.`);
+      else if (a === 'ficha') verFicha(id);
       else if (a === 'reabrir') commit((x) => { const y = x.regs[id]; y.estado = y.pago?.tipo === 'reserva' ? 'reserva' : 'pendiente'; if (y.pago?.tipo === 'matricula') delete y.pago; delete y.motivo; }, `${fullName(u)} volvió a pendiente.`);
     });
+  }
+
+  function verFicha(id: string): void {
+    const d = getMat(); const inst = getInst();
+    const r = d.regs[id]; const u = getUsuarios().users.find((x) => x.id === id);
+    if (!r || !u) return;
+    const apo = apoderadosDe(u)[0];
+    mostrarFicha(fichaDoc(inst, {
+      numero: numeroMatricula(d.cfg.anio, u.code), anio: d.cfg.anio, fecha: r.at, tipo: r.nuevo ? 'Ingresante (nuevo)' : 'Promovido',
+      est: { code: u.code, dni: u.dni, apellidos: u.apellidos, nombres: u.nombres }, grado: r.grado, seccion: r.seccion, sede: r.sede,
+      apoderado: apo ? { nombre: fullName(apo), dni: apo.dni, parentesco: apo.parentesco ?? 'Apoderado', celular: apo.phone } : undefined,
+      procesadoPor: by(),
+    }), `Ficha de matrícula ${d.cfg.anio} · ${fullName(u)}`);
   }
 
   /** Mantener, balancear o sortear las secciones de un grado. */
@@ -371,7 +387,7 @@ export function matriculaController(ctx: { me: Account; dialog: DialogFn; render
       const op = el.closest<HTMLElement>('[data-mat-open]'); if (op) { ficha(op.dataset.matOpen!); return true; }
       const ad = el.closest<HTMLElement>('[data-mat-adm]'); if (ad) { ctx.abrirAdm(ad.dataset.matAdm!); return true; }
       const ac = el.closest<HTMLElement>('[data-mat-act]');
-      if (ac) { if (ac.dataset.matAct === 'matricular') matricular(ac.dataset.id!); else if (ac.dataset.matAct === 'formar') formar(ac.dataset.sede!, ac.dataset.grado!); return true; }
+      if (ac) { if (ac.dataset.matAct === 'ficha') verFicha(ac.dataset.id!); else if (ac.dataset.matAct === 'matricular') matricular(ac.dataset.id!); else if (ac.dataset.matAct === 'formar') formar(ac.dataset.sede!, ac.dataset.grado!); return true; }
       const b = el.closest<HTMLElement>('[data-mat]');
       if (!b || b.hasAttribute('disabled')) return !!b;
       const a = b.dataset.mat;
