@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css?v=202611071713">
+<link rel="stylesheet" href="assets/css/styles.css?v=202611081328">
 </head>
 <body>
 <div class="login-page">
@@ -21,35 +21,44 @@
     </section>
 
     <section class="login-form">
-      <form action="panel.html" method="get" class="login-form" style="padding:0">
+      <form id="login-form" class="login-form" style="padding:0" novalidate>
         <h1>¡Bienvenido!</h1>
         <p class="lead">Ingresa a tu intranet</p>
 
         <div class="field-col">
           <label for="codigo">Código de usuario</label>
-          <input class="input" id="codigo" name="codigo" type="text" autocomplete="username" placeholder="Ej. 77703588" aria-describedby="codigo-ayuda">
+          <input class="input" id="codigo" name="codigo" type="text" autocomplete="username" autocapitalize="characters" spellcheck="false" placeholder="Ej. DOC001" aria-describedby="codigo-ayuda login-msg">
           <span class="hint" id="codigo-ayuda">Te lo entrega la administración del colegio.</span>
         </div>
 
         <div class="field-col">
           <label for="clave">Contraseña</label>
           <div class="pw">
-            <input class="input" id="clave" name="clave" type="password" autocomplete="current-password" placeholder="••••••••">
+            <input class="input" id="clave" name="clave" type="password" autocomplete="current-password" placeholder="••••••••" aria-describedby="clave-ayuda login-msg">
             <button id="ver-clave" type="button" aria-label="Mostrar contraseña"><svg class="ico" aria-hidden="true"><use href="#i-eye"></use></svg></button>
           </div>
+          <span class="hint" id="clave-ayuda">La primera vez, tu contraseña es tu mismo código.</span>
         </div>
 
+        <p class="login-msg" id="login-msg" role="alert" hidden></p>
         <button class="btn btn-primary btn-pill" type="submit">Ingresar</button>
+        <p class="login-continue" id="login-continue" hidden></p>
 
         <div class="login-links">
           <a href="#">¿Olvidaste tu contraseña?</a>
           <span>¿No tienes código? <a href="#">Comunícate con la administración</a></span>
         </div>
+
+        <details class="demo-box">
+          <summary>Cuentas de prueba (demo)</summary>
+          <p>Toca una cuenta: el código y la contraseña son iguales.</p>
+          <div class="demo-accounts" id="demo-accounts"></div>
+        </details>
       </form>
     </section>
   </main>
   <p class="login-foot">© 2026 IEP Las Estrellas del Futuro · Mazo, Végueta</p>
 </div>
-<script src="assets/js/app.js?v=202611071713"></script>
+<script src="assets/js/app.js?v=202611081328"></script>
 </body>
 </html>

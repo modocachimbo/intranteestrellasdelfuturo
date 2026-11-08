@@ -3,6 +3,7 @@
    Estados: draft = borrador (el estudiante NO lo ve) · graded = nota publicada (el estudiante ve "Calificado")
             returned = devuelta para corregir (el estudiante ve la retroalimentación y vuelve a entregar). */
 import type { Stroke } from './pdfink';
+import { claseDe, rangoDe } from '../core/escala';
 
 export interface Mark { x: number; y: number; page: number; kind: 'ok' | 'bad' | 'note'; text?: string }
 
@@ -72,8 +73,8 @@ export function rubricFromGrade(g: number): number[] {
 
 /** Nivel de logro según la escala vigesimal del colegio. */
 export function nivel(g: number): { code: string; name: string; cls: string } {
-  return g >= 18 ? { code: 'AD', name: 'Logro destacado', cls: 'g-ad' } : g >= 14 ? { code: 'A', name: 'Logro esperado', cls: 'g-a' }
-    : g >= 11 ? { code: 'B', name: 'En proceso', cls: 'g-b' } : { code: 'C', name: 'En inicio', cls: 'g-c' };
+  const r = rangoDe(g);   // usa la escala que definió Dirección en el panel
+  return { code: r.code, name: r.name, cls: claseDe(g) };
 }
 
 /** URL del PDF entregado (demo: assets/demo/entregas/<actividad>/<estudiante>.pdf). */

@@ -570,3 +570,39 @@ input.nota.g-x { background: #fff; border: 1.5px dashed #9AA4BF; }
 // Letra manuscrita (Caveat, licencia OFL) servida desde el propio sitio
 @font-face { font-family: 'Caveat'; font-style: normal; font-weight: 500; font-display: swap; src: url('../fonts/caveat-500.woff2') format('woff2'); }
 @font-face { font-family: 'Caveat'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/caveat-700.woff2') format('woff2'); }
+
+/* ---------- Utilidades compartidas ---------- */
+.muted { color: var(--tinta-3); }
+.small { font-size: 12.5px; }
+.chip.red { background: var(--peligro-100); color: var(--peligro-700); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 300; padding: 12px 18px; border-radius: 14px; background: var(--azul-950); color: #fff; font-weight: 600; font-size: 14px; box-shadow: 0 12px 30px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.link-btn { border: 0; background: none; padding: 4px 0; font: inherit; font-size: 13px; font-weight: 600; color: var(--azul-600); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Ingreso: mensajes y cuentas de prueba ---------- */
+.input[aria-invalid="true"] { border-color: #D92D20; background: #FFF5F5; }
+.login-msg { margin: 0; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; font-weight: 600; }
+.login-msg.error { background: var(--peligro-100); color: var(--peligro-700); }
+.login-msg.info { background: var(--azul-100); color: var(--azul-800); }
+.login-continue { margin: -4px 0 0; text-align: center; font-size: 13.5px; color: var(--tinta-2); }
+.btn:disabled { opacity: .6; cursor: default; }
+.demo-box { border: 1.5px dashed var(--borde); border-radius: 16px; padding: 10px 14px; font-size: 13px; color: var(--tinta-2); }
+.demo-box summary { cursor: pointer; font-weight: 700; color: var(--azul-800); min-height: 28px; display: flex; align-items: center; }
+.demo-box p { margin: 6px 0 10px; }
+.demo-accounts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.demo-acc { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 10px; border: 1.5px solid var(--borde); border-radius: 12px; background: #fff; font: inherit; cursor: pointer; text-align: left; }
+.demo-acc b { font-family: var(--f-titulo); font-size: 14px; color: var(--azul-900); letter-spacing: .02em; }
+.demo-acc span { font-size: 11.5px; color: var(--tinta-3); }
+.demo-acc:hover { border-color: var(--azul-500); background: var(--azul-50); }
+
+/* ---------- Menú plegable por bloques ---------- */
+.nav-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; margin: 0; min-height: 30px; border: 0; background: none; cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #8EA2E6; border-radius: 8px; }
+.nav-toggle:hover { color: #fff; }
+.nav-toggle .ico { transition: transform .2s; }
+.nav-toggle[aria-expanded="false"] .ico { transform: rotate(-90deg); }
+.nav-group.foldable { gap: 2px; }
+.nav-group.foldable .nav-label { margin-bottom: 0; }
+.nav .soon { margin-left: auto; width: 7px; height: 7px; flex: none; border-radius: 99px; border: 1.5px solid #8EA2E6; font-size: 0; }
+.nav a:has(.soon) { min-height: 40px; color: #B9C6F2; }
+.nav a[aria-current="page"] .soon { border-color: #fff; }
+.sidebar { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }

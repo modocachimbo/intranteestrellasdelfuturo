@@ -803,3 +803,6 @@ body.pdfv-lock { overflow: hidden; }
   .bar { height: 7px; border-radius: 99px; background: var(--borde-suave); margin: 6px 0 4px; overflow: hidden; span { display: block; height: 100%; border-radius: 99px; background: var(--curso); } }
   small { font-size: 12px; color: var(--tinta-3); }
   .sr-total { display: flex; justify-content: space-between; padding-top: 10px; margin-top: 6px; border-top: 1.5px solid var(--borde); font-weight: 700; b { font-family: var(--f-titulo); font-size: 18px; } } }
+
+.st-grade.m-literal { padding-top: 0; align-items: center; b { font-size: 64px; } span { display: none; } }
+.st-grade.m-ambas { flex-direction: column; align-items: center; justify-content: center; padding-top: 0; gap: 2px; b { font-size: 52px; } span { margin: 0; font-size: 18px; font-weight: 700; opacity: .85; padding: 1px 10px; border-radius: 99px; background: rgba(255,255,255,.18); } }

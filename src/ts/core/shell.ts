@@ -1,16 +1,28 @@
 /* Estructura común de la intranet: menú lateral, barra superior y menú en celular. */
 import { ico } from './icons';
+import { currentAccount, logout } from './session';
 
-interface NavItem {
+export interface NavItem {
   id: string;
   label: string;
   href: string;
   icon: string;
   count?: number;
+  soon?: boolean;      // módulo todavía en diseño
 }
-interface NavGroup {
+export interface NavGroup {
   title: string;
   items: NavItem[];
+  id?: string;         // con id, el grupo se puede plegar
+}
+export interface ShellUser { initials: string; name: string; role: string }
+export interface ShellOptions {
+  nav?: NavGroup[];
+  user?: ShellUser;
+  home?: string;
+  page?: string;
+  search?: string;
+  topActions?: string;   // HTML extra en la barra superior (por ejemplo, el selector de sede)
 }
 
 export const NAV: NavGroup[] = [
@@ -34,35 +46,75 @@ export const NAV: NavGroup[] = [
 ];
 
 /** Usuario de ejemplo hasta conectar el inicio de sesión real. */
-export const USER = { initials: 'JR', name: 'Javier Rojas', role: 'Docente · Química' };
+export const USER: ShellUser = { initials: 'JR', name: 'Javier Rojas', role: 'Docente · Química' };
 
-function renderSidebar(el: HTMLElement, page: string): void {
-  let h = '<a class="brand" href="panel.html"><img src="logo.png" alt=""><span><b>Las Estrellas<br>del Futuro</b><small>Intranet 2026</small></span></a>';
+const OPEN_KEY = 'ef-menu-abierto';
+function openGroups(): string[] { try { return JSON.parse(localStorage.getItem(OPEN_KEY) ?? '[]') as string[]; } catch { return []; } }
+
+function renderSidebar(el: HTMLElement, page: string, nav: NavGroup[], home: string): void {
+  const open = openGroups();
+  let h = `<a class="brand" href="${home}"><img src="logo.png" alt=""><span><b>Las Estrellas<br>del Futuro</b><small>Intranet 2026</small></span></a>`;
   h += '<nav class="nav-groups" aria-label="Menú principal">';
-  for (const g of NAV) {
-    h += `<div class="nav-group">${g.title ? `<div class="nav-label">${g.title}</div>` : ''}<div class="nav">`;
+  for (const g of nav) {
+    const hasCurrent = g.items.some((n) => n.id === page);
+    const isOpen = !g.id || hasCurrent || open.includes(g.id);
+    const label = g.title
+      ? g.id
+        ? `<button type="button" class="nav-label nav-toggle" data-group="${g.id}" aria-expanded="${isOpen}"><span>${g.title}</span>${ico('chevron', 'ico-sm')}</button>`
+        : `<div class="nav-label">${g.title}</div>`
+      : '';
+    h += `<div class="nav-group${g.id ? ' foldable' : ''}">${label}<div class="nav"${isOpen ? '' : ' hidden'}>`;
     for (const n of g.items) {
       const current = n.id === page ? ' aria-current="page"' : '';
       const count = n.count ? `<span class="count" aria-label="${n.count} sin leer">${n.count}</span>` : '';
-      h += `<a href="${n.href}"${current}>${ico(n.icon)}<span>${n.label}</span>${count}</a>`;
+      const soon = n.soon ? '<span class="soon" title="En diseño">pronto</span>' : '';
+      h += `<a href="${n.href}" data-nav="${n.id}"${current}>${ico(n.icon)}<span>${n.label}</span>${count}${soon}</a>`;
     }
     h += '</div></div>';
   }
   h += '</nav><div class="sidebar-foot nav">' +
     `<a href="#">${ico('user')}<span>Mi perfil</span></a>` +
-    `<a href="index.html">${ico('logout')}<span>Cerrar sesión</span></a></div>`;
+    `<a href="index.html?salir=1" data-logout>${ico('logout')}<span>Cerrar sesión</span></a></div>`;
   el.innerHTML = h;
+  el.addEventListener('click', (e) => {
+    const t = (e.target as HTMLElement).closest<HTMLElement>('[data-group]');
+    if (t) {
+      const nav = t.nextElementSibling as HTMLElement;
+      const show = nav.hidden;
+      nav.hidden = !show;
+      t.setAttribute('aria-expanded', String(show));
+      const id = t.dataset.group!;
+      const list = openGroups().filter((x) => x !== id);
+      if (show) list.push(id);
+      try { localStorage.setItem(OPEN_KEY, JSON.stringify(list)); } catch { /* sin almacenamiento */ }
+      return;
+    }
+    if ((e.target as HTMLElement).closest('[data-logout]')) logout();
+  });
 }
 
-function renderTopbar(el: HTMLElement): void {
+/** Marca la opción actual del menú (para páginas que cambian de sección sin recargar). */
+export function markCurrent(id: string): void {
+  document.querySelectorAll<HTMLElement>('#sidebar [data-nav]').forEach((a) => {
+    const on = a.dataset.nav === id;
+    if (on) {
+      a.setAttribute('aria-current', 'page');
+      const nav = a.closest<HTMLElement>('.nav');
+      if (nav?.hidden) { nav.hidden = false; nav.previousElementSibling?.setAttribute('aria-expanded', 'true'); }
+    } else a.removeAttribute('aria-current');
+  });
+  document.querySelector('.app')?.classList.remove('menu-open');
+}
+
+function renderTopbar(el: HTMLElement, user: ShellUser, search: string, extra?: string): void {
   el.innerHTML =
     `<button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">${ico('menu')}</button>` +
-    `<label class="search">${ico('search', 'ico-sm')}<span class="sr-only">Buscar</span><input type="search" placeholder="Buscar estudiante, curso o tarea…"></label>` +
+    `<label class="search">${ico('search', 'ico-sm')}<span class="sr-only">Buscar</span><input type="search" placeholder="${search}"></label>` +
     '<div class="topbar-actions">' +
-    `<button class="btn btn-ghost hide-sm" type="button">IV Bimestre ${ico('chevron', 'ico-sm')}</button>` +
+    (extra ?? `<button class="btn btn-ghost hide-sm" type="button">IV Bimestre ${ico('chevron', 'ico-sm')}</button>`) +
     `<button class="icon-btn" type="button" aria-label="Mensajes, 3 sin leer">${ico('chat')}<span class="dot"></span></button>` +
     `<button class="icon-btn" type="button" aria-label="Notificaciones">${ico('bell')}</button>` +
-    `<div class="user"><span class="avatar">${USER.initials}</span><span class="who"><b>${USER.name}</b><small>${USER.role}</small></span></div>` +
+    `<div class="user"><span class="avatar">${user.initials}</span><span class="who"><b>${user.name}</b><small>${user.role}</small></span></div>` +
     '</div>';
 }
 
@@ -100,12 +152,15 @@ function wireSmallBits(): void {
   });
 }
 
-export function mountShell(): void {
-  const page = document.body.dataset.page ?? '';
+export function mountShell(o: ShellOptions = {}): void {
+  const page = o.page ?? document.body.dataset.page ?? '';
   const sb = document.getElementById('sidebar');
   const tb = document.getElementById('topbar');
-  if (sb) renderSidebar(sb, page);
-  if (tb) renderTopbar(tb);
+  // En las páginas del docente se muestra quien inició sesión (si es docente)
+  const acc = currentAccount();
+  const user = o.user ?? (acc && acc.role === 'docente' ? { initials: acc.initials, name: acc.name, role: acc.title } : USER);
+  if (sb) renderSidebar(sb, page, o.nav ?? NAV, o.home ?? 'panel.html');
+  if (tb) renderTopbar(tb, user, o.search ?? 'Buscar estudiante, curso o tarea…', o.topActions);
   wireMobileMenu();
   wireSmallBits();
 }

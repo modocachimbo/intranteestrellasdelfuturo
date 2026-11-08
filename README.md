@@ -7,7 +7,8 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 
 | Página | Qué muestra |
 |---|---|
-| `index.html` | Ingreso con el código de usuario que entrega la administración. |
+| `index.html` | Ingreso con código y contraseña (la primera contraseña es el mismo código). Lleva a cada rol a su panel. |
+| `admin.html` | Panel de administración: tablero por rol, menú por bloques y escala de notas. |
 | `panel.html` | Inicio del docente: bienvenida, aviso de cierre de notas, indicadores, estadística académica por rangos de nota, estrella del bimestre, mis cursos, semana y horario de hoy, comunicados y cumpleaños. |
 | `horario.html` | Horario semanal con recreos; cada clase abre su aula virtual. |
 | `cursos.html` | Mis cursos (académico): registrar notas, asistencia, estudiantes y sílabo por curso, filtrado por sede. |
@@ -15,6 +16,30 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 | `curso.html` | Aula virtual del curso (se dibuja con TypeScript desde los datos): Semana 0, bimestres, unidades y semanas; índice plegable, navegación entre semanas y periodos, modo edición y ventanas para añadir actividades. |
 | `notas.html` | Registro de notas numéricas (0–20) por competencias, con promedios automáticos y conclusión descriptiva. |
 | `movil.html` | Vista previa de la intranet dentro de un celular. |
+
+## Ingreso y roles
+
+Cuentas de prueba (código = contraseña):
+
+| Código | Rol | Entra a |
+|---|---|---|
+| `ADM001` | Administrador del sistema | `admin.html` (todo) |
+| `DIR001` | Dirección | `admin.html` (todo menos seguridad) |
+| `COO001` | Coordinación académica | `admin.html` (académico y evaluación) |
+| `SEC001` | Secretaría | `admin.html` (matrícula, traslados, trámites) |
+| `TES001` | Tesorería | `admin.html` (pensiones, caja, morosidad) |
+| `DOC001` | Docente | `panel.html` |
+
+- Código en mayúsculas o minúsculas. 5 intentos fallidos bloquean 1 minuto.
+- Si la contraseña sigue siendo el código, el panel pide cambiarla (mínimo 8 caracteres, letras y números, distinta al código).
+- En la demo todo se guarda en el navegador; "Restablecer las contraseñas de prueba" en el ingreso las vuelve al código. Con base de datos, esto lo hará el servidor.
+- Roles y módulos se definen en `src/ts/admin/modules.ts` y `src/ts/core/session.ts`.
+
+## Panel de administración (`admin.html`)
+
+- **Inicio**: filtro por sede (Mazo, Huacho o ambas); indicadores de matrícula, asistencia, notas, pensiones, morosidad y admisión; matrícula por nivel; pensiones cobradas por mes; docentes con menos avance de notas (con recordatorio); asistencia por nivel; pendientes; agenda; actividad reciente. Cada rol ve solo lo suyo.
+- **Menú por bloques**: Base del colegio, Secretaría, Académico, Evaluación, Asistencia y convivencia, Tesorería, Comunicación, Personal, Servicios, Dirección y sistema. Los módulos en diseño (punto vacío en el menú) muestran qué incluirán, quién los usa y en qué fase llegan.
+- **Escala de notas** (`admin.html#escala`): por nivel, *Vigesimal* (0–20), *Literal* (AD, A, B, C) o *Ambas* (0–20 con su letra); equivalencia editable con revisión de huecos y cruces; nota aprobatoria, decimales y desde qué bimestre se aplica; confirmación y historial de cambios. Solo Dirección y el administrador pueden cambiarla; Coordinación la ve. El aula virtual ya muestra las notas con esta escala (`src/ts/core/escala.ts`).
 
 ## Aula virtual vs. gestión académica
 

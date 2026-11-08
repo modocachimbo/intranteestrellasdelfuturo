@@ -5,6 +5,8 @@ import { fechaHora } from '../calendar';
 import { shortName } from '../data/students';
 import { esc } from '../render';
 import { RUBRICA, nivel } from '../reviews';
+import { fmtNota } from '../../core/escala';
+import type { Nivel } from '../../core/escala';
 import type { Review } from '../reviews';
 import type { Activity, Course, Submission, Week } from '../types';
 
@@ -17,6 +19,7 @@ export function studentView(c: StudentCtx): string {
   const returned = rv.state === 'returned';
   const name = shortName(sub.student);
   const lv = graded ? nivel(rv.grade!) : null;
+  const nf = graded ? fmtNota(rv.grade!, (c.course.level.toLowerCase() as Nivel) || 'secundaria') : null;
   const marks = rv.ink?.length ?? 0;
 
   const gradeState = graded ? `<span class="chip green">${ico('checkc', 'ico-sm')}Calificado</span>`
@@ -34,10 +37,10 @@ export function studentView(c: StudentCtx): string {
 
   const result = graded ? `
     <section class="card st-result">
-      <div class="st-grade ${lv!.cls}"><b>${rv.grade}</b><span>/20</span></div>
+      <div class="st-grade ${lv!.cls} m-${nf!.modo}" aria-label="Nota ${nf!.main}${nf!.modo === 'ambas' ? `, ${nf!.letra}` : ''}"><b>${nf!.main}</b><span>${nf!.sub}</span></div>
       <div class="st-grade-info">
         <span class="chip green">${ico('checkc', 'ico-sm')}Calificado</span>
-        <h2>${lv!.name} <small>(${lv!.code})</small></h2>
+        <h2>${lv!.name}${nf!.modo === 'vigesimal' ? ` <small>(${lv!.code})</small>` : ''}</h2>
         <p>Calificado por Javier Rojas${rv.published ? ` · ${fechaHora(new Date(rv.published))}` : ''}</p>
         ${marks ? `<p class="muted small">${ico('pen', 'ico-sm')} Tu docente dejó ${marks} ${marks === 1 ? 'marca' : 'marcas'} en tu trabajo. Míralas abajo.</p>` : ''}
       </div>
@@ -89,7 +92,7 @@ export function studentView(c: StudentCtx): string {
           <dl>${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl></section>
         ${showRubric ? `<section class="card st-rubric"><h3>${ico('grade', 'ico-sm')}Rúbrica</h3>
           ${RUBRICA.map((cr, i) => { const p = rv.rubric[i]!; const l = cr.levels.find((x) => x[1] === p); return `<div class="sr"><div class="sr-h"><span>${cr.name}</span><b>${p}/5</b></div><div class="bar"><span style="width:${p * 20}%"></span></div><small>${l ? `${l[0]} · ${l[2]}` : ''}</small></div>`; }).join('')}
-          <div class="sr-total"><span>Total</span><b>${rv.grade}/20</b></div></section>` : ''}
+          <div class="sr-total"><span>Total</span><b>${nf!.modo === 'literal' ? nf!.main : `${rv.grade}/20`}</b></div></section>` : ''}
       </aside>
     </div>
   </div>`;
