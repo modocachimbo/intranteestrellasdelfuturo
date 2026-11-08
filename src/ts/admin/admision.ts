@@ -297,7 +297,7 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
     mostrarFicha(fichaDoc(inst, {
       numero: numeroMatricula(anio, p.matricula?.estCode || 'EST0'), anio, fecha: p.matricula?.at ?? new Date().toISOString(),
       tipo: p.ingreso === 'durante' ? 'Ingreso durante el año (traslado)' : 'Ingresante (nuevo)', inicio: p.ingreso === 'durante' ? p.bimestre : undefined,
-      est: { code: est?.code ?? p.matricula?.estCode ?? '—', dni: p.dni, apellidos: p.apellidos, nombres: p.nombres, nacimiento: p.nacimiento },
+      est: { code: est?.code ?? p.matricula?.estCode ?? '—', dni: p.dni, apellidos: p.apellidos, nombres: p.nombres, nacimiento: p.nacimiento, foto: est?.foto },
       grado: p.grado, seccion: p.matricula?.seccion ?? '', sede: p.sede, procedencia: p.procedencia || undefined,
       apoderado: { nombre: p.apoderado.nombres, dni: p.apoderado.dni, parentesco: p.apoderado.parentesco, celular: p.apoderado.celular },
       procesadoPor: by(),

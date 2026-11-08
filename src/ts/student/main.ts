@@ -89,7 +89,7 @@ function verFicha(anio: number): void {
     numero: numeroMatricula(anio, ALUMNO.code), anio, fecha: proximo ? reg?.at ?? '' : llegada?.matricula?.at ?? `${anio}-03-02`,
     tipo: proximo ? (reg?.nuevo ? 'Ingresante (nuevo)' : 'Promovido') : llegada?.ingreso === 'durante' ? 'Ingreso durante el año (traslado)' : llegada ? 'Ingresante (nuevo)' : 'Promovido',
     inicio: !proximo && llegada?.ingreso === 'durante' ? llegada.bimestre : undefined,
-    est: { code: ALUMNO.code, dni: ALUMNO.dni, apellidos: ALUMNO.apellidos, nombres: ALUMNO.nombres },
+    est: { code: ALUMNO.code, dni: ALUMNO.dni, apellidos: ALUMNO.apellidos, nombres: ALUMNO.nombres, foto: ALUMNO.foto },
     grado: proximo ? reg?.grado ?? '' : sec?.grado ?? '', seccion: sec?.id ?? '', sede: sec?.sede ?? ALUMNO.sede,
     apoderado: apo ? { nombre: `${apo.nombres} ${apo.apellidos}`, dni: apo.dni, parentesco: apo.parentesco ?? 'Apoderado', celular: apo.phone } : undefined,
     procesadoPor: 'Portal del estudiante',

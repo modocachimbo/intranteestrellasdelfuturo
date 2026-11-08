@@ -11,7 +11,7 @@ export interface FichaData {
   numero: string; anio: number; fecha: string;
   tipo: string;                      // Promovido · Nuevo · Ingreso durante el año (traslado)
   inicio?: string;                   // para ingresos durante el año: desde qué bimestre
-  est: { code: string; dni: string; apellidos: string; nombres: string; nacimiento?: string };
+  est: { code: string; dni: string; apellidos: string; nombres: string; nacimiento?: string; foto?: string };
   grado: string; seccion: string; sede: string;
   apoderado?: { nombre: string; dni: string; parentesco: string; celular: string };
   procesadoPor: string;
@@ -20,6 +20,7 @@ export interface FichaData {
 
 const esc = (s: string) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
 const f = (iso?: string) => (iso ? new Date(iso.length === 10 ? `${iso}T12:00` : iso).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—');
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.9l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z"/></svg>';
 
 export function fichaHtml(inst: Institucion, d: FichaData): string {
   const gi = gradoInfo(inst, d.grado);
@@ -29,37 +30,77 @@ export function fichaHtml(inst: Institucion, d: FichaData): string {
   const cursos = cursosDe(inst, d.grado);
   const total = cursos.reduce((a, c) => a + c.horas, 0);
   const logo = inst.datos.logo || 'logo.png';
+  const ini = `${d.est.nombres[0] ?? ''}${d.est.apellidos[0] ?? ''}`.toUpperCase();
+  const grado = gi?.grado.name ?? '—';
+  const tono = /traslado/i.test(d.tipo) ? 'y' : /nuevo|ingres/i.test(d.tipo) ? 'b' : 'g';
+  const campo = (k: string, v: string, wide = false) => `<div class="fd-f${wide ? ' wide' : ''}"><dt>${k}</dt><dd>${v || '—'}</dd></div>`;
+  const mitad = Math.ceil(cursos.length / 2);
+  const col = (lista: typeof cursos) => `<ol class="fd-cursos">${lista.map((c) => `<li><span class="cod">${c.cod}</span><span class="nm">${esc(c.name)}</span><span class="hr"><i>${'<em></em>'.repeat(Math.min(c.horas, 6))}</i><b>${c.horas} h</b></span></li>`).join('')}</ol>`;
   return `<article class="ficha-doc">
     <header class="fd-head">
-      <img src="${logo}" alt="">
-      <div><b>${esc(inst.datos.nombre.toUpperCase())}</b><h1>FICHA DE MATRÍCULA</h1><p class="fd-ugel">${esc(inst.datos.resolucion)} · ${esc(inst.datos.ugel)}</p></div>
+      <span class="fd-stars" aria-hidden="true">${STAR}${STAR}${STAR}</span>
+      <span class="fd-logo"><img src="${logo}" alt=""></span>
+      <div class="fd-tt">
+        <small>${esc(inst.datos.nombre)}</small>
+        <h1>Ficha de matrícula</h1>
+        <p>${esc(inst.datos.resolucion)} · ${esc(inst.datos.ugel)} · ${esc(sede?.name ?? "—")}</p>
+      </div>
+      <div class="fd-anio"><small>Año escolar</small><b>${d.anio}</b></div>
       <span class="fd-qr">${qrSvg(`${d.numero}|${d.est.dni}`)}</span>
     </header>
-    <section class="fd-box">
-      <dl>
-        <div><dt>Código del estudiante</dt><dd>${esc(d.est.code)}</dd></div>
-        <div><dt>DNI</dt><dd>${esc(d.est.dni)}</dd></div>
-        <div class="wide"><dt>Apellidos y nombres</dt><dd>${esc(`${d.est.apellidos}, ${d.est.nombres}`.toUpperCase())}</dd></div>
-        <div><dt>Nivel</dt><dd>${esc(gi?.nivel.name.toUpperCase() ?? '—')}</dd></div>
-        <div><dt>Sede</dt><dd>${esc((sede?.name ?? '—').toUpperCase())}</dd></div>
-        ${d.est.nacimiento ? `<div><dt>Fecha de nacimiento</dt><dd>${f(d.est.nacimiento)}</dd></div>` : ''}
-        ${d.procedencia ? `<div><dt>Procedencia</dt><dd>${esc(d.procedencia)}</dd></div>` : ''}
-      </dl>
+
+    <div class="fd-ticket">
+      <div><small>N.º de matrícula</small><b>${esc(d.numero)}</b></div>
+      <div><small>Nivel</small><b>${esc(gi?.nivel.name ?? '—')}</b></div>
+      <div><small>Grado</small><b>${esc(grado)}</b></div>
+      <div><small>Sección</small><b>${esc(sec?.name ?? 'Por asignar')}</b></div>
+      <div><small>Turno</small><b>${esc(turno?.name ?? '—')}</b></div>
+    </div>
+
+    <section class="fd-est">
+      <div class="fd-foto">${d.est.foto ? `<img src="${d.est.foto}" alt="">` : `<span>${esc(ini)}</span>`}</div>
+      <div class="fd-est-main">
+        <div class="fd-label">Estudiante</div>
+        <h2>${esc(d.est.apellidos)}, <span>${esc(d.est.nombres)}</span></h2>
+        <div class="fd-chips"><span class="ch ${tono}">${esc(d.tipo)}</span>${d.inicio ? `<span class="ch y">Desde el ${esc(d.inicio)}</span>` : ''}<span class="ch o">Matriculado el ${f(d.fecha)}</span></div>
+        <dl class="fd-grid">
+          ${campo('Código', esc(d.est.code))}${campo('DNI', esc(d.est.dni))}${campo('Nacimiento', d.est.nacimiento ? f(d.est.nacimiento) : '')}${campo('Sede', esc(sede?.name ?? ''))}
+          ${d.procedencia ? campo('Colegio de procedencia', esc(d.procedencia), true) : ''}
+        </dl>
+      </div>
     </section>
-    <div class="fd-band"><span>MATRÍCULA N.º : <b>${esc(d.numero)}</b></span><span>AÑO ESCOLAR : <b>${d.anio}</b></span><span>GRADO : <b>${esc(gi?.grado.name.toUpperCase() ?? '—')}</b></span><span>SECCIÓN : <b>${esc(sec?.name ?? 'Por asignar')}</b></span><span>TURNO : <b>${esc(turno?.name.toUpperCase() ?? '—')}</b></span></div>
-    <p class="fd-tipo">Situación: <b>${esc(d.tipo)}</b>${d.inicio ? ` · Se incorpora desde el <b>${esc(d.inicio)}</b>` : ''} · Fecha de matrícula: <b>${f(d.fecha)}</b></p>
-    <table class="fd-table">
-      <thead><tr><th>Cód.</th><th>Área o curso</th><th>Grado</th><th>Sección</th><th>Horas semanales</th></tr></thead>
-      <tbody>${cursos.map((c) => `<tr><td>${c.cod}</td><td>${esc(c.name)}</td><td>${esc(gi?.grado.name ?? '')}</td><td>${esc(sec?.name ?? '—')}</td><td class="n">${c.horas}</td></tr>`).join('')}</tbody>
-      <tfoot><tr><td></td><td>Cursos matriculados: <b>${cursos.length}</b></td><td colspan="2">Total de horas semanales:</td><td class="n"><b>${total}</b></td></tr></tfoot>
-    </table>
-    ${d.apoderado ? `<section class="fd-box fd-apo"><dl>
-      <div class="wide"><dt>Apoderado</dt><dd>${esc(d.apoderado.nombre)} (${esc(d.apoderado.parentesco)})</dd></div>
-      <div><dt>DNI</dt><dd>${esc(d.apoderado.dni)}</dd></div><div><dt>Celular</dt><dd>${esc(d.apoderado.celular || '—')}</dd></div>
-    </dl></section>` : ''}
-    <p class="fd-legal">El apoderado declara haber leído y aceptado el contrato de prestación de servicios educativos, el reglamento interno y el uso de imagen. Las pensiones vencen el último día de cada mes (marzo a diciembre).</p>
-    <div class="fd-signs"><div><span></span>Firma del apoderado</div><div><span></span>${esc(inst.datos.firma)}<small>${esc(inst.datos.cargoFirma)}</small></div><div><span></span>Secretaría</div></div>
-    <footer class="fd-foot"><span>Procesado por: <b>${esc(d.procesadoPor)}</b></span><span>Fecha de impresión: ${new Date().toLocaleString('es-PE')}</span><span>Verifique con el código QR · página 1 de 1</span></footer>
+
+    <section class="fd-plan">
+      <div class="fd-sec-t"><b>Cursos que llevará</b><span>${cursos.length} cursos · ${total} horas semanales · ${esc(grado)} ${esc(sec?.name ?? '')}</span></div>
+      <div class="fd-cols">${col(cursos.slice(0, mitad))}${col(cursos.slice(mitad))}</div>
+    </section>
+
+    <div class="fd-two">
+      <section class="fd-card">
+        <div class="fd-label">Padre, madre o apoderado</div>
+        ${d.apoderado ? `<dl class="fd-grid">${campo('Nombre', `${esc(d.apoderado.nombre)} <em>(${esc(d.apoderado.parentesco)})</em>`, true)}${campo('DNI', esc(d.apoderado.dni))}${campo('Celular', esc(d.apoderado.celular))}</dl>` : '<p class="fd-vacio">Por registrar</p>'}
+      </section>
+      <section class="fd-card fd-legal">
+        <div class="fd-label">Compromiso</div>
+        <p>El apoderado declara haber leído y aceptado el contrato de prestación de servicios educativos, el reglamento interno y el uso de imagen. Las pensiones vencen el último día de cada mes (marzo a diciembre).</p>
+      </section>
+    </div>
+
+    <div class="fd-signs"><div><span></span>Firma del apoderado<small>DNI ${esc(d.apoderado?.dni ?? '')}</small></div><div><span></span>${esc(inst.datos.firma)}<small>${esc(inst.datos.cargoFirma)}</small></div><div><span></span>Secretaría<small>Sello y firma</small></div></div>
+
+    <div class="fd-cut"><span>✂</span>Constancia para el apoderado · recorte por la línea</div>
+    <section class="fd-stub">
+      <span class="fd-logo sm"><img src="${logo}" alt=""></span>
+      <div class="fd-stub-main">
+        <b>Constancia de matrícula ${d.anio}</b>
+        <span>${esc(`${d.est.apellidos}, ${d.est.nombres}`)}</span>
+        <dl><div><dt>N.º</dt><dd>${esc(d.numero)}</dd></div><div><dt>Grado</dt><dd>${esc(grado)} ${esc(sec?.name ?? '')}</dd></div><div><dt>Turno</dt><dd>${esc(turno?.name ?? '—')}</dd></div><div><dt>Fecha</dt><dd>${f(d.fecha)}</dd></div></dl>
+      </div>
+      <span class="fd-sello">Sello</span>
+      <span class="fd-qr sm">${qrSvg(`${d.numero}|${d.est.dni}`)}</span>
+    </section>
+
+    <footer class="fd-foot"><span>Procesado por: <b>${esc(d.procesadoPor)}</b></span><span>Impreso el ${new Date().toLocaleString('es-PE')}</span><span>Escanee el QR para verificar · página 1 de 1</span></footer>
   </article>`;
 }
 

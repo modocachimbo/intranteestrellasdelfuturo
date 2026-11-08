@@ -315,7 +315,7 @@ export function matriculaController(ctx: { me: Account; dialog: DialogFn; render
     const apo = apoderadosDe(u)[0];
     mostrarFicha(fichaDoc(inst, {
       numero: numeroMatricula(d.cfg.anio, u.code), anio: d.cfg.anio, fecha: r.at, tipo: r.nuevo ? 'Ingresante (nuevo)' : 'Promovido',
-      est: { code: u.code, dni: u.dni, apellidos: u.apellidos, nombres: u.nombres }, grado: r.grado, seccion: r.seccion, sede: r.sede,
+      est: { code: u.code, dni: u.dni, apellidos: u.apellidos, nombres: u.nombres, foto: u.foto }, grado: r.grado, seccion: r.seccion, sede: r.sede,
       apoderado: apo ? { nombre: fullName(apo), dni: apo.dni, parentesco: apo.parentesco ?? 'Apoderado', celular: apo.phone } : undefined,
       procesadoPor: by(),
     }), `Ficha de matrícula ${d.cfg.anio} · ${fullName(u)}`);
