@@ -10,7 +10,7 @@ import type { Nivel } from '../../core/escala';
 import type { Review } from '../reviews';
 import type { Activity, Course, Submission, Week } from '../types';
 
-export interface StudentCtx { a: Activity; week: Week; course: Course; sub: Submission; index: number; review: Review; published: boolean; now: Date }
+export interface StudentCtx { a: Activity; week: Week; course: Course; sub: Submission; index: number; review: Review; published: boolean; now: Date; asStudent?: boolean }
 
 export function studentView(c: StudentCtx): string {
   const { a, sub, review: rv } = c;
@@ -68,8 +68,8 @@ export function studentView(c: StudentCtx): string {
   const showRubric = graded && rv.rubric.every((x) => x !== null);
 
   return `<div class="student-view">
-    <div class="preview-strip" role="note">${ico('eye', 'ico-sm')}<span><b>Vista del estudiante</b> · Así ve <b>${esc(name)}</b> esta tarea${c.published ? '' : '. La nota en borrador no aparece.'}</span>
-      <a class="btn btn-ghost" href="#r-${a.id}-${c.index}">${ico('arrow', 'ico-sm', 'transform:rotate(180deg)')}Volver a la revisión</a></div>
+    ${c.asStudent ? `<a class="back-link" href="estudiante.html#tareas">${ico('arrow', 'ico-sm', 'transform:rotate(180deg)')}Mis tareas</a>` : `<div class="preview-strip" role="note">${ico('eye', 'ico-sm')}<span><b>Vista del estudiante</b> · Así ve <b>${esc(name)}</b> esta tarea${c.published ? '' : '. La nota en borrador no aparece.'}</span>
+      <a class="btn btn-ghost" href="#r-${a.id}-${c.index}">${ico('arrow', 'ico-sm', 'transform:rotate(180deg)')}Volver a la revisión</a></div>`}
 
     <header class="st-head card">
       <span class="tile" style="--c:${c.course.color}">${ico('tasks')}</span>

@@ -9,6 +9,7 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 |---|---|
 | `index.html` | Ingreso con código y contraseña (la primera contraseña es el mismo código). Lleva a cada rol a su panel. |
 | `admin.html` | Panel de administración: tablero por rol, menú por bloques y escala de notas. |
+| `estudiante.html` | Portal del estudiante: inicio, mis cursos, tareas, calificaciones (con la escala del colegio), horario y comunicados. |
 | `panel.html` | Inicio del docente: bienvenida, aviso de cierre de notas, indicadores, estadística académica por rangos de nota, estrella del bimestre, mis cursos, semana y horario de hoy, comunicados y cumpleaños. |
 | `horario.html` | Horario semanal con recreos; cada clase abre su aula virtual. |
 | `cursos.html` | Mis cursos (académico): registrar notas, asistencia, estudiantes y sílabo por curso, filtrado por sede. |
@@ -29,6 +30,7 @@ Cuentas de prueba (código = contraseña):
 | `SEC001` | Secretaría | `admin.html` (matrícula, traslados, trámites) |
 | `TES001` | Tesorería | `admin.html` (pensiones, caja, morosidad) |
 | `DOC001` | Docente | `panel.html` |
+| `EST001` | Estudiante (Camila Alvarado, 3.º A) | `estudiante.html` |
 
 - Código en mayúsculas o minúsculas. 5 intentos fallidos bloquean 1 minuto.
 - Si la contraseña sigue siendo el código, el panel pide cambiarla (mínimo 8 caracteres, letras y números, distinta al código).
@@ -40,6 +42,14 @@ Cuentas de prueba (código = contraseña):
 - **Inicio**: filtro por sede (Mazo, Huacho o ambas); indicadores de matrícula, asistencia, notas, pensiones, morosidad y admisión; matrícula por nivel; pensiones cobradas por mes; docentes con menos avance de notas (con recordatorio); asistencia por nivel; pendientes; agenda; actividad reciente. Cada rol ve solo lo suyo.
 - **Menú por bloques**: Base del colegio, Secretaría, Académico, Evaluación, Asistencia y convivencia, Tesorería, Comunicación, Personal, Servicios, Dirección y sistema. Los módulos en diseño (punto vacío en el menú) muestran qué incluirán, quién los usa y en qué fase llegan.
 - **Escala de notas** (`admin.html#escala`): por nivel, *Vigesimal* (0–20), *Literal* (AD, A, B, C) o *Ambas* (0–20 con su letra); equivalencia editable con revisión de huecos y cruces; nota aprobatoria, decimales y desde qué bimestre se aplica; confirmación y historial de cambios. Solo Dirección y el administrador pueden cambiarla; Coordinación la ve. El aula virtual ya muestra las notas con esta escala (`src/ts/core/escala.ts`).
+
+## Portal del estudiante (`estudiante.html`)
+
+- **Inicio**: tareas por entregar, últimas notas, promedio parcial, asistencia, clases de hoy y comunicados.
+- **Tareas**: por entregar, en revisión, calificadas y no entregadas. Las de Química salen del aula virtual: cuando el docente publica la nota, aquí aparece *Calificado* y al abrirla se ve la nota, el comentario, la rúbrica y el PDF con las marcas.
+- **Calificaciones**: notas por curso y bimestre con la escala que definió Dirección; asistencia del año.
+- **Mis cursos**, **Horario** y **Comunicados**.
+- El estudiante no puede abrir el aula del docente ni el panel de administración.
 
 ## Aula virtual vs. gestión académica
 

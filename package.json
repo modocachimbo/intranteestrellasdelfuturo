@@ -5,11 +5,11 @@
   "description": "Intranet y aula virtual · IEP Las Estrellas del Futuro",
   "scripts": {
     "build:css": "sass src/scss:assets/css --no-source-map --style=compressed",
-    "build:js": "esbuild src/ts/app.ts src/ts/aula.ts src/ts/admin.ts --bundle --format=iife --target=es2019 --minify --outdir=assets/js --entry-names=[name]",
+    "build:js": "esbuild src/ts/app.ts src/ts/aula.ts src/ts/admin.ts src/ts/estudiante.ts --bundle --format=iife --target=es2019 --minify --outdir=assets/js --entry-names=[name]",
     "build": "npm run typecheck && npm run build:css && npm run build:js",
     "typecheck": "tsc --noEmit",
     "watch:css": "sass src/scss:assets/css --no-source-map --watch",
-    "watch:js": "esbuild src/ts/app.ts src/ts/aula.ts src/ts/admin.ts --bundle --format=iife --target=es2019 --outdir=assets/js --entry-names=[name] --watch"
+    "watch:js": "esbuild src/ts/app.ts src/ts/aula.ts src/ts/admin.ts src/ts/estudiante.ts --bundle --format=iife --target=es2019 --outdir=assets/js --entry-names=[name] --watch"
   },
   "devDependencies": {
     "@fontsource/caveat": "^5.1.0",

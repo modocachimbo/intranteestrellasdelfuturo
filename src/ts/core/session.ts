@@ -3,7 +3,7 @@
    - Al conectar la base de datos, esta lista se reemplaza por la consulta al servidor (las contraseñas nunca
      se guardan en el navegador: aquí solo se guarda quién inició sesión). */
 
-export type Role = 'admin' | 'director' | 'coordinador' | 'secretaria' | 'tesoreria' | 'docente';
+export type Role = 'admin' | 'director' | 'coordinador' | 'secretaria' | 'tesoreria' | 'docente' | 'estudiante';
 
 export interface Account { code: string; name: string; initials: string; role: Role; title: string; sede: string }
 
@@ -14,6 +14,7 @@ export const ROLE_NAME: Record<Role, string> = {
   secretaria: 'Secretaría',
   tesoreria: 'Tesorería',
   docente: 'Docente',
+  estudiante: 'Estudiante',
 };
 
 /** Cuentas de prueba: la contraseña es el mismo código. */
@@ -24,6 +25,8 @@ export const ACCOUNTS: Account[] = [
   { code: 'SEC001', name: 'Milagros Torres Lazo', initials: 'MT', role: 'secretaria', title: 'Secretaría', sede: 'Sede Mazo' },
   { code: 'TES001', name: 'Jorge Salinas Cruz', initials: 'JS', role: 'tesoreria', title: 'Tesorería', sede: 'Ambas sedes' },
   { code: 'DOC001', name: 'Javier Rojas', initials: 'JR', role: 'docente', title: 'Docente · Química', sede: 'Sede Mazo' },
+  // Estudiante e1 de los datos del aula (Química 3.º A)
+  { code: 'EST001', name: 'Camila Alvarado Ríos', initials: 'CA', role: 'estudiante', title: '3.º A · Secundaria', sede: 'Sede Mazo' },
 ];
 
 export interface Session { code: string; at: string; samePassword: boolean }
@@ -107,4 +110,4 @@ export function changePassword(pass: string): boolean {
 /** Vuelve las cuentas de prueba a su contraseña inicial (el código). */
 export function resetDemoPasswords(): void { store.del('ef-claves'); store.del(TRIES); }
 
-export const homeFor = (r: Role) => (r === 'docente' ? 'panel.html' : 'admin.html');
+export const homeFor = (r: Role) => (r === 'docente' ? 'panel.html' : r === 'estudiante' ? 'estudiante.html' : 'admin.html');

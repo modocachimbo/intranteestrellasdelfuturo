@@ -45,6 +45,20 @@ export const NAV: NavGroup[] = [
   },
 ];
 
+/** Menú del estudiante (estudiante.html). */
+export const NAV_ESTUDIANTE: NavGroup[] = [
+  { title: '', items: [
+    { id: 'inicio', label: 'Inicio', href: 'estudiante.html#inicio', icon: 'home' },
+    { id: 'cursos', label: 'Mis cursos', href: 'estudiante.html#cursos', icon: 'book' },
+    { id: 'tareas', label: 'Tareas', href: 'estudiante.html#tareas', icon: 'tasks' },
+    { id: 'notas', label: 'Calificaciones', href: 'estudiante.html#notas', icon: 'grade' },
+    { id: 'horario', label: 'Horario', href: 'estudiante.html#horario', icon: 'clock' },
+  ] },
+  { title: 'Comunicación', items: [
+    { id: 'comunicados', label: 'Comunicados', href: 'estudiante.html#comunicados', icon: 'megaphone', count: 2 },
+  ] },
+];
+
 /** Usuario de ejemplo hasta conectar el inicio de sesión real. */
 export const USER: ShellUser = { initials: 'JR', name: 'Javier Rojas', role: 'Docente · Química' };
 
@@ -158,8 +172,9 @@ export function mountShell(o: ShellOptions = {}): void {
   const tb = document.getElementById('topbar');
   // En las páginas del docente se muestra quien inició sesión (si es docente)
   const acc = currentAccount();
-  const user = o.user ?? (acc && acc.role === 'docente' ? { initials: acc.initials, name: acc.name, role: acc.title } : USER);
-  if (sb) renderSidebar(sb, page, o.nav ?? NAV, o.home ?? 'panel.html');
+  const student = acc?.role === 'estudiante';
+  const user = o.user ?? (acc && (acc.role === 'docente' || student) ? { initials: acc.initials, name: acc.name, role: acc.title } : USER);
+  if (sb) renderSidebar(sb, page, o.nav ?? (student ? NAV_ESTUDIANTE : NAV), o.home ?? (student ? 'estudiante.html' : 'panel.html'));
   if (tb) renderTopbar(tb, user, o.search ?? 'Buscar estudiante, curso o tarea…', o.topActions);
   wireMobileMenu();
   wireSmallBits();

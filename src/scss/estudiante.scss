@@ -1,0 +1,74 @@
+// Portal del estudiante (estudiante.html) y botón de regreso en su vista de tarea
+$bp-md: 720px;
+
+.stu { gap: 20px; }
+.page-band .cap::first-letter { text-transform: uppercase; }
+.center { text-align: center; }
+.ico-tile.sm { width: 34px; height: 34px; border-radius: 10px; }
+
+.grade { gap: 3px; small { font-size: 10px; opacity: .8; } &.empty { background: var(--borde-suave); color: var(--tinta-3); }
+  &.big { width: 92px; height: 92px; border-radius: 26px; font-family: var(--f-titulo); font-size: 40px; font-weight: 600; small { font-size: 15px; } } }
+
+.stu-avg { flex: 0 1 220px; display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 22px; background: var(--azul-50);
+  > span:last-child { font-size: 14px; font-weight: 700; color: var(--azul-900); line-height: 1.3; small { font-weight: 500; color: var(--tinta-3); } } }
+
+// Tareas
+.tareas { display: flex; flex-direction: column; gap: 8px; }
+.tarea { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--borde-suave); border-radius: 16px; color: var(--tinta); text-decoration: none; background: #fff;
+  .tile { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--c); color: #fff; flex: none; .ico { --ico-fill: #fff; --ico-fill-op: .3; color: #fff; } }
+  .t-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;
+    small { font-size: 12px; font-weight: 600; color: var(--tinta-3); } b { font-size: 14.5px; line-height: 1.3; }
+    .t-due { font-size: 12.5px; color: var(--tinta-3); &.soon { color: var(--peligro-700); font-weight: 700; } } }
+  .t-end { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .chev { transform: rotate(-90deg); color: var(--tinta-3); flex: none; }
+  &[data-toast] { cursor: pointer; }
+  @at-root a.tarea:hover { border-color: var(--azul-200); background: var(--azul-50); text-decoration: none; color: var(--tinta); }
+  @media (max-width: $bp-md) { flex-wrap: wrap; .t-main { flex-basis: calc(100% - 60px); } .t-end { width: 100%; justify-content: flex-start; padding-left: 52px; } .chev { display: none; } } }
+.tabs-pill { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;
+  a { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--borde); color: var(--tinta-2); font-weight: 600; font-size: 14px; text-decoration: none;
+    span { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 99px; background: var(--borde-suave); display: grid; place-items: center; font-size: 12px; }
+    &[aria-selected="true"] { background: var(--azul-600); border-color: var(--azul-600); color: #fff; span { background: rgba(255,255,255,.25); } }
+    &:hover { text-decoration: none; } } }
+.empty { padding: 24px 0; text-align: center; }
+
+// Hoy y comunicados
+.hoy { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;
+  li { display: flex; align-items: center; gap: 10px; > span:last-child { display: flex; flex-direction: column; b { font-size: 14px; } small { font-size: 12px; color: var(--tinta-3); } } }
+  .h { width: 44px; font-size: 13px; font-weight: 700; color: var(--tinta-2); } }
+.dot { width: 10px; height: 10px; border-radius: 99px; background: var(--c); flex: none; display: inline-block; }
+.activity { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px;
+  li { display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; line-height: 1.4; small { display: block; font-size: 12px; color: var(--tinta-3); margin-top: 2px; } } }
+.comm { .comm-h { display: flex; align-items: center; gap: 12px; > div { flex: 1; display: flex; flex-direction: column; b { font-size: 16px; } small { font-size: 12.5px; color: var(--tinta-3); } } }
+  p { margin: 12px 0 0; color: var(--tinta-2); line-height: 1.55; } &.nuevo { border-left: 4px solid var(--amarillo-400); } }
+
+// Cursos
+.stu-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.stu-course { display: flex; flex-direction: column; gap: 2px; padding: 18px; color: var(--tinta); text-decoration: none; border-top: 5px solid var(--c);
+  .sc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .tile { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--c); color: #fff; .ico { --ico-fill: #fff; --ico-fill-op: .3; color: #fff; } }
+  b { font-size: 16px; } small { font-size: 13px; color: var(--tinta-3); }
+  .sc-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--borde-suave); font-size: 13px; color: var(--tinta-3); font-weight: 600; } }
+a.stu-course:hover { text-decoration: none; color: var(--tinta); box-shadow: var(--sombra-2); transform: translateY(-2px); }
+
+// Tablas
+.table-wrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+.stu-notas, .stu-horario { width: 100%; border-collapse: collapse; font-size: 14px;
+  th, td { padding: 10px 8px; border-bottom: 1px solid var(--borde-suave); text-align: center; }
+  thead th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--tinta-3); font-weight: 700; }
+  tbody th, tfoot th, thead th:first-child { text-align: left; font-weight: 600; white-space: nowrap; } }
+.stu-notas { min-width: 560px;
+  tbody th .dot { margin-right: 10px; }
+  .grade { width: auto; min-width: 38px; padding: 0 6px; }
+  td.parcial { background: var(--azul-50); } td.prom .grade { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px currentColor; }
+  tfoot th, tfoot td { border-bottom: 0; border-top: 2px solid var(--borde); font-weight: 700; } }
+.escala-leg { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; font-size: 13px; color: var(--tinta-2); > span { display: inline-flex; align-items: center; gap: 8px; } .grade { width: auto; min-width: 34px; height: 26px; padding: 0 6px; } }
+.kpis.mini { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+  > div { background: var(--fondo); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; small { font-size: 12.5px; color: var(--tinta-3); font-weight: 600; } b { font-family: var(--f-titulo); font-size: 24px; font-weight: 600; } }
+  @media (max-width: $bp-md) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stu-horario { min-width: 640px;
+  td { padding: 6px; } th:first-child { font-size: 12.5px; color: var(--tinta-3); white-space: nowrap; }
+  .hc { display: block; padding: 10px 8px; border-radius: 10px; background: color-mix(in srgb, var(--c) 12%, #fff); border-left: 4px solid var(--c); font-size: 13px; font-weight: 600; text-align: left; }
+  .today { background: var(--amarillo-100); } thead .today { color: #6B4A00; }
+  .recreo td { font-size: 12.5px; font-weight: 700; color: var(--tinta-3); letter-spacing: .08em; text-transform: uppercase; background: var(--fondo); } }
+
+@media (max-width: $bp-md) { .stu-avg { flex-basis: 100%; } }

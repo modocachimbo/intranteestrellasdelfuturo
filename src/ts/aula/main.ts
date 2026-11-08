@@ -12,6 +12,7 @@ import { activityView } from './views/activity';
 import { effectiveReview, reviewView } from './views/review';
 import { PDF_EJEMPLO, getReview, pdfUrl, rubricTotal, saveReview } from './reviews';
 import { InkViewer } from './pdfink';
+import { currentAccount } from '../core/session';
 import { studentView } from './views/student';
 import type { Review } from './reviews';
 import { bankRow, bankView, csv, gradebookView, gradedColumns, participantsView, questionDialog, reportsView } from './views/tabs';
@@ -170,8 +171,11 @@ function rerenderView(): void {
 const scrollTo = (id: string, smooth = true) => requestAnimationFrame(() =>
   document.getElementById(id)?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' }));
 
+const IS_STUDENT = currentAccount()?.role === 'estudiante';
 function route(smooth: boolean): void {
   const h = decodeURIComponent(location.hash.slice(1));
+  // El estudiante solo ve sus propias entregas (por ahora, desde su portal)
+  if (IS_STUDENT && !/^e-.+-0$/.test(h)) { location.replace('estudiante.html#tareas'); return; }
   if (h.startsWith('r-') || h.startsWith('e-')) { openReviewRoute(h); return; }
   if (h.startsWith('a-') || ['participantes', 'calificaciones', 'banco', 'informes'].includes(h)) {
     state.route = h; render();
@@ -513,7 +517,7 @@ function renderStudent(): string | null {
   const sub = subs[i];
   const saved = getReview(f.a.id, sub.student.id);
   rvState.work = structuredCloneSafe(effectiveReview(sub, saved));
-  return studentView({ a: f.a, week: f.w, course, sub, index: i, review: rvState.work, published: saved ? saved.state === 'graded' : sub.grade != null, now: NOW });
+  return studentView({ a: f.a, week: f.w, course, sub, index: i, review: rvState.work, published: saved ? saved.state === 'graded' : sub.grade != null, now: NOW, asStudent: IS_STUDENT });
 }
 const structuredCloneSafe = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
 
@@ -837,5 +841,5 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenus
 window.addEventListener('hashchange', () => route(true));
 
 // ---------- Inicio ----------
-render();
-if (location.hash) route(false);
+if (IS_STUDENT && !/^#e-.+-0$/.test(location.hash)) location.replace('estudiante.html#tareas');
+else { render(); if (location.hash) route(false); }

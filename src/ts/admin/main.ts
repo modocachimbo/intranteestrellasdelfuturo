@@ -18,6 +18,7 @@ injectSprite();
 const acc = currentAccount();
 if (!acc) location.replace('index.html?next=admin.html');
 else if (acc.role === 'docente') location.replace('panel.html');
+else if (acc.role === 'estudiante') location.replace('estudiante.html');
 else start();
 
 function start(): void {

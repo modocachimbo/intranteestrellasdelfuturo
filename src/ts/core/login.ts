@@ -47,7 +47,7 @@ export function wireLogin(): void {
       btn.disabled = true;
       btn.textContent = 'Ingresando…';
       const next = params.get('next');
-      const dest = next && /^[a-z-]+\.html(#[\w-]*)?$/.test(next) && (r.account.role !== 'docente' || next !== 'admin.html') ? next : homeFor(r.account.role);
+      const dest = next && /^[a-z-]+\.html(#[\w-]*)?$/.test(next) && (['docente', 'estudiante'].includes(r.account.role) ? next !== 'admin.html' : true) ? next : homeFor(r.account.role);
       location.href = dest;
       return;
     }
