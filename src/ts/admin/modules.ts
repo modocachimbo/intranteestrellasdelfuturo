@@ -28,7 +28,7 @@ export const BLOQUES: Bloque[] = [
       incluye: ['Sedes Mazo y Huacho: dirección, código modular, director de sede', 'Año escolar y calendario: bimestres, semanas, vacaciones y feriados', 'Niveles, grados, secciones y turnos', 'Aulas y su capacidad (sirve para horarios y simulacros)', 'Logo, datos para libretas y documentos'] },
     { id: 'escala', name: 'Escala de notas', icon: 'grade', roles: ACAD, edit: DIR, fase: 1, listo: true, desc: 'Vigesimal, literal o ambas, por nivel.', incluye: [] },
     { id: 'usuarios', name: 'Usuarios y roles', icon: 'users', roles: DIR, fase: 1, listo: true, desc: 'Cuentas de todas las personas y lo que cada una puede ver y hacer.',
-      incluye: ['Docentes, estudiantes, padres o apoderados y personal', 'Generar códigos de ingreso (la primera contraseña es el código)', 'Restablecer contraseñas y bloquear o activar cuentas', 'Roles y permisos detallados', 'Importar desde Excel y exportar listas'] },
+      incluye: ['Docentes, estudiantes, padres o apoderados y personal', 'Entran con su DNI (la primera contraseña es el mismo DNI)', 'Restablecer contraseñas y bloquear o activar cuentas', 'Roles y permisos detallados', 'Importar desde Excel y exportar listas'] },
   ] },
   { id: 'secretaria', name: 'Secretaría', modulos: [
     { id: 'admision', name: 'Admisión', icon: 'megaphone', roles: SEC, fase: 5, desc: 'Del interesado al estudiante nuevo.',

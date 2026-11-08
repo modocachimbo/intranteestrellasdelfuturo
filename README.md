@@ -7,7 +7,7 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 
 | Página | Qué muestra |
 |---|---|
-| `index.html` | Ingreso con código y contraseña (la primera contraseña es el mismo código). Lleva a cada rol a su panel. |
+| `index.html` | Ingreso con DNI y contraseña (la primera contraseña es el mismo DNI). Lleva a cada rol a su panel. |
 | `admin.html` | Panel de administración: tablero por rol, menú por bloques y escala de notas. |
 | `estudiante.html` | Portal del estudiante: inicio, mis cursos, tareas, calificaciones (con la escala del colegio), horario y comunicados. |
 | `panel.html` | Inicio del docente: bienvenida, aviso de cierre de notas, indicadores, estadística académica por rangos de nota, estrella del bimestre, mis cursos, semana y horario de hoy, comunicados y cumpleaños. |
@@ -20,23 +20,25 @@ En línea: https://modocachimbo.github.io/intranteestrellasdelfuturo/
 
 ## Ingreso y roles
 
-Cuentas de prueba (código = contraseña):
+Cada persona entra con su **DNI** (o carné de extranjería) y la contraseña inicial es el **mismo DNI**; al entrar se le pide cambiarla. Cuentas de prueba:
 
-| Código | Rol | Entra a |
+| DNI (usuario y contraseña) | Rol | Entra a |
 |---|---|---|
-| `ADM001` | Administrador del sistema | `admin.html` (todo) |
-| `DIR001` | Dirección | `admin.html` (todo menos seguridad) |
-| `COO001` | Coordinación académica | `admin.html` (académico y evaluación) |
-| `SEC001` | Secretaría | `admin.html` (matrícula, traslados, trámites) |
-| `TES001` | Tesorería | `admin.html` (pensiones, caja, morosidad) |
-| `DOC001` | Docente | `panel.html` |
-| `EST001` | Estudiante (Camila Alvarado, 3.º A) | `estudiante.html` |
-| `APO001` | Madre de Camila y de Fernanda | `estudiante.html` (elige al hijo) |
-| `AUX001` | Auxiliar de educación (rol creado) | `admin.html` (asistencia y convivencia) |
+| `11111111` | Administrador del sistema | `admin.html` (todo) |
+| `22222222` | Dirección | `admin.html` (todo menos seguridad) |
+| `33333333` | Coordinación académica | `admin.html` (académico y evaluación) |
+| `44444444` | Secretaría | `admin.html` (matrícula, traslados, trámites) |
+| `55555555` | Tesorería | `admin.html` (pensiones, caja, morosidad) |
+| `77777777` | Docente | `panel.html` |
+| `88888888` | Estudiante (Camila Alvarado, 3.º A) | `estudiante.html` |
+| `99999999` | Madre de Camila y de Fernanda | `estudiante.html` (elige al hijo) |
+| `66666666` | Auxiliar de educación (rol creado) | `admin.html` (asistencia y convivencia) |
 
-- Código en mayúsculas o minúsculas. 5 intentos fallidos bloquean 1 minuto.
-- Si la contraseña sigue siendo el código, el panel pide cambiarla (mínimo 8 caracteres, letras y números, distinta al código).
-- En la demo todo se guarda en el navegador; "Restablecer las contraseñas de prueba" en el ingreso las vuelve al código. Con base de datos, esto lo hará el servidor.
+- 5 intentos fallidos bloquean 1 minuto.
+- Si una persona tiene dos cuentas con el mismo DNI (por ejemplo, docente y madre de familia), al ingresar elige cómo entrar. Ejemplo: la docente Lucía Paredes (DOC009) también es apoderada (APO032).
+- El código (DOC013, EST032…) es el identificador interno de cada cuenta: vincula padres e hijos y aparece en reportes.
+- Si la contraseña sigue siendo el DNI, el panel pide cambiarla (mínimo 8 caracteres, letras y números, que no sea el DNI).
+- En la demo todo se guarda en el navegador; "Restablecer las contraseñas de prueba" en el ingreso las vuelve al DNI. Con base de datos, esto lo hará el servidor.
 - Roles y módulos se definen en `src/ts/admin/modules.ts` y `src/ts/core/session.ts`.
 
 ## Panel de administración (`admin.html`)
@@ -51,10 +53,10 @@ Cuentas de prueba (código = contraseña):
   - Logo propio (hasta 300 KB) con vista previa del encabezado de documentos.
   - Historial de cambios, descargar y restaurar respaldo (JSON) y volver a los datos de ejemplo. Datos en `src/ts/core/institucion.ts`.
 - **Usuarios y roles** (`admin.html#usuarios`):
-  - *Personas*: todas las cuentas (personal, docentes, estudiantes, padres) con búsqueda, filtros por tipo, estado, sede y sección; crear, editar, restablecer contraseña (vuelve al código), bloquear, activar y eliminar; acciones en grupo. Los códigos se generan solos por rol (DOC013, EST032…) y la contraseña inicial es el código.
-  - Reglas: no puedes bloquearte ni eliminarte; siempre queda al menos un administrador activo; DNI de 8 dígitos y sin repetir; una cuenta bloqueada o inactiva no puede entrar.
+  - *Personas*: todas las cuentas (personal, docentes, estudiantes, padres) con búsqueda, filtros por tipo, estado, sede y sección; crear, editar, restablecer contraseña (vuelve al DNI), bloquear, activar y eliminar; acciones en grupo. Cada cuenta entra con su DNI (contraseña inicial: el mismo DNI); el código interno se genera solo por rol (DOC013, EST032…).
+  - Reglas: no puedes bloquearte ni eliminarte; siempre queda al menos un administrador activo; DNI de 8 dígitos (o carné de 9 a 12) y sin repetir, salvo que sea la misma persona con dos cuentas; una cuenta bloqueada o inactiva no puede entrar.
   - *Roles y permisos*: por cada rol del personal, cada módulo en No / Ver / Editar. El menú y el tablero de cada persona salen de estos permisos. Se pueden crear roles nuevos (por ejemplo, Psicología) con su prefijo de código.
-  - *Credenciales*: tarjetas para imprimir con código y contraseña inicial, por tipo, sede y sección.
+  - *Credenciales*: tarjetas para imprimir con el usuario (DNI) y la contraseña inicial, por tipo, sede y sección.
   - *Importar y exportar*: plantilla CSV por tipo, revisión fila por fila antes de crear y exportación a Excel (CSV).
   - Los padres entran al portal del estudiante y eligen a cuál de sus hijos ver.
 - **Escala de notas** (`admin.html#escala`): por nivel, *Vigesimal* (0–20), *Literal* (AD, A, B, C) o *Ambas* (0–20 con su letra); equivalencia editable con revisión de huecos y cruces; nota aprobatoria, decimales y desde qué bimestre se aplica; confirmación y historial de cambios. Solo Dirección y el administrador pueden cambiarla; Coordinación la ve. El aula virtual ya muestra las notas con esta escala (`src/ts/core/escala.ts`).

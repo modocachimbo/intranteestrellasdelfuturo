@@ -606,3 +606,6 @@ input.nota.g-x { background: #fff; border: 1.5px dashed #9AA4BF; }
 .nav a:has(.soon) { min-height: 40px; color: #B9C6F2; }
 .nav a[aria-current="page"] .soon { border-color: #fff; }
 .sidebar { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }
+
+.login-choose { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; border-radius: 16px; background: var(--azul-50); border: 1.5px solid var(--azul-200);
+  p { grid-column: 1 / -1; margin: 0 0 2px; font-size: 13.5px; color: var(--azul-900); } .demo-acc b { font-size: 14px; } }

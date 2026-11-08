@@ -87,15 +87,15 @@ function personas(d: UsuariosStore, st: UsrState, o: UsrOpts, inst: Institucion)
     ${list.length ? `<div class="table-wrap"><table class="usr-table">
       <thead><tr>
         ${o.canEdit ? `<th class="ck"><input type="checkbox" data-usr-selall aria-label="Seleccionar esta página"${allSel ? ' checked' : ''}></th>` : ''}
-        <th>Persona</th><th>Código</th><th>Tipo o rol</th><th>Sede, sección o hijos</th><th>Estado</th><th>Último acceso</th>${o.canEdit ? '<th><span class="sr-only">Acciones</span></th>' : ''}
+        <th>Persona</th><th>Usuario (DNI)</th><th>Tipo o rol</th><th>Sede, sección o hijos</th><th>Estado</th><th>Último acceso</th>${o.canEdit ? '<th><span class="sr-only">Acciones</span></th>' : ''}
       </tr></thead>
       <tbody>${rows.map((u) => { const est = ESTADOS.find((e) => e.id === u.estado)!; const own = hasOwnPassword(u.code); const me = u.id === o.meId; return `<tr class="${u.estado !== 'activo' ? 'off' : ''}${st.sel.has(u.id) ? ' sel' : ''}">
         ${o.canEdit ? `<td class="ck"><input type="checkbox" data-usr-sel="${u.id}" aria-label="Seleccionar a ${esc(fullName(u))}"${st.sel.has(u.id) ? ' checked' : ''}></td>` : ''}
-        <td><button type="button" class="person-btn" data-usr="view" data-id="${u.id}"><span class="avatar sm t-${u.tipo}">${esc(initialsOf(u))}</span><span><b>${esc(fullName(u))}${me ? ' <span class="chip blue">Tú</span>' : ''}</b><small>DNI ${esc(u.dni) || '—'}${u.email ? ` · ${esc(u.email)}` : ''}</small></span></button></td>
-        <td><code class="code">${u.code}</code></td>
+        <td><button type="button" class="person-btn" data-usr="view" data-id="${u.id}"><span class="avatar sm t-${u.tipo}">${esc(initialsOf(u))}</span><span><b>${esc(fullName(u))}${me ? ' <span class="chip blue">Tú</span>' : ''}</b><small>Código ${u.code}${u.email ? ` · ${esc(u.email)}` : ''}</small></span></button></td>
+        <td><code class="code">${esc(u.dni) || '—'}</code></td>
         <td>${rolLabel(u)}</td>
         <td class="det">${detalle(u)}</td>
-        <td class="est"><span class="chip ${est.tone}">${est.name}</span><small class="${own ? '' : 'pw-ini'}" title="${own ? 'Ya cambió su contraseña' : 'Su contraseña todavía es su mismo código'}">${own ? 'Clave propia' : 'Clave inicial'}</small></td>
+        <td class="est"><span class="chip ${est.tone}">${est.name}</span><small class="${own ? '' : 'pw-ini'}" title="${own ? 'Ya cambió su contraseña' : 'Su contraseña todavía es su DNI'}">${own ? 'Clave propia' : 'Clave inicial'}</small></td>
         <td class="muted small nowrap">${acceso(u.acceso)}</td>
         ${o.canEdit ? `<td class="row-actions">
           <button type="button" class="icon-btn sm" data-usr="edit" data-id="${u.id}" aria-label="Editar" title="Editar">${ico('edit', 'ico-sm')}</button>
@@ -146,7 +146,7 @@ function credenciales(d: UsuariosStore, st: UsrState, inst: Institucion): string
   const url = `${location.origin}${location.pathname.replace(/[^/]*$/, '')}`;
   return `<section class="card card-pad no-print">
     <div class="card-head"><h2>Credenciales para entregar</h2><button type="button" class="btn btn-primary sm" data-usr="print"${list.length ? '' : ' disabled'}>${ico('print', 'ico-sm', '--ico-fill:#fff')}Imprimir ${list.length}</button></div>
-    <p class="card-sub">Cada tarjeta trae el código y la contraseña inicial. Recórtalas y entrégalas en un sobre o en reunión de padres.</p>
+    <p class="card-sub">Cada tarjeta trae el usuario (DNI) y la contraseña inicial (el mismo DNI). Recórtalas y entrégalas en un sobre o en reunión de padres.</p>
     <div class="usr-filters">
       <select class="input" data-cred="tipo" aria-label="Tipo">${TIPOS.map((t) => `<option value="${t.id}"${st.credTipo === t.id ? ' selected' : ''}>${t.plural}</option>`).join('')}</select>
       <select class="input" data-cred="sede" aria-label="Sede"><option value="todas">Todas las sedes</option>${inst.sedes.map((s) => `<option value="${s.id}"${st.credSede === s.id ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</select>
@@ -162,8 +162,8 @@ export function credCard(d: UsuariosStore, u: Usuario, inst: Institucion, url: s
   return `<article class="cred">
     <header><img src="${inst.datos.logo || 'logo.png'}" alt=""><div><b>Las Estrellas del Futuro</b><small>Intranet ${new Date().getFullYear()}</small></div></header>
     <p class="cred-name">${esc(fullName(u))}</p><p class="cred-extra">${esc(extra)}</p>
-    <dl><div><dt>Código</dt><dd>${u.code}</dd></div><div><dt>Contraseña inicial</dt><dd>${u.code}</dd></div></dl>
-    <p class="cred-url">Ingresa en <b>${esc(url.replace(/^https?:\/\//, ''))}</b> · Al entrar, cambia tu contraseña.</p>
+    <dl><div><dt>Usuario (DNI)</dt><dd>${esc(u.dni)}</dd></div><div><dt>Contraseña inicial</dt><dd>${esc(u.dni)}</dd></div></dl>
+    <p class="cred-url">Ingresa en <b>${esc(url.replace(/^https?:\/\//, ''))}</b> · Al entrar podrás cambiar tu contraseña.</p>
   </article>`;
 }
 
@@ -181,7 +181,7 @@ function importar(st: UsrState, inst: Institucion): string {
         <li><b>Sube el archivo</b> para revisarlo antes de crear las cuentas.
           <label class="btn btn-primary sm file-btn">${ico('upload', 'ico-sm', '--ico-fill:#fff')}Elegir archivo CSV<input type="file" accept=".csv,text/csv" data-imp-file hidden></label></li>
       </ol>
-      <p class="muted small">Los códigos se generan solos y la contraseña inicial es el mismo código. ${st.importTipo === 'estudiante' ? `Sede, grado y sección deben escribirse como en Institución (por ejemplo: ${esc(inst.sedes[0]?.name ?? 'Sede Mazo')} · 3.º año · A).` : st.importTipo === 'apoderado' ? 'En "hijos" escribe los códigos de estudiante separados por coma (EST001, EST014).' : ''}</p>
+      <p class="muted small">Cada persona entra con su DNI y la contraseña inicial es el mismo DNI. El código interno se genera solo. ${st.importTipo === 'estudiante' ? `Sede, grado y sección deben escribirse como en Institución (por ejemplo: ${esc(inst.sedes[0]?.name ?? 'Sede Mazo')} · 3.º año · A).` : st.importTipo === 'apoderado' ? 'En "hijos" escribe los códigos de estudiante separados por coma (EST001, EST014).' : ''}</p>
     </section>
     <section class="card card-pad">
       <div class="card-head"><h2>Exportar</h2></div>

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css?v=202611081710">
+<link rel="stylesheet" href="assets/css/styles.css?v=202611081715">
 </head>
 <body>
 <div class="login-page">
@@ -26,9 +26,9 @@
         <p class="lead">Ingresa a tu intranet</p>
 
         <div class="field-col">
-          <label for="codigo">Código de usuario</label>
-          <input class="input" id="codigo" name="codigo" type="text" autocomplete="username" autocapitalize="characters" spellcheck="false" placeholder="Ej. DOC001" aria-describedby="codigo-ayuda login-msg">
-          <span class="hint" id="codigo-ayuda">Te lo entrega la administración del colegio.</span>
+          <label for="codigo">DNI</label>
+          <input class="input" id="codigo" name="dni" type="text" inputmode="numeric" autocomplete="username" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="Tu número de DNI" aria-describedby="codigo-ayuda login-msg">
+          <span class="hint" id="codigo-ayuda">O tu carné de extranjería.</span>
         </div>
 
         <div class="field-col">
@@ -37,21 +37,22 @@
             <input class="input" id="clave" name="clave" type="password" autocomplete="current-password" placeholder="••••••••" aria-describedby="clave-ayuda login-msg">
             <button id="ver-clave" type="button" aria-label="Mostrar contraseña"><svg class="ico" aria-hidden="true"><use href="#i-eye"></use></svg></button>
           </div>
-          <span class="hint" id="clave-ayuda">La primera vez, tu contraseña es tu mismo código.</span>
+          <span class="hint" id="clave-ayuda">La primera vez, tu contraseña es tu mismo DNI. Luego podrás cambiarla.</span>
         </div>
 
         <p class="login-msg" id="login-msg" role="alert" hidden></p>
         <button class="btn btn-primary btn-pill" type="submit">Ingresar</button>
+        <div class="login-choose" id="login-choose" hidden></div>
         <p class="login-continue" id="login-continue" hidden></p>
 
         <div class="login-links">
           <a href="#">¿Olvidaste tu contraseña?</a>
-          <span>¿No tienes código? <a href="#">Comunícate con la administración</a></span>
+          <span>¿No puedes entrar? <a href="#">Comunícate con la administración</a></span>
         </div>
 
         <details class="demo-box">
           <summary>Cuentas de prueba (demo)</summary>
-          <p>Toca una cuenta: el código y la contraseña son iguales.</p>
+          <p>Toca una cuenta: el DNI es el usuario y también la contraseña.</p>
           <div class="demo-accounts" id="demo-accounts"></div>
         </details>
       </form>
@@ -59,6 +60,6 @@
   </main>
   <p class="login-foot">© 2026 IEP Las Estrellas del Futuro · Mazo, Végueta</p>
 </div>
-<script src="assets/js/app.js?v=202611081710"></script>
+<script src="assets/js/app.js?v=202611081715"></script>
 </body>
 </html>

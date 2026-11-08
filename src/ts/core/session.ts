@@ -1,15 +1,15 @@
 /* Inicio de sesión de la demo.
-   - Cada persona entra con el CÓDIGO que le entrega la administración. La contraseña inicial es el mismo código.
+   - Cada persona entra con su DNI. La contraseña inicial es el mismo DNI; al entrar se le pide cambiarla.
    - Al conectar la base de datos, esta lista se reemplaza por la consulta al servidor (las contraseñas nunca
      se guardan en el navegador: aquí solo se guarda quién inició sesión). */
 
-import { findByCode, fullName, getUsuarios, initialsOf, roleName, saveUsuarios } from './usuarios';
+import { findByCode, findByDni, fullName, getUsuarios, initialsOf, normDni, roleName, saveUsuarios } from './usuarios';
 import type { Usuario } from './usuarios';
 
 /** Id del rol: admin, director, coordinador, secretaria, tesoreria, docente, estudiante, apoderado o uno creado por el administrador. */
 export type Role = string;
 
-export interface Account { code: string; name: string; initials: string; role: Role; title: string; sede: string; userId: string }
+export interface Account { code: string; dni: string; name: string; initials: string; role: Role; title: string; sede: string; userId: string; tipo: string }
 
 /** Nombre visible de cada rol (los roles nuevos salen de Usuarios y roles). */
 export const ROLE_NAME: Record<string, string> = new Proxy({}, { get: (_t, k: string) => roleName(k) });
@@ -17,10 +17,10 @@ export const ROLE_NAME: Record<string, string> = new Proxy({}, { get: (_t, k: st
 export function toAccount(u: Usuario): Account {
   const title = u.tipo === 'personal' ? (u.cargo || roleName(u.role)) : u.tipo === 'docente' ? `Docente${u.especialidad ? ` · ${u.especialidad}` : ''}`
     : u.tipo === 'estudiante' ? 'Estudiante' : `${u.parentesco || 'Apoderado'} de familia`;
-  return { code: u.code, name: fullName(u), initials: initialsOf(u), role: u.role, title, sede: u.sede, userId: u.id };
+  return { code: u.code, dni: u.dni, name: fullName(u), initials: initialsOf(u), role: u.role, title, sede: u.sede, userId: u.id, tipo: u.tipo };
 }
 
-/** Cuentas de prueba que se muestran en el ingreso (la contraseña es el mismo código). */
+/** Cuentas de prueba que se muestran en el ingreso (usuario y contraseña: el DNI). */
 export const DEMO_CODES = ['ADM001', 'DIR001', 'COO001', 'SEC001', 'TES001', 'AUX001', 'DOC001', 'EST001', 'APO001'];
 export const demoAccounts = (): Account[] => DEMO_CODES.map((c) => findByCode(c)).filter((u): u is Usuario => !!u && u.estado === 'activo').map(toAccount);
 
@@ -51,29 +51,33 @@ export function currentSession(): Session | null {
   try { return JSON.parse(store.get(KEY) ?? 'null') as Session | null; } catch { return null; }
 }
 
-export type LoginResult = { ok: true; account: Account } | { ok: false; reason: 'empty' | 'wrong' | 'locked' | 'blocked' | 'inactive'; wait?: number; left?: number };
+export type LoginResult =
+  | { ok: true; account: Account }
+  | { ok: false; reason: 'empty' | 'wrong' | 'locked' | 'blocked' | 'inactive'; wait?: number; left?: number }
+  | { ok: false; reason: 'choose'; options: Account[] };
 
-/** Revisa código y contraseña; después de 5 intentos fallidos bloquea 1 minuto. */
-export function login(codeRaw: string, password: string): LoginResult {
-  const code = normCode(codeRaw);
-  if (!code || !password) return { ok: false, reason: 'empty' };
+const passOk = (u: Usuario, password: string) => { const custom = claves()[u.code]; return custom ? custom === hash(u.code, password) : normDni(password) === u.dni; };
+
+/** Revisa DNI y contraseña; después de 5 intentos fallidos bloquea 1 minuto.
+    Si la persona tiene dos cuentas con el mismo DNI (por ejemplo, docente y apoderada), devuelve "choose" para que elija. */
+export function login(dniRaw: string, password: string, pickCode?: string): LoginResult {
+  const dni = normDni(dniRaw);
+  if (!dni || !password) return { ok: false, reason: 'empty' };
   const t = JSON.parse(store.get(TRIES) ?? '{"n":0,"until":0}') as { n: number; until: number };
   if (t.until > Date.now()) return { ok: false, reason: 'locked', wait: Math.ceil((t.until - Date.now()) / 1000) };
-  const acc = findByCode(code);
-  // La contraseña inicial es el código (en mayúsculas o minúsculas); si la persona la cambió, vale la nueva
-  const custom = acc ? claves()[acc.code] : undefined;
-  const okPass = acc && (custom ? custom === hash(acc.code, password) : normCode(password) === acc.code);
-  if (!acc || !okPass) {
+  const matches = findByDni(dni).filter((u) => passOk(u, password));
+  if (!matches.length) {
     const n = t.n + 1;
     if (n >= MAX_TRIES) { store.set(TRIES, JSON.stringify({ n: 0, until: Date.now() + LOCK_MS })); return { ok: false, reason: 'locked', wait: LOCK_MS / 1000 }; }
     store.set(TRIES, JSON.stringify({ n, until: 0 }));
     return { ok: false, reason: 'wrong', left: MAX_TRIES - n };
   }
   store.del(TRIES);
-  if (acc.estado === 'bloqueado') return { ok: false, reason: 'blocked' };
-  if (acc.estado === 'inactivo') return { ok: false, reason: 'inactive' };
-  store.set(KEY, JSON.stringify({ code: acc.code, at: new Date().toISOString(), samePassword: !custom } satisfies Session));
-  // Último acceso
+  const activos = matches.filter((u) => u.estado === 'activo');
+  if (!activos.length) return { ok: false, reason: matches.some((u) => u.estado === 'bloqueado') ? 'blocked' : 'inactive' };
+  const acc = pickCode ? activos.find((u) => u.code === pickCode) : activos.length === 1 ? activos[0] : undefined;
+  if (!acc) return { ok: false, reason: 'choose', options: activos.map(toAccount) };
+  store.set(KEY, JSON.stringify({ code: acc.code, at: new Date().toISOString(), samePassword: !claves()[acc.code] } satisfies Session));
   const d = getUsuarios();
   const u = d.users.find((x) => x.code === acc.code);
   if (u) { u.acceso = new Date().toISOString(); saveUsuarios(d); }
@@ -92,10 +96,10 @@ function hash(code: string, pass: string): string {
 }
 
 /** Reglas de una contraseña nueva. Devuelve el problema o null si está bien. */
-export function passwordProblem(code: string, pass: string, confirm: string): string | null {
+export function passwordProblem(dni: string, pass: string, confirm: string): string | null {
   if (pass.length < 8) return 'Usa al menos 8 caracteres.';
   if (!/[a-zA-ZñÑ]/.test(pass) || !/\d/.test(pass)) return 'Combina letras y números.';
-  if (normCode(pass) === code) return 'No puede ser igual a tu código.';
+  if (normDni(pass) === dni || pass.includes(dni)) return 'No puede ser tu DNI ni contenerlo.';
   if (pass !== confirm) return 'Las dos contraseñas no coinciden.';
   return null;
 }
@@ -112,10 +116,10 @@ export function changePassword(pass: string): boolean {
 
 /** ¿La persona ya cambió su contraseña inicial? */
 export const hasOwnPassword = (code: string) => !!claves()[code];
-/** Restablece la contraseña de una cuenta: vuelve a ser su código. */
+/** Restablece la contraseña de una cuenta: vuelve a ser su DNI. */
 export function resetPassword(code: string): void { const all = claves(); delete all[code]; store.set('ef-claves', JSON.stringify(all)); }
 
-/** Vuelve las cuentas de prueba a su contraseña inicial (el código). */
+/** Vuelve las cuentas de prueba a su contraseña inicial (el DNI). */
 export function resetDemoPasswords(): void { store.del('ef-claves'); store.del(TRIES); }
 
 export const homeFor = (r: Role) => (r === 'docente' ? 'panel.html' : r === 'estudiante' || r === 'apoderado' ? 'estudiante.html' : 'admin.html');

@@ -123,7 +123,7 @@ export function inicioView(acc: Account, sede: SedeFiltro, now: Date, samePasswo
     </div>
   </section>
   <main class="content overlap adm">
-    ${samePassword ? `<section class="sec-alert" role="note">${ico('key')}<div><b>Tu contraseña es igual a tu código.</b> Cámbiala para que nadie más pueda entrar con tu cuenta.</div>
+    ${samePassword ? `<section class="sec-alert" role="note">${ico('key')}<div><b>Tu contraseña todavía es tu DNI.</b> Cámbiala para que nadie más pueda entrar con tu cuenta.</div>
       <button class="btn btn-primary" type="button" data-open="password">Cambiar contraseña</button></section>` : ''}
 
     <section class="card welcome adm-welcome">

@@ -72,8 +72,12 @@ export function usrController(ctx: UsrCtx) {
   function validar(v: Values, tipo: Tipo, d: UsuariosStore, editId?: string): string | null {
     const dni = String(v.dni);
     if (!/^\d{8}$/.test(dni) && !/^[A-Z0-9]{9,12}$/i.test(dni)) return 'El DNI debe tener 8 dígitos (o el carné de extranjería de 9 a 12 caracteres).';
-    const dup = d.users.find((u) => u.id !== editId && u.dni === dni && u.tipo === tipo);
-    if (dup) return `Ya existe una cuenta de ${TIPOS.find((t) => t.id === tipo)!.name.toLowerCase()} con ese DNI: ${fullName(dup)} (${dup.code}).`;
+    const dniN = dni.toUpperCase();
+    const mismos = d.users.filter((u) => u.id !== editId && u.dni === dniN);
+    const dup = mismos.find((u) => u.tipo === tipo);
+    if (dup) return `Ya existe una cuenta de ${TIPOS.find((t) => t.id === tipo)!.name.toLowerCase()} con ese DNI: ${fullName(dup)} (${dup.code}). El DNI es su usuario para entrar.`;
+    const otro = mismos.find((u) => `${u.nombres} ${u.apellidos}`.toLowerCase() !== `${v.nombres} ${v.apellidos}`.toLowerCase());
+    if (otro) return `Ese DNI ya es el usuario de ${fullName(otro)} (${otro.code}). Revisa el número.`;
     if (v.phone && !/^9\d{8}$/.test(String(v.phone))) return 'El celular debe tener 9 dígitos y empezar con 9.';
     if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v.email))) return 'Revisa el correo: parece incompleto.';
     if (v.email && d.users.some((u) => u.id !== editId && u.email && u.email.toLowerCase() === String(v.email).toLowerCase())) return 'Ese correo ya lo usa otra cuenta.';
@@ -122,7 +126,7 @@ export function usrController(ctx: UsrCtx) {
         if (commit((x) => { x.users.push(nu); }, `Cuenta creada: ${fullName(nu)} · código ${code}.`, true)) createdDialog([nu]);
       }
       return null;
-    }, u ? 'Guardar cambios' : 'Crear cuenta', u ? `Código ${u.code} · no cambia` : `Se le asignará el código ${nextCode(d, prefix)}${tipo === 'personal' ? ' (según el rol)' : ''}`);
+    }, u ? 'Guardar cambios' : 'Crear cuenta', u ? `Código interno ${u.code} · entra con su DNI (si cambias el DNI, cambia su usuario)` : `Entrará con su DNI. Código interno: ${nextCode(d, prefix)}${tipo === 'personal' ? ' (según el rol)' : ''}`);
   }
 
   function chooseTipo(): void {
@@ -138,13 +142,13 @@ export function usrController(ctx: UsrCtx) {
     const url = `${location.origin}${location.pathname.replace(/[^/]*$/, '')}`;
     const one = us.length === 1 ? us[0] : null;
     const d = dialog(`<div class="dlg-body">
-      <header class="dlg-h">${ico('checkc', '', 'color:#1E9E5A')}<div><h2>${one ? 'Cuenta creada' : `${us.length} cuentas creadas`}</h2><p class="muted small">La contraseña inicial es el mismo código. Al entrar se le pedirá cambiarla.</p></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
-      ${one ? `<div class="created-box"><span>${esc(fullName(one))}</span><dl><div><dt>Código</dt><dd>${one.code}</dd></div><div><dt>Contraseña inicial</dt><dd>${one.code}</dd></div></dl></div>`
+      <header class="dlg-h">${ico('checkc', '', 'color:#1E9E5A')}<div><h2>${one ? 'Cuenta creada' : `${us.length} cuentas creadas`}</h2><p class="muted small">Entra con su DNI y la contraseña inicial es el mismo DNI. Al entrar se le pedirá cambiarla.</p></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
+      ${one ? `<div class="created-box"><span>${esc(fullName(one))}</span><dl><div><dt>Usuario (DNI)</dt><dd>${esc(one.dni)}</dd></div><div><dt>Contraseña inicial</dt><dd>${esc(one.dni)}</dd></div></dl></div>`
         : `<ul class="created-list">${us.slice(0, 12).map((u) => `<li><code class="code">${u.code}</code>${esc(fullName(u))}</li>`).join('')}${us.length > 12 ? `<li class="muted">… y ${us.length - 12} más</li>` : ''}</ul>`}
       <footer class="dlg-f">${one ? `<button type="button" class="btn btn-ghost" data-copy-cred>${ico('copy', 'ico-sm')}Copiar datos</button>` : ''}<button type="button" class="btn btn-primary" data-print-created>${ico('print', 'ico-sm', '--ico-fill:#fff')}Imprimir ${one ? 'credencial' : 'credenciales'}</button></footer>
     </div>`);
     d.querySelector('[data-copy-cred]')?.addEventListener('click', async () => {
-      const txt = `Intranet Las Estrellas del Futuro\n${fullName(one!)}\nCódigo: ${one!.code}\nContraseña inicial: ${one!.code}\nIngresa en: ${url}`;
+      const txt = `Intranet Las Estrellas del Futuro\n${fullName(one!)}\nUsuario (DNI): ${one!.dni}\nContraseña inicial: ${one!.dni}\nIngresa en: ${url}`;
       try { await navigator.clipboard.writeText(txt); toast('Datos copiados. Pégalos en WhatsApp o en un correo.'); } catch { toast('No se pudo copiar. Selecciona el texto a mano.'); }
     });
     d.querySelector('[data-print-created]')?.addEventListener('click', () => { d.close(); printCards(us, inst, url); });
@@ -178,12 +182,12 @@ export function usrController(ctx: UsrCtx) {
     const us = ids.map((id) => d.users.find((u) => u.id === id)).filter((u): u is Usuario => !!u);
     if (!isAdmin && us.some((u) => u.role === 'admin')) { toast('Solo un administrador del sistema puede cambiar cuentas de administrador.'); return; }
     const conPropia = us.filter((u) => hasOwnPassword(u.code));
-    if (!conPropia.length) { toast(us.length === 1 ? 'Su contraseña ya es la inicial (su código).' : 'Todas esas cuentas ya tienen la contraseña inicial.'); return; }
+    if (!conPropia.length) { toast(us.length === 1 ? 'Su contraseña ya es la inicial (su DNI).' : 'Todas esas cuentas ya tienen la contraseña inicial.'); return; }
     confirmDel(dialog, conPropia.length === 1 ? `¿Restablecer la contraseña de ${fullName(conPropia[0])}?` : `¿Restablecer ${conPropia.length} contraseñas?`,
-      [conPropia.length === 1 ? `Su contraseña volverá a ser su código: ${conPropia[0].code}.` : 'Cada contraseña volverá a ser el código de la persona.', 'Al entrar se le pedirá crear una nueva.'], () => {
+      [conPropia.length === 1 ? `Su contraseña volverá a ser su DNI: ${conPropia[0].dni}.` : 'Cada contraseña volverá a ser el DNI de la persona.', 'Al entrar se le pedirá crear una nueva.'], () => {
         conPropia.forEach((u) => resetPassword(u.code));
-        commit(() => { st.sel.clear(); }, conPropia.length === 1 ? `Contraseña restablecida: ${fullName(conPropia[0])} entra con ${conPropia[0].code}.` : `${conPropia.length} contraseñas restablecidas.`, true);
-        toast(conPropia.length === 1 ? `Listo: ${fullName(conPropia[0])} entra con ${conPropia[0].code} / ${conPropia[0].code}.` : `${conPropia.length} contraseñas restablecidas.`);
+        commit(() => { st.sel.clear(); }, conPropia.length === 1 ? `Contraseña restablecida: ${fullName(conPropia[0])} entra con su DNI.` : `${conPropia.length} contraseñas restablecidas.`, true);
+        toast(conPropia.length === 1 ? `Listo: ${fullName(conPropia[0])} entra con su DNI ${conPropia[0].dni} (usuario y contraseña).` : `${conPropia.length} contraseñas restablecidas.`);
       }, 'Restablecer', false);
   }
 
@@ -325,7 +329,7 @@ export function usrController(ctx: UsrCtx) {
       if (!data.apellidos) errors.push('falta apellidos');
       if (!/^\d{8}$/.test(data.dni) && !/^[A-Z0-9]{9,12}$/i.test(data.dni)) errors.push('DNI no válido');
       else if (dnis.has(data.dni)) errors.push('DNI repetido en el archivo');
-      else if (d.users.some((u) => u.dni === data.dni && u.tipo === t)) errors.push('ya existe una cuenta con ese DNI');
+      else if (d.users.some((u) => u.dni === data.dni.toUpperCase() && (u.tipo === t || `${u.nombres} ${u.apellidos}`.toLowerCase() !== `${data.nombres} ${data.apellidos}`.toLowerCase()))) errors.push('ese DNI ya es el usuario de otra cuenta');
       dnis.add(data.dni);
       if (data.celular && !/^9\d{8}$/.test(data.celular)) errors.push('celular no válido');
       if (data.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.correo)) errors.push('correo no válido');

@@ -143,11 +143,11 @@ function start(): void {
 
   function openPassword(): void {
     const d = dialog(`<form method="dialog" class="dlg-body" novalidate>
-      <header class="dlg-h">${ico('key')}<div><h2>Cambiar contraseña</h2><p class="muted small">Tu código sigue siendo el mismo: ${me.code}</p></div>
+      <header class="dlg-h">${ico('key')}<div><h2>Cambiar contraseña</h2><p class="muted small">Tu usuario sigue siendo tu DNI: ${me.dni}</p></div>
         <button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
       <label class="field-col"><span>Contraseña nueva</span><input class="input" type="password" id="pw1" autocomplete="new-password" required></label>
       <label class="field-col"><span>Repite la contraseña</span><input class="input" type="password" id="pw2" autocomplete="new-password" required></label>
-      <ul class="pw-rules small"><li data-r="len">Al menos 8 caracteres</li><li data-r="mix">Letras y números</li><li data-r="code">Distinta a tu código</li></ul>
+      <ul class="pw-rules small"><li data-r="len">Al menos 8 caracteres</li><li data-r="mix">Letras y números</li><li data-r="code">Que no sea tu DNI</li></ul>
       <p class="login-msg error" id="pw-msg" role="alert" hidden></p>
       <footer class="dlg-f"><button type="button" class="btn btn-ghost" data-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar contraseña</button></footer>
     </form>`);
@@ -156,13 +156,13 @@ function start(): void {
       const v = p1.value;
       d.querySelector('[data-r="len"]')!.classList.toggle('ok', v.length >= 8);
       d.querySelector('[data-r="mix"]')!.classList.toggle('ok', /[a-zA-ZñÑ]/.test(v) && /\d/.test(v));
-      d.querySelector('[data-r="code"]')!.classList.toggle('ok', !!v && v.toUpperCase() !== me.code);
+      d.querySelector('[data-r="code"]')!.classList.toggle('ok', !!v && !v.toUpperCase().includes(me.dni));
     });
     d.querySelector('form')!.addEventListener('submit', (e) => {
-      const err = passwordProblem(me.code, p1.value, p2.value);
+      const err = passwordProblem(me.dni, p1.value, p2.value);
       if (err) { e.preventDefault(); msg.textContent = err; msg.hidden = false; (err.includes('coinciden') ? p2 : p1).focus(); return; }
       changePassword(p1.value);
-      toast('Contraseña cambiada. La próxima vez entra con tu código y tu nueva contraseña.');
+      toast('Contraseña cambiada. La próxima vez entra con tu DNI y tu nueva contraseña.');
       if (route === 'inicio') render();
     });
     p1.focus();

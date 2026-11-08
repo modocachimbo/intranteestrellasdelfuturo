@@ -1,5 +1,6 @@
 /* Usuarios y roles: todas las cuentas del colegio y lo que cada rol puede ver y hacer.
-   - Cada persona entra con su CÓDIGO; la contraseña inicial es el mismo código.
+   - Cada persona entra con su DNI (o carné de extranjería); la contraseña inicial es el mismo DNI y la cambia al entrar.
+   - El código (DOC013, EST032…) es el identificador interno de la cuenta: sirve para vincular padres e hijos y en reportes.
    - Los permisos de cada rol del personal se definen módulo por módulo (ver / editar).
    - Siempre debe quedar al menos un Administrador del sistema activo.
    Al conectar la base de datos, esto se guarda en el servidor (aquí, en el navegador). */
@@ -67,17 +68,20 @@ function semilla(): UsuariosStore {
   const accesos = ['Hoy, 7:52 a. m.', 'Hoy, 10:15 a. m.', 'Ayer, 6:40 p. m.', 'Hace 2 días', 'Hace 5 días', 'Hace 2 semanas'];
   const acc = () => accesos[Math.floor(r() * accesos.length)];
   const mail = (n: string, a: string) => `${n.split(' ')[0]}.${a.split(' ')[0]}`.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase() + '@estrellasdelfuturo.edu.pe';
+  const FIJOS = new Set(['11111111', '22222222', '33333333', '44444444', '55555555', '66666666', '77777777', '88888888', '99999999']);
+  const dniLibre = () => { let x = dni(); while (FIJOS.has(x) || users.some((u) => u.dni === x)) x = dni(); return x; };
   const add = (u: Omit<Usuario, 'id' | 'creado' | 'estado' | 'dni' | 'phone' | 'email'> & Partial<Usuario>) =>
-    users.push({ id: u.code.toLowerCase(), creado: '2026-03-02T08:00:00', estado: 'activo', dni: dni(), phone: cel(), email: u.tipo === 'estudiante' || u.tipo === 'apoderado' ? '' : mail(u.nombres, u.apellidos), acceso: acc(), ...u } as Usuario);
+    users.push({ id: u.code.toLowerCase(), creado: '2026-03-02T08:00:00', estado: 'activo', dni: dniLibre(), phone: cel(), email: u.tipo === 'estudiante' || u.tipo === 'apoderado' ? '' : mail(u.nombres, u.apellidos), acceso: acc(), ...u } as Usuario);
 
-  add({ code: 'ADM001', tipo: 'personal', role: 'admin', nombres: 'Luis', apellidos: 'Paredes Vega', sede: '', cargo: 'Administrador del sistema' });
-  add({ code: 'DIR001', tipo: 'personal', role: 'director', nombres: 'Rosa', apellidos: 'Huamán Castillo', sede: '', cargo: 'Directora general' });
+  // Cuentas de prueba con DNI fácil de recordar (11111111, 22222222…)
+  add({ code: 'ADM001', dni: '11111111', tipo: 'personal', role: 'admin', nombres: 'Luis', apellidos: 'Paredes Vega', sede: '', cargo: 'Administrador del sistema' });
+  add({ code: 'DIR001', dni: '22222222', tipo: 'personal', role: 'director', nombres: 'Rosa', apellidos: 'Huamán Castillo', sede: '', cargo: 'Directora general' });
   add({ code: 'DIR002', tipo: 'personal', role: 'director', nombres: 'Manuel', apellidos: 'Ortiz Reyes', sede: 'huacho', cargo: 'Director de sede' });
-  add({ code: 'COO001', tipo: 'personal', role: 'coordinador', nombres: 'Patricia', apellidos: 'León Ríos', sede: 'mazo', cargo: 'Coordinadora académica' });
-  add({ code: 'SEC001', tipo: 'personal', role: 'secretaria', nombres: 'Milagros', apellidos: 'Torres Lazo', sede: 'mazo', cargo: 'Secretaria' });
+  add({ code: 'COO001', dni: '33333333', tipo: 'personal', role: 'coordinador', nombres: 'Patricia', apellidos: 'León Ríos', sede: 'mazo', cargo: 'Coordinadora académica' });
+  add({ code: 'SEC001', dni: '44444444', tipo: 'personal', role: 'secretaria', nombres: 'Milagros', apellidos: 'Torres Lazo', sede: 'mazo', cargo: 'Secretaria' });
   add({ code: 'SEC002', tipo: 'personal', role: 'secretaria', nombres: 'Karina', apellidos: 'Flores Pinto', sede: 'huacho', cargo: 'Secretaria', estado: 'inactivo', acceso: 'Hace 3 meses' });
-  add({ code: 'TES001', tipo: 'personal', role: 'tesoreria', nombres: 'Jorge', apellidos: 'Salinas Cruz', sede: '', cargo: 'Tesorero' });
-  add({ code: 'AUX001', tipo: 'personal', role: 'auxiliar', nombres: 'Rocío', apellidos: 'Mendoza Huerta', sede: 'mazo', cargo: 'Auxiliar de secundaria' });
+  add({ code: 'TES001', dni: '55555555', tipo: 'personal', role: 'tesoreria', nombres: 'Jorge', apellidos: 'Salinas Cruz', sede: '', cargo: 'Tesorero' });
+  add({ code: 'AUX001', dni: '66666666', tipo: 'personal', role: 'auxiliar', nombres: 'Rocío', apellidos: 'Mendoza Huerta', sede: 'mazo', cargo: 'Auxiliar de secundaria' });
 
   const DOCENTES: [string, string, string, string][] = [
     ['Javier', 'Rojas', 'Química', 'mazo'], ['Carlos', 'Medina Ruiz', 'Matemática', 'huacho'], ['Ana Lucía', 'Ponce Arce', 'Comunicación', 'mazo'],
@@ -85,24 +89,27 @@ function semilla(): UsuariosStore {
     ['Martín', 'Chávez Lino', 'Educación Física', 'mazo'], ['Raúl', 'Espinoza Vera', 'Física', 'mazo'], ['Lucía', 'Paredes Gil', 'Biología', 'mazo'],
     ['Sofía', 'Lazo Prado', 'Arte y Cultura', 'mazo'], ['Pedro', 'Vílchez Soto', 'Educación Religiosa', ''], ['Iván', 'Torres Meza', 'Computación', 'mazo'],
   ];
-  DOCENTES.forEach(([n, a, esp, sede], i) => add({ code: `DOC${String(i + 1).padStart(3, '0')}`, tipo: 'docente', role: 'docente', nombres: n, apellidos: a, especialidad: esp, sede, estado: i === 10 ? 'bloqueado' : 'activo' }));
+  DOCENTES.forEach(([n, a, esp, sede], i) => add({ code: `DOC${String(i + 1).padStart(3, '0')}`, ...(i === 0 ? { dni: '77777777' } : {}), tipo: 'docente', role: 'docente', nombres: n, apellidos: a, especialidad: esp, sede, estado: i === 10 ? 'bloqueado' : 'activo' }));
 
   const PADRES = ['Rosa', 'Juan', 'María', 'Luis', 'Carmen', 'José', 'Ana', 'Jorge', 'Patricia', 'Miguel', 'Elena', 'Víctor', 'Silvia', 'Óscar', 'Gloria', 'Raúl'];
   STUDENTS.forEach((s, i) => {
     const [ap, no] = s.name.split(', ');
     const code = `EST${String(i + 1).padStart(3, '0')}`;
-    add({ code, tipo: 'estudiante', role: 'estudiante', nombres: no, apellidos: ap, sede: 'mazo', seccion: 'mazo-s3-A', estado: i === 29 ? 'inactivo' : 'activo', acceso: s.lastAccess });
+    add({ code, ...(i === 0 ? { dni: '88888888' } : {}), tipo: 'estudiante', role: 'estudiante', nombres: no, apellidos: ap, sede: 'mazo', seccion: 'mazo-s3-A', estado: i === 29 ? 'inactivo' : 'activo', acceso: s.lastAccess });
     const madre = i % 3 !== 1;
-    add({ code: `APO${String(i + 1).padStart(3, '0')}`, tipo: 'apoderado', role: 'apoderado', nombres: PADRES[(i * 5) % PADRES.length], apellidos: madre ? `${ap.split(' ')[1] ?? ap.split(' ')[0]} ${['Soto', 'Lazo', 'Vega', 'Cruz'][i % 4]}` : `${ap.split(' ')[0]} ${['Ramos', 'Díaz', 'Peña'][i % 3]}`,
+    add({ code: `APO${String(i + 1).padStart(3, '0')}`, ...(i === 0 ? { dni: '99999999' } : {}), tipo: 'apoderado', role: 'apoderado', nombres: PADRES[(i * 5) % PADRES.length], apellidos: madre ? `${ap.split(' ')[1] ?? ap.split(' ')[0]} ${['Soto', 'Lazo', 'Vega', 'Cruz'][i % 4]}` : `${ap.split(' ')[0]} ${['Ramos', 'Díaz', 'Peña'][i % 3]}`,
       sede: 'mazo', hijos: [code.toLowerCase()], parentesco: madre ? 'Madre' : 'Padre', email: '' });
   });
   // Hermanos: el apoderado de Camila (APO001) también tiene a otro hijo en 3.º A
   users.find((u) => u.code === 'APO001')!.hijos!.push('est014');
   users.find((u) => u.code === 'APO001')!.nombres = 'Rosa';
+  // Una docente que también es madre de familia: con su DNI entra como docente o como apoderada (elige al ingresar)
+  const lucia = users.find((u) => u.code === 'DOC009')!;
+  add({ code: 'APO032', dni: lucia.dni, tipo: 'apoderado', role: 'apoderado', nombres: lucia.nombres, apellidos: lucia.apellidos, sede: 'mazo', hijos: ['est020'], parentesco: 'Madre', email: lucia.email });
   return { version: 1, users, roles, historial: [{ at: '2026-03-02T08:00:00', by: 'Luis Paredes Vega · Administrador del sistema', summary: 'Carga inicial de cuentas del año 2026.' }] };
 }
 
-const KEY = 'ef-usuarios';
+const KEY = 'ef-usuarios-v2';   // v2: el usuario para entrar es el DNI
 export const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 let cache: UsuariosStore | null = null;
 
@@ -128,6 +135,10 @@ export const initialsOf = (u: Usuario) => `${u.nombres[0] ?? ''}${u.apellidos[0]
 export const rolDe = (d: UsuariosStore, id: string) => d.roles.find((r) => r.id === id);
 export const roleName = (id: string) => rolDe(getUsuarios(), id)?.name ?? id;
 export const findByCode = (code: string) => getUsuarios().users.find((u) => u.code === code);
+/** DNI sin espacios ni guiones, en mayúsculas (el carné de extranjería puede tener letras). */
+export const normDni = (s: string) => s.trim().toUpperCase().replace(/[\s.-]+/g, '');
+/** Cuentas con ese DNI (una persona puede tener dos: por ejemplo, docente y madre de familia). */
+export const findByDni = (dni: string) => { const n = normDni(dni); return n ? getUsuarios().users.filter((u) => u.dni === n) : []; };
 
 /** Siguiente código libre con el prefijo del rol: DOC013, EST032… */
 export function nextCode(d: UsuariosStore, prefix: string): string {
