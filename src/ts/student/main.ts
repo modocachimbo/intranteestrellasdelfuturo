@@ -8,6 +8,7 @@ import { ALUMNO, ALUMNO_NOMBRE, ASISTENCIA, COMUNICADOS, CURSOS, HIJOS, HORARIO,
 import { getInst, gradoInfo } from '../core/institucion';
 import { avisoTexto, hora, marcasDe } from '../core/asistencia';
 import { carneHtml } from '../core/carne';
+import { DOCS_MAT, ESTADOS_MAT, MOTIVOS, getMat, gradoTxt, saveMat } from '../core/matricula';
 import type { Curso, EstadoTarea, Tarea } from './data';
 
 const acc = currentAccount();
@@ -51,6 +52,75 @@ function carneView(): string {
       </div>
     </section>
   </main>`;
+}
+
+/** Matrícula del próximo año: el padre la confirma en línea (acepta contrato, reglamento y uso de imagen). */
+function matriculaCard(): string {
+  if (!ALUMNO) return '';
+  const d = getMat(); const r = d.regs[ALUMNO.id];
+  if (!r) return '';
+  const nom = ALUMNO.nombres.split(' ')[0];
+  const e = ESTADOS_MAT.find((x) => x.id === r.estado)!;
+  const inst = getInst();
+  const fin = new Date(`${d.cfg.finAntiguos}T12:00`).toLocaleDateString('es-PE', { day: 'numeric', month: 'long' });
+  if (r.estado === 'egresa') return '';
+  const puede = esPadre() && (r.estado === 'pendiente' || r.estado === 'reserva');
+  const txt = r.estado === 'matriculado' ? `${nom} ya está matriculado para ${d.cfg.anio} en ${gradoTxt(inst, r.grado)}${inst.secciones.find((s) => s.id === r.seccion) ? ` · sección ${inst.secciones.find((s) => s.id === r.seccion)!.name}` : ''}. ¡Gracias!`
+    : r.estado === 'solicitada' ? 'Recibimos tu confirmación. Acércate a Secretaría o paga la cuota para completar la matrícula.'
+    : r.estado === 'no_continua' ? `Registramos que ${nom} no continuará el próximo año.`
+    : `${esPadre() ? `Confirma que ${nom} continúa` : 'Tu apoderado debe confirmar tu matrícula'} en ${gradoTxt(inst, r.grado)}. Plazo: ${fin}.`;
+  return `<section class="mat-card ${r.estado}" role="status">${ico('idcard')}<div><b>Matrícula ${d.cfg.anio} · <span class="chip ${e.tone}">${e.name}</span></b><p>${txt}</p></div>
+    ${puede ? `<button type="button" class="btn btn-primary" data-mat-confirm>Confirmar matrícula</button>` : ''}</section>`;
+}
+
+function confirmarMatricula(): void {
+  if (!ALUMNO) return;
+  const d = getMat(); const r = d.regs[ALUMNO.id]; const inst = getInst();
+  const firmar = DOCS_MAT.filter((x) => x.firma);
+  const dlg = document.createElement('dialog');
+  dlg.className = 'dlg adm-dlg stu-dlg';
+  dlg.innerHTML = `<form method="dialog" class="dlg-body">
+    <header class="dlg-h">${ico('idcard')}<div><h2>Matrícula ${d.cfg.anio} de ${ALUMNO.nombres.split(' ')[0]}</h2><p class="muted small">${gradoTxt(inst, r.grado)} · cuota S/ ${d.cfg.costo}${r.pago?.tipo === 'reserva' ? ` (ya pagaste S/ ${r.pago.monto} de reserva)` : ''}</p></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
+    <p class="small">Lee y acepta los documentos. Es como firmarlos en Secretaría.</p>
+    ${firmar.map((x) => `<label class="check full"><input type="checkbox" name="doc" value="${x.id}"><span>Leí y acepto: <b>${x.name}</b> <a href="#" data-leer="${x.id}">Leer</a></span></label>`).join('')}
+    <p class="login-msg error" role="alert" hidden></p>
+    <footer class="dlg-f"><button type="button" class="btn btn-ghost danger-t" data-nocont>No continuará</button><button class="btn btn-primary" type="submit">Confirmar matrícula</button></footer>
+  </form>`;
+  document.body.appendChild(dlg);
+  dlg.addEventListener('close', () => dlg.remove());
+  dlg.showModal();
+  dlg.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    if (t.closest('[data-close]') || t === dlg) { dlg.close(); return; }
+    if (t.closest('[data-leer]')) { e.preventDefault(); alertLeer(); return; }
+    if (t.closest('[data-nocont]')) {
+      const f = dlg.querySelector('form')!;
+      f.innerHTML = `<header class="dlg-h">${ico('logout')}<div><h2>¿${ALUMNO!.nombres.split(' ')[0]} no continuará?</h2><p class="muted small">Nos ayuda saber el motivo.</p></div></header>
+        <label class="field-col"><span>Motivo</span><select class="input" name="motivo">${MOTIVOS.map((m) => `<option>${m}</option>`).join('')}</select></label>
+        <footer class="dlg-f"><button type="button" class="btn btn-ghost" data-close>Cancelar</button><button type="button" class="btn btn-danger" data-nocont-ok>Confirmar</button></footer>`;
+      return;
+    }
+    if (t.closest('[data-nocont-ok]')) {
+      const x = getMat(); const y = x.regs[ALUMNO!.id];
+      y.estado = 'no_continua'; y.motivo = (dlg.querySelector('[name=motivo]') as HTMLSelectElement).value; y.seccion = '';
+      saveMat(x); dlg.close(); location.reload();
+    }
+  });
+  dlg.querySelector('form')!.addEventListener('submit', (e) => {
+    const f = e.target as HTMLFormElement;
+    const docs = [...f.querySelectorAll<HTMLInputElement>('input[name=doc]:checked')].map((i) => i.value);
+    if (docs.length < firmar.length) { e.preventDefault(); const m = f.querySelector<HTMLElement>('.login-msg')!; m.textContent = 'Para confirmar, acepta los tres documentos.'; m.hidden = false; return; }
+    const x = getMat(); const y = x.regs[ALUMNO!.id];
+    y.docs = [...new Set([...y.docs, ...docs])]; y.estado = 'solicitada'; y.enLinea = new Date().toISOString();
+    saveMat(x);
+    setTimeout(() => location.reload(), 50);
+  });
+  function alertLeer(): void {
+    let el = document.querySelector<HTMLElement>('.toast');
+    if (!el) { el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+    el.textContent = 'Aquí se abrirá el documento en PDF (lo sube Secretaría).'; el.classList.add('show');
+    setTimeout(() => el!.classList.remove('show'), 3000);
+  }
 }
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
@@ -101,6 +171,7 @@ function inicio(now: Date): string {
       <div class="stu-avg">${promIV !== null ? nota(promIV, true) : ''}<span>Promedio del IV bimestre<br><small>parcial</small></span></div>
     </section>
     ${llegada()}
+    ${matriculaCard()}
     <section class="kpis" aria-label="Resumen">
       <a class="card kpi" href="#tareas"><span class="ico-tile y">${ico('tasks')}</span><span><span class="lbl">Por entregar</span><br><span class="num">${pend.length}</span><br><span class="sub">${pend[0]?.due ? `Próxima: ${relativo(pend[0].due, now)}` : 'Nada pendiente'}</span></span></a>
       <a class="card kpi" href="#tareas"><span class="ico-tile g">${ico('checkc')}</span><span><span class="lbl">Calificadas</span><br><span class="num">${ts.filter((t) => t.estado === 'calificada').length}</span><br><span class="sub">este bimestre</span></span></a>
@@ -214,6 +285,7 @@ function start(): void {
   document.addEventListener('click', (e) => {
     const hj = (e.target as HTMLElement).closest<HTMLElement>('[data-hijo]');
     if (hj) { try { localStorage.setItem('ef-hijo', hj.dataset.hijo!); } catch { /* sin almacenamiento */ } location.reload(); return; }
+    if ((e.target as HTMLElement).closest('[data-mat-confirm]')) { confirmarMatricula(); return; }
     const t = (e.target as HTMLElement).closest<HTMLElement>('[data-toast]');
     if (!t) return;
     let el = document.querySelector<HTMLElement>('.toast');

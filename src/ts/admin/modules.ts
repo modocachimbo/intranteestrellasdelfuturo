@@ -33,7 +33,7 @@ export const BLOQUES: Bloque[] = [
   { id: 'secretaria', name: 'Secretaría', modulos: [
     { id: 'admision', name: 'Admisión', icon: 'megaphone', roles: SEC, fase: 1, listo: true, desc: 'Del interesado al estudiante nuevo.',
       incluye: ['Registro de interesados y visitas guiadas', 'Postulación en línea con documentos', 'Pago del derecho de admisión', 'Examen o entrevista y resultados', 'Vacantes por grado y lista de espera'] },
-    { id: 'matricula', name: 'Matrícula', icon: 'idcard', roles: SEC, fase: 1, desc: 'Matrícula nueva y ratificación de los antiguos.',
+    { id: 'matricula', name: 'Matrícula', icon: 'idcard', roles: SEC, fase: 1, listo: true, desc: 'Matrícula nueva y ratificación de los antiguos.',
       incluye: ['Matrícula nueva y ratificación en línea', 'Reserva de vacante', 'Control de documentos: DNI, partida, certificados, libreta anterior', 'Contrato, reglamento interno y consentimiento de uso de imagen firmados', 'Exportar al SIAGIE', 'Formar secciones balanceadas con sorteo'] },
     { id: 'traslados', name: 'Traslados y retiros', icon: 'swap', roles: SEC, fase: 1, desc: 'Movimientos de estudiantes durante el año.',
       incluye: ['Traslado de entrada: constancia de vacante, resolución, certificados', 'Traslado de salida: constancia, certificados, baja en SIAGIE', 'Cambio de sección y de sede', 'Retiro', 'Antes de cada movimiento: cierre del estado de cuenta y notas al certificado'] },

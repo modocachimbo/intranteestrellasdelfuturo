@@ -429,6 +429,7 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
   }
 
   return {
+    abrir,
     click(el: HTMLElement): boolean {
       const op = el.closest<HTMLElement>('[data-adm-open]');
       if (op) { abrir(op.dataset.admOpen!); return true; }
