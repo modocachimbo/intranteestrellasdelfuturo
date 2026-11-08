@@ -6,6 +6,8 @@ import { currentAccount } from '../core/session';
 import { markCurrent, mountShell } from '../core/shell';
 import { ALUMNO, ALUMNO_NOMBRE, ASISTENCIA, COMUNICADOS, CURSOS, HIJOS, HORARIO, NIVEL, promedio, tareas } from './data';
 import { getInst, gradoInfo } from '../core/institucion';
+import { avisoTexto, hora, marcasDe } from '../core/asistencia';
+import { carneHtml } from '../core/carne';
 import type { Curso, EstadoTarea, Tarea } from './data';
 
 const acc = currentAccount();
@@ -24,6 +26,31 @@ function padreBar(): string {
   if (!esPadre()) return '';
   return `<section class="padre-bar" role="note">${ico('heart', 'ico-sm')}<span>Estás viendo a <b>${ALUMNO_NOMBRE || 'tu hijo o hija'}</b></span>
     ${HIJOS.length > 1 ? `<span class="hijos">${HIJOS.map((h) => `<button type="button" class="chip ${h.id === ALUMNO?.id ? 'blue' : 'gray'}" data-hijo="${h.id}">${h.nombres.split(' ')[0]}</button>`).join('')}</span>` : ''}</section>`;
+}
+
+/** Aviso de llegada y salida de hoy (lo que llega al apoderado cuando el carné se escanea en la puerta). */
+function llegada(): string {
+  if (!ALUMNO) return '';
+  const ms = marcasDe(ALUMNO.id);
+  const nom = ALUMNO.nombres.split(' ')[0];
+  if (!ms.length) return `<section class="arrival none" role="status">${ico('clock', 'ico-sm')}<span><b>${esPadre() ? `${nom} todavía no registra su ingreso hoy.` : 'Todavía no registras tu ingreso hoy.'}</b><small>Cuando pase su carné por la puerta, aparecerá aquí al instante.</small></span></section>`;
+  return `<section class="arrival" role="status">${ms.slice().reverse().map((m) => `<div class="arr ${m.estado}">${ico(m.tipo === 'ingreso' ? 'check' : 'logout', 'ico-sm')}<span><b>${avisoTexto(ALUMNO!, m)}</b><small>${m.tipo === 'ingreso' ? (m.estado === 'puntual' ? 'Puntual' : 'Tardanza') : 'Salida'} · registrado en la puerta a las ${hora(m.at)}</small></span></div>`).join('')}</section>`;
+}
+
+function carneView(): string {
+  if (!ALUMNO) return `${band('idcard', 'Carné', '')}<main class="content overlap stu"><p class="muted">No hay estudiante.</p></main>`;
+  const inst = getInst();
+  return `${band('idcard', esPadre() ? `Carné de ${ALUMNO.nombres.split(' ')[0]}` : 'Mi carné', 'Muéstralo en la puerta: se escanea el código')}
+  <main class="content overlap stu">${padreBar()}
+    <section class="card card-pad stu-carne">
+      <div class="carne-phone">${carneHtml(ALUMNO, inst, { orient: 'v', code: 'qr' })}</div>
+      <div class="stu-carne-txt"><h2>Carné digital</h2>
+        <p>${esPadre() ? 'Es el mismo código de su carné impreso. Si lo olvida, puede mostrar esta pantalla en la puerta.' : 'Es el mismo código de tu carné impreso. Si lo olvidas, muestra esta pantalla en la puerta (sube el brillo).'}</p>
+        <p class="muted small">Cada vez que se escanea, ${esPadre() ? 'recibes' : 'tu apoderado recibe'} el aviso de llegada o salida.</p>
+        ${ALUMNO.foto ? '' : '<p class="muted small">La foto la coloca Secretaría.</p>'}
+      </div>
+    </section>
+  </main>`;
 }
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
@@ -73,7 +100,7 @@ function inicio(now: Date): string {
       </div>
       <div class="stu-avg">${promIV !== null ? nota(promIV, true) : ''}<span>Promedio del IV bimestre<br><small>parcial</small></span></div>
     </section>
-
+    ${llegada()}
     <section class="kpis" aria-label="Resumen">
       <a class="card kpi" href="#tareas"><span class="ico-tile y">${ico('tasks')}</span><span><span class="lbl">Por entregar</span><br><span class="num">${pend.length}</span><br><span class="sub">${pend[0]?.due ? `Próxima: ${relativo(pend[0].due, now)}` : 'Nada pendiente'}</span></span></a>
       <a class="card kpi" href="#tareas"><span class="ico-tile g">${ico('checkc')}</span><span><span class="lbl">Calificadas</span><br><span class="num">${ts.filter((t) => t.estado === 'calificada').length}</span><br><span class="sub">este bimestre</span></span></a>
@@ -172,14 +199,14 @@ function comunicadosView(): string {
 function start(): void {
   mountShell({ page: 'inicio', search: 'Buscar curso o tarea…', topActions: `<span class="chip blue hide-sm">IV Bimestre</span>` });
   const root = document.getElementById('stu-root')!;
-  const TITLES: Record<string, string> = { inicio: 'Inicio', cursos: 'Mis cursos', tareas: 'Tareas', notas: 'Calificaciones', horario: 'Horario', comunicados: 'Comunicados' };
+  const TITLES: Record<string, string> = { inicio: 'Inicio', cursos: 'Mis cursos', tareas: 'Tareas', notas: 'Calificaciones', horario: 'Horario', comunicados: 'Comunicados', carne: 'Carné' };
   const go = () => {
     const h = location.hash.slice(1) || 'inicio';
     const [base, sub] = h.split('-');
     const r = TITLES[base] ? base : 'inicio';
     const now = nowFn();
     root.innerHTML = r === 'cursos' ? cursos() : r === 'tareas' ? tareasView(now, sub ?? 'pendientes') : r === 'notas' ? notasView()
-      : r === 'horario' ? horarioView(now) : r === 'comunicados' ? comunicadosView() : inicio(now);
+      : r === 'horario' ? horarioView(now) : r === 'comunicados' ? comunicadosView() : r === 'carne' ? carneView() : inicio(now);
     markCurrent(r);
     document.title = `${TITLES[r]} · Estrellas del Futuro`;
     if (base !== 'tareas' || !sub) window.scrollTo(0, 0);

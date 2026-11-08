@@ -21,10 +21,11 @@ export interface Usuario {
   hijos?: string[];             // apoderado: ids de estudiantes
   parentesco?: string;          // apoderado
   estado: Estado; creado: string; acceso?: string;
+  foto?: string;                // foto del carné (imagen reducida, data URL)
 }
 export interface Rol { id: string; name: string; tipo: Tipo; system: boolean; desc: string; prefix: string; perms: Record<string, Permiso> }
 export interface Cambio { at: string; by: string; summary: string }
-export interface UsuariosStore { version: 1; users: Usuario[]; roles: Rol[]; historial: Cambio[] }
+export interface UsuariosStore { version: 1; users: Usuario[]; roles: Rol[]; historial: Cambio[]; known?: string[] }
 
 export const TIPOS: { id: Tipo; name: string; plural: string; icon: string }[] = [
   { id: 'personal', name: 'Personal', plural: 'Personal', icon: 'briefcase' },
@@ -59,7 +60,7 @@ function semilla(): UsuariosStore {
     sys('estudiante', 'Estudiante', 'estudiante', 'EST', 'Su aula virtual, tareas, notas y horario.'),
     sys('apoderado', 'Padre o apoderado', 'apoderado', 'APO', 'Notas, asistencia, pagos y comunicados de sus hijos.'),
     { id: 'auxiliar', name: 'Auxiliar de educación', tipo: 'personal', system: false, desc: 'Asistencia, portería y convivencia.', prefix: 'AUX',
-      perms: { asistencia: 'editar', convivencia: 'editar', comunicados: 'ver', agenda: 'ver', expediente: 'ver' } },
+      perms: { carnes: 'editar', asistencia: 'editar', convivencia: 'editar', comunicados: 'ver', agenda: 'ver', expediente: 'ver' } },
   ];
   const users: Usuario[] = [];
   const r = rng('usuarios-2026');
@@ -106,7 +107,7 @@ function semilla(): UsuariosStore {
   // Una docente que también es madre de familia: con su DNI entra como docente o como apoderada (elige al ingresar)
   const lucia = users.find((u) => u.code === 'DOC009')!;
   add({ code: 'APO032', dni: lucia.dni, tipo: 'apoderado', role: 'apoderado', nombres: lucia.nombres, apellidos: lucia.apellidos, sede: 'mazo', hijos: ['est020'], parentesco: 'Madre', email: lucia.email });
-  return { version: 1, users, roles, historial: [{ at: '2026-03-02T08:00:00', by: 'Luis Paredes Vega · Administrador del sistema', summary: 'Carga inicial de cuentas del año 2026.' }] };
+  return { version: 1, known: BLOQUES.flatMap((b) => b.modulos.map((m) => m.id)), users, roles, historial: [{ at: '2026-03-02T08:00:00', by: 'Luis Paredes Vega · Administrador del sistema', summary: 'Carga inicial de cuentas del año 2026.' }] };
 }
 
 const KEY = 'ef-usuarios-v2';   // v2: el usuario para entrar es el DNI
@@ -117,9 +118,22 @@ export function getUsuarios(): UsuariosStore {
   if (cache) return cache;
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) { const d = JSON.parse(raw) as UsuariosStore; if (d?.version === 1 && d.users?.length && d.roles?.length) return (cache = d); }
+    if (raw) { const d = JSON.parse(raw) as UsuariosStore; if (d?.version === 1 && d.users?.length && d.roles?.length) return (cache = conModulosNuevos(d)); }
   } catch { /* dato dañado o sin almacenamiento */ }
   return (cache = semilla());
+}
+/** Cuando el sistema agrega módulos nuevos, los roles guardados reciben sus permisos recomendados. */
+function conModulosNuevos(d: UsuariosStore): UsuariosStore {
+  const ids = BLOQUES.flatMap((b) => b.modulos.map((m) => m.id));
+  const known = d.known ?? ids.filter((id) => id !== 'carnes');
+  const nuevos = ids.filter((id) => !known.includes(id));
+  if (!nuevos.length && d.known) return d;
+  for (const r of d.roles) if (r.tipo === 'personal') { const base = permisosBase(r.system ? r.id : ''); for (const m of nuevos) if (base[m]) r.perms[m] = base[m]; }
+  const aux = d.roles.find((r) => r.id === 'auxiliar');
+  if (aux && nuevos.includes('carnes')) aux.perms.carnes = 'editar';
+  d.known = ids;
+  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch { /* sin almacenamiento */ }
+  return d;
 }
 export function saveUsuarios(d: UsuariosStore): boolean {
   cache = d;

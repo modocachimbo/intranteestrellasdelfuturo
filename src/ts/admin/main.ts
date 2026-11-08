@@ -9,6 +9,10 @@ import { hasData, refreshSedeNames } from './data';
 import { getInst } from '../core/institucion';
 import { instController } from './inst-ctrl';
 import { usrController } from './usr-ctrl';
+import { ADM_TABS, admisionController, admisionView } from './admision';
+import type { AdmState, AdmTab } from './admision';
+import { CAR_TABS, carnesController, carnesView } from './carnes';
+import type { CarState, CarTab } from './carnes';
 import { USR_TABS, usuariosView } from './views/usuarios';
 import type { UsrState, UsrTab } from './views/usuarios';
 import { getUsuarios } from '../core/usuarios';
@@ -41,6 +45,8 @@ function start(): void {
   const usr: UsrState = { tab: 'personas', tipo: 'todos', estado: 'todos', sede: 'todas', seccion: '', q: '', page: 1, sel: new Set(), rol: 'admin', rolDraft: null,
     importTipo: 'estudiante', importRows: null, importFile: '', credTipo: 'estudiante', credSede: 'todas', credSeccion: '', credSolo: true };
   let instSede = '';
+  const adm: AdmState = { tab: 'resumen', sede: 'todas', grado: '', q: '' };
+  const car: CarState = { tab: 'disenar', tipo: 'estudiante', sede: 'todas', seccion: '', q: '', modo: 'ingreso', ultimo: '' };
 
   // Menú: solo los módulos que el rol puede ver
   const nav: NavGroup[] = [
@@ -78,6 +84,10 @@ function start(): void {
     if (route === 'inicio') {
       html = inicioView(me, sede === 'todas' || hasData(sede) ? sede : 'todas', new Date(), !!currentSession()?.samePassword);
       if (sede !== 'todas' && !hasData(sede)) html = html.replace('<main class="content overlap adm">', `<main class="content overlap adm"><section class="sec-alert info" role="note">${ico('pin')}<div><b>Esta sede todavía no tiene estudiantes ni pagos registrados.</b> Mientras tanto se muestran los datos de todas las sedes.</div></section>`);
+    } else if (route.startsWith('admision') || route.startsWith('carnes')) {
+      const id = route.startsWith('admision') ? 'admision' : 'carnes';
+      const m = findModule(id)!;
+      html = !canSee(m, me.role) ? sinPermisoView() : id === 'admision' ? admisionView(adm, { canEdit: canEdit(m, me.role) }) : carnesView(car, { canEdit: canEdit(m, me.role) });
     } else if (route.startsWith('usuarios')) {
       const m = findModule('usuarios')!;
       const ok = canSee(m, me.role);
@@ -114,14 +124,17 @@ function start(): void {
     const h = decodeURIComponent(location.hash.slice(1)) || 'inicio';
     if (route === 'escala' && h !== 'escala' && escalaDirty()) toast('Dejaste cambios sin guardar en la escala de notas. Se descartaron.');
     if (h !== 'escala') draft = null;
-    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') || h.startsWith('usuarios') ? h : 'inicio';
+    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') || h.startsWith('usuarios') || h.startsWith('admision') || h.startsWith('carnes') ? h : 'inicio';
+    if (!route.startsWith('carnes')) carCtl.stop();
+    if (route.startsWith('admision')) { const tab = route.split('-')[1]; adm.tab = (ADM_TABS.some((t) => t.id === tab) ? tab : 'resumen') as AdmTab; }
+    if (route.startsWith('carnes')) { const tab = route.split('-')[1]; car.tab = (CAR_TABS.some((t) => t.id === tab) ? tab : 'disenar') as CarTab; }
     if (route.startsWith('usuarios')) { const tab = route.split('-')[1]; usr.tab = (USR_TABS.some((t) => t.id === tab) ? tab : 'personas') as UsrTab; }
     if (route.startsWith('institucion')) {
       const [, tab, sid] = route.split('-');
       instTab = (INST_TABS.some((t) => t.id === tab) ? tab : 'sedes') as InstTab;
       if (sid) instSede = sid;
     }
-    const id = route.startsWith('institucion') ? 'institucion' : route.startsWith('usuarios') ? 'usuarios' : route.replace(/^m-/, '');
+    const id = route.startsWith('institucion') ? 'institucion' : route.startsWith('usuarios') ? 'usuarios' : route.startsWith('admision') ? 'admision' : route.startsWith('carnes') ? 'carnes' : route.replace(/^m-/, '');
     markCurrent(id);
     const m = findModule(id);
     document.title = `${route === 'inicio' ? 'Inicio' : m?.name ?? 'Panel'} · Administración · Estrellas del Futuro`;
@@ -203,6 +216,8 @@ function start(): void {
   }
 
   const inst = instController({ me, dialog, render, sede: () => instSede });
+  const admCtl = admisionController({ me, dialog, render, state: adm, canEdit: () => canEdit(findModule('admision')!, me.role) });
+  const carCtl = carnesController({ me, dialog, render, state: car });
   const usrCtl = usrController({ me, dialog, render, state: usr, isAdmin: me.role === 'admin' });
 
   // ---------- Eventos ----------
@@ -210,6 +225,8 @@ function start(): void {
     const t = e.target as HTMLInputElement;
     if (route.startsWith('institucion') && inst.change(t)) return;
     if (route.startsWith('usuarios') && usrCtl.change(t)) return;
+    if (route.startsWith('admision') && admCtl.change(t)) return;
+    if (route.startsWith('carnes') && carCtl.change(t)) return;
     if (t.id === 'sede-select') { sede = t.value as SedeFiltro; ls.set('ef-sede', sede); if (route === 'inicio') render(); toast(`Mostrando: ${(t as unknown as HTMLSelectElement).selectedOptions[0].text}`); return; }
     if (!draft) return;
     if (t.dataset.modo) { draft.modo[t.dataset.modo as keyof Escala['modo']] = t.value as Escala['modo']['inicial']; render(); return; }
@@ -227,6 +244,8 @@ function start(): void {
   document.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;
     if (route.startsWith('institucion') && inst.click(t)) return;
+    if (route.startsWith('admision') && admCtl.click(t)) return;
+    if (route.startsWith('carnes') && carCtl.click(t)) return;
     if (route.startsWith('usuarios') && usrCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
     if (t.closest('[data-open="password"]')) { openPassword(); return; }
     const rem = t.closest<HTMLElement>('[data-remind]');
@@ -245,7 +264,12 @@ function start(): void {
     }
   });
 
-  document.addEventListener('input', (e) => { if (route.startsWith('usuarios')) usrCtl.input(e.target as HTMLInputElement); });
+  document.addEventListener('input', (e) => {
+    const t = e.target as HTMLInputElement;
+    if (route.startsWith('usuarios')) usrCtl.input(t);
+    else if (route.startsWith('admision')) admCtl.input(t);
+    else if (route.startsWith('carnes')) carCtl.input(t);
+  });
   window.addEventListener('beforeunload', (e) => { if (escalaDirty()) { e.preventDefault(); e.returnValue = ''; } });
   window.addEventListener('hashchange', go);
   window.addEventListener('storage', (e) => { if (e.key === 'ef-sesion' && !currentAccount()) location.replace('index.html?salir=1'); });

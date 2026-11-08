@@ -31,7 +31,7 @@ export const BLOQUES: Bloque[] = [
       incluye: ['Docentes, estudiantes, padres o apoderados y personal', 'Entran con su DNI (la primera contraseña es el mismo DNI)', 'Restablecer contraseñas y bloquear o activar cuentas', 'Roles y permisos detallados', 'Importar desde Excel y exportar listas'] },
   ] },
   { id: 'secretaria', name: 'Secretaría', modulos: [
-    { id: 'admision', name: 'Admisión', icon: 'megaphone', roles: SEC, fase: 5, desc: 'Del interesado al estudiante nuevo.',
+    { id: 'admision', name: 'Admisión', icon: 'megaphone', roles: SEC, fase: 1, listo: true, desc: 'Del interesado al estudiante nuevo.',
       incluye: ['Registro de interesados y visitas guiadas', 'Postulación en línea con documentos', 'Pago del derecho de admisión', 'Examen o entrevista y resultados', 'Vacantes por grado y lista de espera'] },
     { id: 'matricula', name: 'Matrícula', icon: 'idcard', roles: SEC, fase: 1, desc: 'Matrícula nueva y ratificación de los antiguos.',
       incluye: ['Matrícula nueva y ratificación en línea', 'Reserva de vacante', 'Control de documentos: DNI, partida, certificados, libreta anterior', 'Contrato, reglamento interno y consentimiento de uso de imagen firmados', 'Exportar al SIAGIE', 'Formar secciones balanceadas con sorteo'] },
@@ -54,6 +54,8 @@ export const BLOQUES: Bloque[] = [
     { id: 'simulacros', name: 'Simulacros', icon: 'dice', roles: ACAD, fase: 3, desc: 'Exámenes generales con sorteo de aulas y resultados automáticos.', incluye: ['Programar: grados, cursos, preguntas, fecha y aulas', 'Sorteo de aulas y asientos mezclando secciones según capacidad', 'Listas para la puerta, etiquetas para carpetas y vigilantes', 'Hojas de respuesta (lector óptico o celular) y calificación automática', 'Ranking general y por sección, por curso y evolución', 'Otros sorteos: grupos de trabajo y turnos de exposición'] },
   ] },
   { id: 'asistencia', name: 'Asistencia y convivencia', modulos: [
+    { id: 'carnes', name: 'Carnés y lector', icon: 'idcard', roles: [...SEC, 'coordinador'], fase: 1, listo: true, desc: 'Carné con foto y código QR o de barras para registrar la asistencia.',
+      incluye: ['Carné horizontal y vertical con el mismo código (DNI)', 'Foto, datos, sección, sede y vigencia', 'Imprimir en tamaño tarjeta (CR80) con reverso', 'Lector en la puerta: aviso inmediato al apoderado'] },
     { id: 'asistencia', name: 'Asistencia y portería', icon: 'qr', roles: [...SEC, 'coordinador'], fase: 1, desc: 'Ingreso y salida de estudiantes.', incluye: ['Ingreso con carné QR o fotocheck', 'Aviso al padre al entrar y salir', 'Tardanzas, faltas y justificaciones', 'Permisos de salida', 'Personas autorizadas para recoger (inicial y primaria)', 'Asistencia del personal'] },
     { id: 'convivencia', name: 'Convivencia', icon: 'shield', roles: ACAD, fase: 4, desc: 'Conducta e incidencias.', incluye: ['Incidencias, méritos y deméritos', 'Nota de conducta', 'Citaciones a padres', 'Libro de registro de incidencias y SíseVe'] },
     { id: 'bienestar', name: 'Bienestar y tópico', icon: 'heart', roles: ACAD, fase: 4, desc: 'Psicología, tutoría y salud.', incluye: ['Psicología: fichas confidenciales y seguimiento', 'Tutoría', 'Tópico: atenciones, alergias, seguro y contactos de emergencia'] },

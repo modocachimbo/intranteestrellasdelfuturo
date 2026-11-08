@@ -59,6 +59,13 @@ Cada persona entra con su **DNI** (o carné de extranjería) y la contraseña in
   - *Credenciales*: tarjetas para imprimir con el usuario (DNI) y la contraseña inicial, por tipo, sede y sección.
   - *Importar y exportar*: plantilla CSV por tipo, revisión fila por fila antes de crear y exportación a Excel (CSV).
   - Los padres entran al portal del estudiante y eligen a cuál de sus hijos ver.
+- **Admisión** (`admin.html#admision`): resumen (avance por etapa, vacantes, canales, fechas), tablero de postulantes por etapa (Interesado → Postulante → Evaluado → Admitido / Lista de espera / No admitido → Matriculado), vacantes por grado y sede, y proceso (fechas, costo, nota mínima, requisitos).
+  - Ficha de cada postulante: datos, apoderado, documentos, pago del derecho, examen y entrevista, seguimiento; aviso si la edad al 31 de marzo no corresponde al grado.
+  - Reglas: pasa a Postulante al pagar; no se admite sin vacante (va a lista de espera) y pide confirmar si la nota o la entrevista no alcanzan; no se matricula sin los documentos obligatorios ni sin DNI.
+  - **Matricular** crea la cuenta del estudiante y la del apoderado (entran con su DNI); si el apoderado ya tenía cuenta, se le agrega el hijo.
+  - **Postulación en línea** (`postula.html`): los padres llenan la ficha y llega como Interesado.
+- **Carnés y lector** (`admin.html#carnes`): carné horizontal y vertical (diseños distintos, mismo código: el DNI) con foto, datos, sección, sede y vigencia; QR, código de barras (Code 128) o ambos; reverso; impresión en tamaño tarjeta (85,6 × 54 mm). Fotos desde archivo o cámara.
+  - **Lector de asistencia**: lector USB (barras o 2D), cámara del celular o escribiendo el DNI. Marca ingreso (puntual o tardanza según el turno) o salida y envía el aviso a los apoderados: "Camila llegó al colegio a las 7:42". El padre lo ve en su inicio; el estudiante tiene su **carné digital** en el portal.
 - **Escala de notas** (`admin.html#escala`): por nivel, *Vigesimal* (0–20), *Literal* (AD, A, B, C) o *Ambas* (0–20 con su letra); equivalencia editable con revisión de huecos y cruces; nota aprobatoria, decimales y desde qué bimestre se aplica; confirmación y historial de cambios. Solo Dirección y el administrador pueden cambiarla; Coordinación la ve. El aula virtual ya muestra las notas con esta escala (`src/ts/core/escala.ts`).
 
 ## Portal del estudiante (`estudiante.html`)

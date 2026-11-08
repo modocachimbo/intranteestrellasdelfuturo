@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admisión · Las Estrellas del Futuro</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css?v=202611081744">
+<link rel="stylesheet" href="assets/css/postula.css?v=202611081744">
+</head>
+<body class="postula">
+  <header class="po-hero">
+    <img src="logo.png" alt="Logo de IEP Las Estrellas del Futuro">
+    <div><p class="eyebrow">Admisión <span id="p-anio">2027</span></p><h1>Sé parte de Las Estrellas del Futuro</h1><p>Llena esta ficha y te llamaremos para coordinar una visita y los siguientes pasos.</p></div>
+  </header>
+  <main class="po-main">
+    <p class="po-closed" id="cerrado" hidden>Las inscripciones están cerradas por ahora. Escríbenos para la lista de espera.</p>
+    <form id="pform" class="po-card" novalidate>
+      <fieldset><legend>Datos del estudiante</legend>
+        <label class="field-col"><span>Nombres</span><input class="input" name="nombres" maxlength="50" autocomplete="off" required></label>
+        <label class="field-col"><span>Apellidos</span><input class="input" name="apellidos" maxlength="60" autocomplete="off" required></label>
+        <label class="field-col half"><span>DNI (opcional)</span><input class="input" name="dni" inputmode="numeric" maxlength="12"></label>
+        <label class="field-col half"><span>Fecha de nacimiento</span><input class="input" name="nac" type="date"></label>
+        <label class="field-col half"><span>Sede</span><select class="input" name="sede" id="sede"></select></label>
+        <label class="field-col half"><span>Grado al que postula</span><select class="input" name="grado" id="grado"></select></label>
+        <label class="field-col"><span>Colegio de procedencia</span><input class="input" name="proc" maxlength="80"></label>
+      </fieldset>
+      <fieldset><legend>Padre, madre o apoderado</legend>
+        <label class="field-col"><span>Nombres y apellidos</span><input class="input" name="apo" maxlength="80" autocomplete="name" required></label>
+        <label class="field-col half"><span>Parentesco</span><select class="input" name="par"><option>Madre</option><option>Padre</option><option>Abuelo(a)</option><option>Tío(a)</option><option>Tutor(a) legal</option></select></label>
+        <label class="field-col half"><span>DNI</span><input class="input" name="apodni" inputmode="numeric" maxlength="12"></label>
+        <label class="field-col half"><span>Celular (WhatsApp)</span><input class="input" name="cel" inputmode="tel" maxlength="9" placeholder="9xxxxxxxx" autocomplete="tel" required></label>
+        <label class="field-col half"><span>Correo (opcional)</span><input class="input" name="correo" type="email" maxlength="80" autocomplete="email"></label>
+        <label class="field-col"><span>¿Cómo nos conociste?</span><select class="input" name="canal" id="canal"></select></label>
+        <label class="field-col"><span>¿Algo que debamos saber? (opcional)</span><input class="input" name="msg" maxlength="200"></label>
+      </fieldset>
+      <label class="check po-ok"><input type="checkbox" name="acepto"><span>Acepto que el colegio use estos datos solo para el proceso de admisión (Ley 29733).</span></label>
+      <p class="login-msg error" id="p-msg" role="alert" hidden></p>
+      <button class="btn btn-primary btn-pill" type="submit">Enviar ficha</button>
+    </form>
+    <section class="po-card po-done" id="ok" hidden><h2>¡Gracias! Recibimos la ficha de <span id="ok-name"></span>.</h2><p>Secretaría te escribirá por WhatsApp en las próximas 48 horas para coordinar una visita.</p><a class="btn btn-ghost" href="postula.html">Enviar otra ficha</a></section>
+  </main>
+  <p class="login-foot">© 2026 IEP Las Estrellas del Futuro · Mazo, Végueta</p>
+<script src="assets/js/postula.js?v=202611081744"></script>
+</body>
+</html>

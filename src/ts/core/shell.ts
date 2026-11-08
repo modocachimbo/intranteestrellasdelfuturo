@@ -53,6 +53,7 @@ export const NAV_ESTUDIANTE: NavGroup[] = [
     { id: 'tareas', label: 'Tareas', href: 'estudiante.html#tareas', icon: 'tasks' },
     { id: 'notas', label: 'Calificaciones', href: 'estudiante.html#notas', icon: 'grade' },
     { id: 'horario', label: 'Horario', href: 'estudiante.html#horario', icon: 'clock' },
+    { id: 'carne', label: 'Carné', href: 'estudiante.html#carne', icon: 'idcard' },
   ] },
   { title: 'Comunicación', items: [
     { id: 'comunicados', label: 'Comunicados', href: 'estudiante.html#comunicados', icon: 'megaphone', count: 2 },
@@ -172,7 +173,7 @@ export function mountShell(o: ShellOptions = {}): void {
   const tb = document.getElementById('topbar');
   // En las páginas del docente se muestra quien inició sesión (si es docente)
   const acc = currentAccount();
-  const student = acc?.role === 'estudiante';
+  const student = acc?.role === 'estudiante' || acc?.role === 'apoderado';
   const user = o.user ?? (acc && (acc.role === 'docente' || student) ? { initials: acc.initials, name: acc.name, role: acc.title } : USER);
   if (sb) renderSidebar(sb, page, o.nav ?? (student ? NAV_ESTUDIANTE : NAV), o.home ?? (student ? 'estudiante.html' : 'panel.html'));
   if (tb) renderTopbar(tb, user, o.search ?? 'Buscar estudiante, curso o tarea…', o.topActions);
