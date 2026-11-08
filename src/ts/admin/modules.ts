@@ -23,7 +23,7 @@ const TES: Role[] = ['admin', 'director', 'tesoreria'];
 
 export const BLOQUES: Bloque[] = [
   { id: 'base', name: 'Base del colegio', modulos: [
-    { id: 'institucion', name: 'Institución', icon: 'school', roles: DIR, fase: 1, desc: 'Lo que se configura una vez al año y usa todo el sistema.',
+    { id: 'institucion', name: 'Institución', icon: 'school', roles: DIR, fase: 1, listo: true, desc: 'Lo que se configura una vez al año y usa todo el sistema.',
       incluye: ['Sedes Mazo y Huacho: dirección, código modular, director de sede', 'Año escolar y calendario: bimestres, semanas, vacaciones y feriados', 'Niveles, grados, secciones y turnos', 'Aulas y su capacidad (sirve para horarios y simulacros)', 'Logo, datos para libretas y documentos'] },
     { id: 'escala', name: 'Escala de notas', icon: 'grade', roles: ACAD, edit: DIR, fase: 1, listo: true, desc: 'Vigesimal, literal o ambas, por nivel.', incluye: [] },
     { id: 'usuarios', name: 'Usuarios y roles', icon: 'users', roles: DIR, fase: 1, desc: 'Cuentas de todas las personas y lo que cada una puede ver y hacer.',

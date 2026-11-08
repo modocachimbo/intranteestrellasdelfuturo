@@ -1,4 +1,5 @@
 /* Datos de ejemplo del tablero de administración (inventados, coherentes entre sí). */
+import { getInst } from '../core/institucion';
 
 export type SedeId = 'mazo' | 'huacho';
 export type SedeFiltro = SedeId | 'todas';
@@ -6,6 +7,11 @@ export const SEDES: { id: SedeId; name: string; short: string }[] = [
   { id: 'mazo', name: 'Sede Mazo', short: 'Mazo' },
   { id: 'huacho', name: 'Sede Huacho', short: 'Huacho' },
 ];
+// Los nombres salen de Institución (si se renombró una sede, el tablero usa el nombre nuevo)
+export function refreshSedeNames(): void { for (const s of SEDES) { const x = getInst().sedes.find((y) => y.id === s.id); if (x) { s.name = x.name; s.short = x.name.replace(/^Sede\s+/i, ''); } } }
+refreshSedeNames();
+export const hasData = (id: string): id is SedeId => id in DATA_IDS;
+const DATA_IDS = { mazo: 1, huacho: 1 };
 
 interface SedeData {
   niveles: { inicial: number; primaria: number; secundaria: number };

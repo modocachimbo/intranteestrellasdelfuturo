@@ -5,7 +5,11 @@ import { ico, injectSprite } from '../core/icons';
 import { ROLE_NAME, changePassword, currentAccount, currentSession, passwordProblem } from '../core/session';
 import { markCurrent, mountShell } from '../core/shell';
 import type { NavGroup } from '../core/shell';
-import { SEDES } from './data';
+import { hasData, refreshSedeNames } from './data';
+import { getInst } from '../core/institucion';
+import { instController } from './inst-ctrl';
+import { INST_TABS, institucionView } from './views/institucion';
+import type { InstTab } from './views/institucion';
 import type { SedeFiltro } from './data';
 import { BLOQUES, canEdit, canSee, findModule } from './modules';
 import { escalaView } from './views/escala';
@@ -28,7 +32,9 @@ function start(): void {
     set: (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* sin almacenamiento */ } },
   };
   let sede = (ls.get('ef-sede') as SedeFiltro | null) ?? 'todas';
-  if (!['todas', 'mazo', 'huacho'].includes(sede)) sede = 'todas';
+  if (sede !== 'todas' && !getInst().sedes.some((s) => s.id === sede)) sede = 'todas';
+  let instTab: InstTab = 'sedes';
+  let instSede = '';
 
   // Menú: solo los módulos que el rol puede ver
   const nav: NavGroup[] = [
@@ -39,7 +45,7 @@ function start(): void {
     })).filter((g) => g.items.length),
   ];
   const sedeSelect = `<label class="sede-pick">${ico('pin', 'ico-sm')}<span class="sr-only">Sede</span>
-    <select id="sede-select"><option value="todas"${sede === 'todas' ? ' selected' : ''}>Ambas sedes</option>${SEDES.map((s) => `<option value="${s.id}"${sede === s.id ? ' selected' : ''}>${s.name}</option>`).join('')}</select></label>`;
+    <select id="sede-select"><option value="todas"${sede === 'todas' ? ' selected' : ''}>Todas las sedes</option>${getInst().sedes.map((s) => `<option value="${s.id}"${sede === s.id ? ' selected' : ''}>${s.name}</option>`).join('')}</select></label>`;
   mountShell({ nav, home: 'admin.html', page: 'inicio', search: 'Buscar estudiante, DNI, código o familia…', topActions: sedeSelect,
     user: { initials: me.initials, name: me.name, role: ROLE_NAME[me.role] } });
 
@@ -62,7 +68,16 @@ function start(): void {
     const keep = document.activeElement as HTMLElement | null;
     const keySel = keep?.dataset.rango ? `[data-rango="${keep.dataset.rango}"][data-k="${keep.dataset.k}"]` : keep?.dataset.regla ? `[data-regla="${keep.dataset.regla}"]` : '';
     let html: string;
-    if (route === 'inicio') html = inicioView(me, sede, new Date(), !!currentSession()?.samePassword);
+    refreshSedeNames();
+    if (route === 'inicio') {
+      html = inicioView(me, sede === 'todas' || hasData(sede) ? sede : 'todas', new Date(), !!currentSession()?.samePassword);
+      if (sede !== 'todas' && !hasData(sede)) html = html.replace('<main class="content overlap adm">', `<main class="content overlap adm"><section class="sec-alert info" role="note">${ico('pin')}<div><b>Esta sede todavía no tiene estudiantes ni pagos registrados.</b> Mientras tanto se muestran los datos de todas las sedes.</div></section>`);
+    } else if (route.startsWith('institucion')) {
+      const m = findModule('institucion')!;
+      const d = getInst();
+      if (!d.sedes.some((x) => x.id === instSede)) instSede = sede !== 'todas' && d.sedes.some((x) => x.id === sede) ? sede : d.sedes[0].id;
+      html = canSee(m, me.role) ? institucionView(d, instTab, { canEdit: canEdit(m, me.role), sede: instSede }) : sinPermisoView();
+    }
     else if (route === 'escala') {
       const m = findModule('escala')!;
       if (!canSee(m, me.role)) html = sinPermisoView();
@@ -74,19 +89,32 @@ function start(): void {
     }
     root.innerHTML = html;
     if (keySel) $(keySel)?.focus();
+    // La lista de sedes de la barra superior sigue a Institución
+    const sel = document.getElementById('sede-select') as HTMLSelectElement | null;
+    const sedes = getInst().sedes;
+    if (sel && sel.options.length !== sedes.length + 1 || sel && sedes.some((x, i) => sel.options[i + 1]?.value !== x.id || sel.options[i + 1]?.text !== x.name)) {
+      if (sede !== 'todas' && !sedes.some((x) => x.id === sede)) { sede = 'todas'; ls.set('ef-sede', sede); }
+      sel!.innerHTML = `<option value="todas">Todas las sedes</option>${sedes.map((x) => `<option value="${x.id}">${x.name}</option>`).join('')}`;
+      sel!.value = sede;
+    }
   }
 
   function go(): void {
     const h = decodeURIComponent(location.hash.slice(1)) || 'inicio';
     if (route === 'escala' && h !== 'escala' && escalaDirty()) toast('Dejaste cambios sin guardar en la escala de notas. Se descartaron.');
     if (h !== 'escala') draft = null;
-    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') ? h : 'inicio';
-    const id = route.replace(/^m-/, '');
+    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') ? h : 'inicio';
+    if (route.startsWith('institucion')) {
+      const [, tab, sid] = route.split('-');
+      instTab = (INST_TABS.some((t) => t.id === tab) ? tab : 'sedes') as InstTab;
+      if (sid) instSede = sid;
+    }
+    const id = route.startsWith('institucion') ? 'institucion' : route.replace(/^m-/, '');
     markCurrent(id);
     const m = findModule(id);
     document.title = `${route === 'inicio' ? 'Inicio' : m?.name ?? 'Panel'} · Administración · Estrellas del Futuro`;
     render();
-    window.scrollTo(0, 0);
+    if (!(route.startsWith('institucion') && h.split('-')[2])) window.scrollTo(0, 0);
   }
 
   // ---------- Diálogos ----------
@@ -162,9 +190,12 @@ function start(): void {
     });
   }
 
+  const inst = instController({ me, dialog, render, sede: () => instSede });
+
   // ---------- Eventos ----------
   document.addEventListener('change', (e) => {
     const t = e.target as HTMLInputElement;
+    if (route.startsWith('institucion') && inst.change(t)) return;
     if (t.id === 'sede-select') { sede = t.value as SedeFiltro; ls.set('ef-sede', sede); if (route === 'inicio') render(); toast(`Mostrando: ${(t as unknown as HTMLSelectElement).selectedOptions[0].text}`); return; }
     if (!draft) return;
     if (t.dataset.modo) { draft.modo[t.dataset.modo as keyof Escala['modo']] = t.value as Escala['modo']['inicial']; render(); return; }
@@ -181,6 +212,7 @@ function start(): void {
 
   document.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;
+    if (route.startsWith('institucion') && inst.click(t)) return;
     if (t.closest('[data-open="password"]')) { openPassword(); return; }
     const rem = t.closest<HTMLElement>('[data-remind]');
     if (rem) {

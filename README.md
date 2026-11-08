@@ -41,6 +41,13 @@ Cuentas de prueba (código = contraseña):
 
 - **Inicio**: filtro por sede (Mazo, Huacho o ambas); indicadores de matrícula, asistencia, notas, pensiones, morosidad y admisión; matrícula por nivel; pensiones cobradas por mes; docentes con menos avance de notas (con recordatorio); asistencia por nivel; pendientes; agenda; actividad reciente. Cada rol ve solo lo suyo.
 - **Menú por bloques**: Base del colegio, Secretaría, Académico, Evaluación, Asistencia y convivencia, Tesorería, Comunicación, Personal, Servicios, Dirección y sistema. Los módulos en diseño (punto vacío en el menú) muestran qué incluirán, quién los usa y en qué fase llegan.
+- **Institución** (`admin.html#institucion`): pestañas Sedes, Año y calendario, Niveles y grados, Secciones, Turnos, Aulas y ambientes, Datos del colegio. Todo se crea, edita y elimina con estas reglas:
+  - Siempre queda al menos una sede, un nivel, un grado por nivel, un turno, un periodo y un ambiente por sede (el botón de eliminar se desactiva y se puede renombrar).
+  - Antes de eliminar se muestra qué más se afecta (secciones de una sede, de un nivel o de un grado; secciones que pasan a otro turno o quedan sin aula). Cada cambio se puede **deshacer** desde el aviso.
+  - Revisa nombres repetidos, código modular (7 dígitos), RUC, horas de turnos, periodos sin cruces y dentro del año, y que dos secciones no usen la misma aula en el mismo turno. Avisa si las vacantes superan la capacidad del aula.
+  - La siguiente sección se propone sola (A, B, C…) con un aula libre.
+  - Logo propio (hasta 300 KB) con vista previa del encabezado de documentos.
+  - Historial de cambios, descargar y restaurar respaldo (JSON) y volver a los datos de ejemplo. Datos en `src/ts/core/institucion.ts`.
 - **Escala de notas** (`admin.html#escala`): por nivel, *Vigesimal* (0–20), *Literal* (AD, A, B, C) o *Ambas* (0–20 con su letra); equivalencia editable con revisión de huecos y cruces; nota aprobatoria, decimales y desde qué bimestre se aplica; confirmación y historial de cambios. Solo Dirección y el administrador pueden cambiarla; Coordinación la ve. El aula virtual ya muestra las notas con esta escala (`src/ts/core/escala.ts`).
 
 ## Portal del estudiante (`estudiante.html`)
