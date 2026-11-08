@@ -72,3 +72,5 @@ a.stu-course:hover { text-decoration: none; color: var(--tinta); box-shadow: var
   .recreo td { font-size: 12.5px; font-weight: 700; color: var(--tinta-3); letter-spacing: .08em; text-transform: uppercase; background: var(--fondo); } }
 
 @media (max-width: $bp-md) { .stu-avg { flex-basis: 100%; } }
+.padre-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; border-radius: 14px; background: #FDF2F8; border: 1.5px solid #FBCFE8; color: #831843; font-size: 14px;
+  > .ico { color: #BE185D; } .hijos { display: flex; gap: 6px; margin-left: auto; } .chip { border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 13px; min-height: 32px; } }

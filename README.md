@@ -31,6 +31,8 @@ Cuentas de prueba (código = contraseña):
 | `TES001` | Tesorería | `admin.html` (pensiones, caja, morosidad) |
 | `DOC001` | Docente | `panel.html` |
 | `EST001` | Estudiante (Camila Alvarado, 3.º A) | `estudiante.html` |
+| `APO001` | Madre de Camila y de Fernanda | `estudiante.html` (elige al hijo) |
+| `AUX001` | Auxiliar de educación (rol creado) | `admin.html` (asistencia y convivencia) |
 
 - Código en mayúsculas o minúsculas. 5 intentos fallidos bloquean 1 minuto.
 - Si la contraseña sigue siendo el código, el panel pide cambiarla (mínimo 8 caracteres, letras y números, distinta al código).
@@ -48,6 +50,13 @@ Cuentas de prueba (código = contraseña):
   - La siguiente sección se propone sola (A, B, C…) con un aula libre.
   - Logo propio (hasta 300 KB) con vista previa del encabezado de documentos.
   - Historial de cambios, descargar y restaurar respaldo (JSON) y volver a los datos de ejemplo. Datos en `src/ts/core/institucion.ts`.
+- **Usuarios y roles** (`admin.html#usuarios`):
+  - *Personas*: todas las cuentas (personal, docentes, estudiantes, padres) con búsqueda, filtros por tipo, estado, sede y sección; crear, editar, restablecer contraseña (vuelve al código), bloquear, activar y eliminar; acciones en grupo. Los códigos se generan solos por rol (DOC013, EST032…) y la contraseña inicial es el código.
+  - Reglas: no puedes bloquearte ni eliminarte; siempre queda al menos un administrador activo; DNI de 8 dígitos y sin repetir; una cuenta bloqueada o inactiva no puede entrar.
+  - *Roles y permisos*: por cada rol del personal, cada módulo en No / Ver / Editar. El menú y el tablero de cada persona salen de estos permisos. Se pueden crear roles nuevos (por ejemplo, Psicología) con su prefijo de código.
+  - *Credenciales*: tarjetas para imprimir con código y contraseña inicial, por tipo, sede y sección.
+  - *Importar y exportar*: plantilla CSV por tipo, revisión fila por fila antes de crear y exportación a Excel (CSV).
+  - Los padres entran al portal del estudiante y eligen a cuál de sus hijos ver.
 - **Escala de notas** (`admin.html#escala`): por nivel, *Vigesimal* (0–20), *Literal* (AD, A, B, C) o *Ambas* (0–20 con su letra); equivalencia editable con revisión de huecos y cruces; nota aprobatoria, decimales y desde qué bimestre se aplica; confirmación y historial de cambios. Solo Dirección y el administrador pueden cambiarla; Coordinación la ve. El aula virtual ya muestra las notas con esta escala (`src/ts/core/escala.ts`).
 
 ## Portal del estudiante (`estudiante.html`)

@@ -4,10 +4,27 @@ import { fmtNota, getEscala } from '../core/escala';
 import { ico, injectSprite } from '../core/icons';
 import { currentAccount } from '../core/session';
 import { markCurrent, mountShell } from '../core/shell';
-import { ASISTENCIA, COMUNICADOS, CURSOS, HORARIO, NIVEL, promedio, tareas } from './data';
+import { ALUMNO, ALUMNO_NOMBRE, ASISTENCIA, COMUNICADOS, CURSOS, HIJOS, HORARIO, NIVEL, promedio, tareas } from './data';
+import { getInst, gradoInfo } from '../core/institucion';
 import type { Curso, EstadoTarea, Tarea } from './data';
 
 const acc = currentAccount();
+
+/** "3.º año A · Secundaria · Sede Mazo" según Institución */
+function seccionLabel(): { corto: string; sede: string } {
+  const inst = getInst();
+  const sec = inst.secciones.find((x) => x.id === ALUMNO?.seccion);
+  const gi = sec ? gradoInfo(inst, sec.grado) : null;
+  const sede = inst.sedes.find((x) => x.id === (sec?.sede ?? ALUMNO?.sede))?.name ?? '';
+  return { corto: gi ? `${gi.grado.name} ${sec!.name} · ${gi.nivel.name}` : 'Sin sección asignada', sede };
+}
+const SEC = seccionLabel();
+const esPadre = () => acc?.role === 'apoderado';
+function padreBar(): string {
+  if (!esPadre()) return '';
+  return `<section class="padre-bar" role="note">${ico('heart', 'ico-sm')}<span>Estás viendo a <b>${ALUMNO_NOMBRE || 'tu hijo o hija'}</b></span>
+    ${HIJOS.length > 1 ? `<span class="hijos">${HIJOS.map((h) => `<button type="button" class="chip ${h.id === ALUMNO?.id ? 'blue' : 'gray'}" data-hijo="${h.id}">${h.nombres.split(' ')[0]}</button>`).join('')}</span>` : ''}</section>`;
+}
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 const BIM = ['I', 'II', 'III', 'IV'];
@@ -44,14 +61,14 @@ function inicio(now: Date): string {
   const dia = now.getDay() - 1;
   const hoy = dia >= 0 && dia < 5 ? HORARIO.map((h) => ({ hora: h.hora, c: h.dias[dia] })).filter((x) => x.c) : [];
   const fecha = now.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
-  const name = acc!.name.split(' ')[0];
+  const name = (esPadre() ? acc!.name : ALUMNO_NOMBRE || acc!.name).split(' ')[0];
   return `${band('home', 'Inicio', `${fecha} · IV Bimestre`)}
-  <main class="content overlap stu">
+  <main class="content overlap stu">${padreBar()}
     <section class="card welcome">
       <div class="text">
-        <span class="eyebrow">3.º A · Secundaria · Sede Mazo</span>
+        <span class="eyebrow">${esPadre() ? `Familia de ${ALUMNO_NOMBRE}` : `${SEC.corto} · ${SEC.sede}`}</span>
         <h2>¡Hola, ${name}!</h2>
-        <p>${pend.length ? `Tienes ${pend.length} ${pend.length === 1 ? 'tarea por entregar' : 'tareas por entregar'}. La más próxima es «${pend[0].name}» de ${pend[0].curso.name}.` : 'Estás al día con tus tareas. ¡Sigue así!'}</p>
+        <p>${esPadre() ? `${ALUMNO_NOMBRE.split(' ')[0]} tiene ${pend.length} ${pend.length === 1 ? 'tarea por entregar' : 'tareas por entregar'}.` : ''}${esPadre() ? '' : pend.length ? `Tienes ${pend.length} ${pend.length === 1 ? 'tarea por entregar' : 'tareas por entregar'}. La más próxima es «${pend[0].name}» de ${pend[0].curso.name}.` : 'Estás al día con tus tareas. ¡Sigue así!'}</p>
         <div class="actions"><a class="btn btn-star" href="#tareas">${ico('tasks', '', '--ico-fill:#fff')}Ver mis tareas</a><a class="btn btn-soft" href="#notas">${ico('grade')}Mis calificaciones</a></div>
       </div>
       <div class="stu-avg">${promIV !== null ? nota(promIV, true) : ''}<span>Promedio del IV bimestre<br><small>parcial</small></span></div>
@@ -82,8 +99,8 @@ function inicio(now: Date): string {
 }
 
 function cursos(): string {
-  return `${band('book', 'Mis cursos', '3.º A · Secundaria · Año escolar 2026')}
-  <main class="content overlap stu">
+  return `${band('book', 'Mis cursos', `${SEC.corto} · Año escolar 2026`)}
+  <main class="content overlap stu">${padreBar()}
     <section class="stu-courses">${CURSOS.map((c: Curso) => { const p = promedio(c.notas); return `<${c.aula ? 'a href="#tareas"' : 'div'} class="card stu-course" style="--c:${c.color}">
       <div class="sc-top"><span class="tile">${ico(c.icon)}</span>${c.aula ? '<span class="chip green">Aula virtual</span>' : ''}</div>
       <b>${c.name}</b><small>${c.teacher}</small>
@@ -104,7 +121,7 @@ function tareasView(now: Date, filtro: string): string {
   const cur = groups.find((g) => g[0] === filtro) ?? groups[0];
   const list = ts.filter(cur[2]).sort((a, b) => cur[0] === 'pendientes' ? (a.due?.getTime() ?? 0) - (b.due?.getTime() ?? 0) : (b.due?.getTime() ?? 0) - (a.due?.getTime() ?? 0));
   return `${band('tasks', 'Tareas', 'Entregas y notas de tus cursos')}
-  <main class="content overlap stu">
+  <main class="content overlap stu">${padreBar()}
     <section class="card card-pad">
       <div class="tabs-pill" role="tablist">${groups.map((g) => `<a role="tab" href="#tareas-${g[0]}" aria-selected="${g === cur}">${g[1]} <span>${ts.filter(g[2]).length}</span></a>`).join('')}</div>
       ${list.length ? `<div class="tareas">${list.map((t) => tareaRow(t, now)).join('')}</div>` : `<p class="muted empty">No hay tareas en «${cur[1]}».</p>`}
@@ -116,8 +133,8 @@ function notasView(): string {
   const e = getEscala();
   const proms = CURSOS.map((c) => promedio(c.notas));
   const general = promedio(proms);
-  return `${band('grade', 'Calificaciones', '3.º A · Secundaria · Año escolar 2026')}
-  <main class="content overlap stu">
+  return `${band('grade', 'Calificaciones', `${SEC.corto} · Año escolar 2026`)}
+  <main class="content overlap stu">${padreBar()}
     <section class="card card-pad">
       <div class="card-head"><h2>Mis notas por bimestre</h2><span class="muted small">El IV bimestre todavía está en curso</span></div>
       <div class="table-wrap"><table class="stu-notas">
@@ -135,8 +152,8 @@ function notasView(): string {
 
 function horarioView(now: Date): string {
   const d = now.getDay() - 1;
-  return `${band('clock', 'Horario', '3.º A · Secundaria · Sede Mazo')}
-  <main class="content overlap stu">
+  return `${band('clock', 'Horario', `${SEC.corto} · ${SEC.sede}`)}
+  <main class="content overlap stu">${padreBar()}
     <section class="card card-pad"><div class="table-wrap"><table class="stu-horario">
       <thead><tr><th>Hora</th>${DIAS.map((x, i) => `<th${i === d ? ' class="today"' : ''}>${x}</th>`).join('')}</tr></thead>
       <tbody>${HORARIO.map((h) => h.dias.every((x) => !x) ? `<tr class="recreo"><th>${h.hora}</th><td colspan="5">Recreo</td></tr>`
@@ -147,7 +164,7 @@ function horarioView(now: Date): string {
 
 function comunicadosView(): string {
   return `${band('megaphone', 'Comunicados', 'Avisos del colegio para ti y tu familia')}
-  <main class="content overlap stu"><section class="stack">${COMUNICADOS.map((c) => `<article class="card card-pad comm${c.nuevo ? ' nuevo' : ''}">
+  <main class="content overlap stu">${padreBar()}<section class="stack">${COMUNICADOS.map((c) => `<article class="card card-pad comm${c.nuevo ? ' nuevo' : ''}">
     <div class="comm-h"><span class="ico-tile${c.nuevo ? ' y' : ''}">${ico('megaphone')}</span><div><b>${c.t}</b><small>${c.from} · ${c.when}</small></div>${c.nuevo ? '<span class="chip yellow">Nuevo</span>' : ''}</div>
     <p>${c.body}</p></article>`).join('')}</section></main>`;
 }
@@ -168,6 +185,8 @@ function start(): void {
     if (base !== 'tareas' || !sub) window.scrollTo(0, 0);
   };
   document.addEventListener('click', (e) => {
+    const hj = (e.target as HTMLElement).closest<HTMLElement>('[data-hijo]');
+    if (hj) { try { localStorage.setItem('ef-hijo', hj.dataset.hijo!); } catch { /* sin almacenamiento */ } location.reload(); return; }
     const t = (e.target as HTMLElement).closest<HTMLElement>('[data-toast]');
     if (!t) return;
     let el = document.querySelector<HTMLElement>('.toast');
@@ -182,5 +201,6 @@ function start(): void {
 // Arranque (al final, cuando todo lo de arriba ya está definido)
 injectSprite();
 if (!acc) location.replace('index.html?next=estudiante.html');
-else if (acc.role !== 'estudiante') location.replace(acc.role === 'docente' ? 'panel.html' : 'admin.html');
+else if (acc.role !== 'estudiante' && acc.role !== 'apoderado') location.replace(acc.role === 'docente' ? 'panel.html' : 'admin.html');
+else if (esPadre() && !ALUMNO) document.getElementById('stu-root')!.innerHTML = '<main class="content"><section class="card card-pad"><h2>No tienes hijos vinculados</h2><p class="muted">Comunícate con la secretaría del colegio para vincular tu cuenta.</p></section></main>';
 else start();

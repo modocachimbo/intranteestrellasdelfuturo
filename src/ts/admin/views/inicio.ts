@@ -1,11 +1,12 @@
 /* Inicio del panel de administración: lo que necesita ver cada rol al entrar. */
 import { ico } from '../../core/icons';
 import type { Account, Role } from '../../core/session';
+import { ALL_MODULES, canSee, canSeeId } from '../modules';
 import { ACTIVIDAD, AGENDA, ALERTAS, AVANCE_NOTAS, MESES, SEDES, pct, resumen, soles } from '../data';
 import type { SedeFiltro } from '../data';
 
 const NIVEL_NAME = { inicial: 'Inicial', primaria: 'Primaria', secundaria: 'Secundaria' } as const;
-const has = (r: Role, ...rs: Role[]) => rs.includes(r);
+const can = (id: string, r: Role) => canSeeId(id, r);
 
 function saludo(d: Date): string { const h = d.getHours(); return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'; }
 
@@ -32,6 +33,13 @@ function acciones(r: Role): Accion[] {
     { label: 'Abrir o cerrar notas', href: '#m-notas', icon: 'lock' },
     { label: 'Escala de notas', href: '#escala', icon: 'sliders' },
   ];
+}
+
+/** Accesos rápidos que el rol realmente puede usar (o sus primeros módulos si es un rol nuevo). */
+function accionesPermitidas(r: Role): Accion[] {
+  const ok = acciones(r).filter((a) => can(a.href.replace(/^#(m-)?/, ''), r));
+  if (ok.length) return ok;
+  return ALL_MODULES.filter((m) => canSee(m, r)).slice(0, 3).map((m, i) => ({ label: m.name, href: m.listo ? `#${m.id}` : `#m-${m.id}`, icon: m.icon, star: i === 0 }));
 }
 
 function kpi(o: { icon: string; tone?: string; label: string; num: string; sub: string; href: string; bar?: number }): string {
@@ -75,23 +83,25 @@ export function inicioView(acc: Account, sede: SedeFiltro, now: Date, samePasswo
   const role = acc.role;
   const sedeName = sede === 'todas' ? 'Ambas sedes' : SEDES.find((s) => s.id === sede)!.name;
   const fecha = now.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
-  const academico = has(role, 'admin', 'director', 'coordinador');
-  const finanzas = has(role, 'admin', 'director', 'tesoreria');
-  const secretaria = has(role, 'admin', 'director', 'secretaria');
+  // Lo que se muestra depende de los permisos del rol (Usuarios y roles)
+  const academico = can('notas', role);
+  const finanzas = can('caja', role) || can('morosidad', role);
+  const secretaria = can('matricula', role) || can('admision', role);
+  const asistencia = can('asistencia', role) || can('matricula', role) || academico;
   const cobro = r.recaudado / r.esperado * 100;
 
   const kpis: string[] = [];
-  if (role !== 'tesoreria') kpis.push(kpi({ icon: 'users', label: 'Estudiantes matriculados', num: String(r.est), sub: `${r.secciones} secciones · ${sedeName}`, href: '#m-matricula' }));
-  if (role !== 'tesoreria') kpis.push(kpi({ icon: 'check', tone: 'g', label: 'Asistencia de hoy', num: pct(r.asistencia), sub: `${r.ausentes} ausentes · ${r.tardanzas} tardanzas`, href: '#m-asistencia' }));
+  if (secretaria || academico || asistencia) kpis.push(kpi({ icon: 'users', label: 'Estudiantes matriculados', num: String(r.est), sub: `${r.secciones} secciones · ${sedeName}`, href: '#m-matricula' }));
+  if (asistencia) kpis.push(kpi({ icon: 'check', tone: 'g', label: 'Asistencia de hoy', num: pct(r.asistencia), sub: `${r.ausentes} ausentes · ${r.tardanzas} tardanzas`, href: '#m-asistencia' }));
   if (academico) kpis.push(kpi({ icon: 'grade', tone: 'y', label: 'Notas del IV bimestre', num: `${r.notasPct} %`, sub: `registradas por ${r.docentes} docentes`, href: '#m-notas', bar: r.notasPct }));
   if (finanzas) kpis.push(kpi({ icon: 'cash', label: 'Pensión de noviembre', num: soles(r.recaudado), sub: `de ${soles(r.esperado)} · ${Math.round(cobro)} % cobrado`, href: '#m-caja', bar: cobro }));
   if (finanzas) kpis.push(kpi({ icon: 'chart', tone: 'r', label: 'Morosidad', num: String(r.morosos), sub: `familias · ${soles(r.deuda)} vencidos`, href: '#m-morosidad' }));
   if (secretaria) kpis.push(kpi({ icon: 'megaphone', tone: 'y', label: 'Admisión 2027', num: String(r.postulantes), sub: `postulantes · ${r.vacantes} vacantes`, href: '#m-admision' }));
 
-  const alertas = ALERTAS.filter((a) => a.roles.includes(role) && (sede === 'todas' || a.sede === 'todas' || a.sede === sede));
+  const alertas = ALERTAS.filter((a) => can(a.modulo, role) && (sede === 'todas' || a.sede === 'todas' || a.sede === sede));
   const avance = AVANCE_NOTAS.filter((d) => sede === 'todas' || d.sede === sede).slice(0, 5);
 
-  const notice = role === 'tesoreria'
+  const notice = finanzas && !academico && !secretaria
     ? `<section class="notice"><span class="ico-tile">${ico('calendar', '', '--ico-fill:#fff')}</span>
         <div class="grow"><b>La pensión de noviembre vence el lunes 30</b><div class="small">Faltan ${soles(r.pendiente)} por cobrar en ${sedeName.toLowerCase()}.</div></div>
         <div class="notice-bar"><div class="progress" role="img" aria-label="${Math.round(cobro)} por ciento cobrado"><span style="width:${cobro}%"></span></div></div>
@@ -123,7 +133,7 @@ export function inicioView(acc: Account, sede: SedeFiltro, now: Date, samePasswo
         <p>${role === 'tesoreria' ? `Hoy hay ${r.morosos} familias con pensiones vencidas y ${soles(r.pendiente)} por cobrar de noviembre.`
           : role === 'secretaria' ? `Tienes ${alertas.length} pendientes: matrículas con documentos, trámites y asistencia.`
           : `Hoy asistió el ${pct(r.asistencia)} de los estudiantes. Hay ${alertas.length} ${alertas.length === 1 ? 'alerta' : 'alertas'} por revisar.`}</p>
-        <div class="actions">${acciones(role).map((a) => `<a class="btn ${a.star ? 'btn-star' : 'btn-soft'}" href="${a.href}">${ico(a.icon, '', a.star ? '--ico-fill:#fff' : '')}${a.label}</a>`).join('')}</div>
+        <div class="actions">${accionesPermitidas(role).map((a) => `<a class="btn ${a.star ? 'btn-star' : 'btn-soft'}" href="${a.href}">${ico(a.icon, '', a.star ? '--ico-fill:#fff' : '')}${a.label}</a>`).join('')}</div>
       </div>
       <div class="sede-split" aria-label="Estudiantes por sede">
         ${r.porSede.map((s) => `<div class="ss s-${s.sede}"><small>${SEDES.find((x) => x.id === s.sede)!.name}</small><b>${s.n}</b><span>estudiantes</span></div>`).join('')}
@@ -136,7 +146,7 @@ export function inicioView(acc: Account, sede: SedeFiltro, now: Date, samePasswo
 
     <div class="grid-main adm-grid">
       <div class="stack">
-        ${role !== 'tesoreria' ? `<section class="card card-pad">
+        ${secretaria || academico ? `<section class="card card-pad">
           <div class="card-head"><h2>Matrícula por nivel</h2><a href="#m-matricula">Ver matrícula</a></div>
           ${chartMatricula(r)}
         </section>` : ''}
@@ -158,7 +168,7 @@ export function inicioView(acc: Account, sede: SedeFiltro, now: Date, samePasswo
           <button class="btn btn-soft full" type="button" data-remind="todos">${ico('megaphone', 'ico-sm')}Recordar a todos los que tienen menos del 80 %</button>
         </section>` : ''}
 
-        ${role !== 'tesoreria' ? `<section class="card card-pad">
+        ${asistencia ? `<section class="card card-pad">
           <div class="card-head"><h2>Asistencia de hoy por nivel</h2><a href="#m-asistencia">Ver asistencia</a></div>
           <div class="asis">${r.asisNivel.map((a) => `<div class="as"><span>${NIVEL_NAME[a.nivel]}</span><div class="progress ${a.pct < 93 ? 'warn' : 'ok'}"><span style="width:${a.pct}%"></span></div><b>${pct(a.pct)}</b></div>`).join('')}</div>
         </section>` : ''}
@@ -175,7 +185,7 @@ export function inicioView(acc: Account, sede: SedeFiltro, now: Date, samePasswo
           <ul class="agenda">${AGENDA.map((e) => `<li><span class="date"><b>${e.d}</b><small>${e.m}</small></span><span><b>${e.t}</b><small>${e.s}</small></span></li>`).join('')}</ul>
         </section>
 
-        ${has(role, 'admin', 'director') ? `<section class="card card-pad">
+        ${can('seguridad', role) || can('indicadores', role) ? `<section class="card card-pad">
           <div class="card-head"><h2>Actividad reciente</h2><a href="#m-seguridad">Registro completo</a></div>
           <ul class="activity">${ACTIVIDAD.map((x) => `<li><span class="ico-tile sm">${ico(x.icon, 'ico-sm')}</span><span><b>${x.who}</b> ${x.what}<small>${x.when}</small></span></li>`).join('')}</ul>
         </section>` : ''}

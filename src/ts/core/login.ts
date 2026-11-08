@@ -1,5 +1,5 @@
 /* Formulario de ingreso: código + contraseña (al inicio, la contraseña es el mismo código). */
-import { ACCOUNTS, ROLE_NAME, currentAccount, homeFor, login, resetDemoPasswords } from './session';
+import { ROLE_NAME, currentAccount, demoAccounts, homeFor, login, resetDemoPasswords } from './session';
 
 export function wireLogin(): void {
   const form = document.getElementById('login-form') as HTMLFormElement | null;
@@ -47,7 +47,7 @@ export function wireLogin(): void {
       btn.disabled = true;
       btn.textContent = 'Ingresando…';
       const next = params.get('next');
-      const dest = next && /^[a-z-]+\.html(#[\w-]*)?$/.test(next) && (['docente', 'estudiante'].includes(r.account.role) ? next !== 'admin.html' : true) ? next : homeFor(r.account.role);
+      const dest = next && /^[a-z-]+\.html(#[\w-]*)?$/.test(next) && (['docente', 'estudiante', 'apoderado'].includes(r.account.role) ? next !== 'admin.html' : true) ? next : homeFor(r.account.role);
       location.href = dest;
       return;
     }
@@ -56,6 +56,8 @@ export function wireLogin(): void {
       (code.value ? pass : code).setAttribute('aria-invalid', 'true');
       (code.value ? pass : code).focus();
     } else if (r.reason === 'locked') lock(r.wait ?? 60);
+    else if (r.reason === 'blocked') show('Tu cuenta está bloqueada. Comunícate con la administración del colegio.');
+    else if (r.reason === 'inactive') show('Tu cuenta está desactivada. Si crees que es un error, comunícate con la administración.');
     else {
       show(`Código o contraseña incorrectos. ${r.left === 1 ? 'Te queda 1 intento' : `Te quedan ${r.left} intentos`} antes de esperar un minuto.`);
       pass.value = '';
@@ -67,7 +69,7 @@ export function wireLogin(): void {
   // Cuentas de prueba: un toque llena el formulario
   const demo = document.getElementById('demo-accounts');
   if (demo) {
-    demo.innerHTML = ACCOUNTS.map((a) => `<button type="button" class="demo-acc" data-code="${a.code}"><b>${a.code}</b><span>${ROLE_NAME[a.role]}</span></button>`).join('');
+    demo.innerHTML = demoAccounts().map((a) => `<button type="button" class="demo-acc" data-code="${a.code}"><b>${a.code}</b><span>${ROLE_NAME[a.role]}</span></button>`).join('');
     demo.insertAdjacentHTML('afterend', '<button type="button" class="link-btn" id="demo-reset">Restablecer las contraseñas de prueba</button>');
     document.getElementById('demo-reset')?.addEventListener('click', () => { resetDemoPasswords(); clearInterval(timer); btn.disabled = false; show('Listo: la contraseña de cada cuenta de prueba vuelve a ser su código.', 'info'); });
     demo.addEventListener('click', (e) => {

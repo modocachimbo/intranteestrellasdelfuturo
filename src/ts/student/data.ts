@@ -7,8 +7,31 @@ import { getReview } from '../aula/reviews';
 import { allWeeks } from '../aula/store';
 import type { Activity, Submission } from '../aula/types';
 
-export const ME = STUDENTS[0];          // e1 · Alvarado Ríos, Camila
-export const ME_INDEX = 0;              // posición en la lista del aula
+import { currentAccount } from '../core/session';
+import { findByCode, fullName, getUsuarios } from '../core/usuarios';
+import type { Usuario } from '../core/usuarios';
+
+/** Estudiante que se muestra: el que inició sesión o, si entra un apoderado, el hijo elegido. */
+function elegirEstudiante(): { user: Usuario | undefined; hijos: Usuario[] } {
+  const acc = currentAccount();
+  const d = getUsuarios();
+  if (acc?.role === 'apoderado') {
+    const p = findByCode(acc.code);
+    const hijos = (p?.hijos ?? []).map((h) => d.users.find((u) => u.id === h)).filter((u): u is Usuario => !!u);
+    let sel = '';
+    try { sel = localStorage.getItem('ef-hijo') ?? ''; } catch { /* sin almacenamiento */ }
+    return { user: hijos.find((h) => h.id === sel) ?? hijos[0], hijos };
+  }
+  return { user: acc ? findByCode(acc.code) : undefined, hijos: [] };
+}
+const elegido = elegirEstudiante();
+export const HIJOS = elegido.hijos;
+export const ALUMNO = elegido.user;
+export const ALUMNO_NOMBRE = ALUMNO ? fullName(ALUMNO) : '';
+// Posición en la lista del aula de Química 3.º A (EST001 → 0). Si no es de esa sección, no tiene tareas de Química.
+const n = ALUMNO && ALUMNO.seccion === 'mazo-s3-A' ? Number(ALUMNO.code.replace(/^EST/, '')) - 1 : -1;
+export const ME_INDEX = n >= 0 && n < STUDENTS.length ? n : -1;
+export const ME = STUDENTS[Math.max(0, ME_INDEX)];
 export const NIVEL = 'secundaria' as const;
 
 export interface Curso { id: string; name: string; teacher: string; color: string; icon: string; notas: (number | null)[]; aula?: boolean }
@@ -30,7 +53,7 @@ const CURSOS_BASE: Omit<Curso, 'notas'>[] = [
 
 /** Notas por bimestre (I a III cerrados; IV parcial). Estables para la demo. */
 export const CURSOS: Curso[] = CURSOS_BASE.map((c) => {
-  const r = rng(c.id + ME.id);
+  const r = rng(c.id + (ALUMNO?.id ?? ME.id));
   const n = () => Math.max(9, Math.min(20, Math.round(ME.ability + (r() - 0.4) * 5)));
   return { ...c, notas: [n(), n(), n(), c.id === 'tut' ? null : n()] };
 });
@@ -55,7 +78,7 @@ export function tareas(): Tarea[] {
   const qui = CURSOS.find((c) => c.id === 'qui')!;
   const out: Tarea[] = [];
   for (const w of allWeeks(QUIMICA_3A)) for (const a of w.activities) {
-    if ((a.type !== 'assign' && a.type !== 'quiz') || !(a.due ?? a.close) || w.number < 28) continue;
+    if (ME_INDEX < 0 || (a.type !== 'assign' && a.type !== 'quiz') || !(a.due ?? a.close) || w.number < 28) continue;
     const sub = submissionsFor(a, NOW)[ME_INDEX];
     const e = estadoDe(a, sub);
     out.push({ id: a.id, curso: qui, name: a.name, tipo: a.type === 'quiz' ? 'Examen virtual' : 'Tarea', due: a.due ?? a.close, ...e, when: sub.when,

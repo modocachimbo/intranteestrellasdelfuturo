@@ -8,6 +8,10 @@ import type { NavGroup } from '../core/shell';
 import { hasData, refreshSedeNames } from './data';
 import { getInst } from '../core/institucion';
 import { instController } from './inst-ctrl';
+import { usrController } from './usr-ctrl';
+import { USR_TABS, usuariosView } from './views/usuarios';
+import type { UsrState, UsrTab } from './views/usuarios';
+import { getUsuarios } from '../core/usuarios';
 import { INST_TABS, institucionView } from './views/institucion';
 import type { InstTab } from './views/institucion';
 import type { SedeFiltro } from './data';
@@ -22,7 +26,7 @@ injectSprite();
 const acc = currentAccount();
 if (!acc) location.replace('index.html?next=admin.html');
 else if (acc.role === 'docente') location.replace('panel.html');
-else if (acc.role === 'estudiante') location.replace('estudiante.html');
+else if (acc.role === 'estudiante' || acc.role === 'apoderado') location.replace('estudiante.html');
 else start();
 
 function start(): void {
@@ -34,6 +38,8 @@ function start(): void {
   let sede = (ls.get('ef-sede') as SedeFiltro | null) ?? 'todas';
   if (sede !== 'todas' && !getInst().sedes.some((s) => s.id === sede)) sede = 'todas';
   let instTab: InstTab = 'sedes';
+  const usr: UsrState = { tab: 'personas', tipo: 'todos', estado: 'todos', sede: 'todas', seccion: '', q: '', page: 1, sel: new Set(), rol: 'admin', rolDraft: null,
+    importTipo: 'estudiante', importRows: null, importFile: '', credTipo: 'estudiante', credSede: 'todas', credSeccion: '', credSolo: true };
   let instSede = '';
 
   // Menú: solo los módulos que el rol puede ver
@@ -72,6 +78,11 @@ function start(): void {
     if (route === 'inicio') {
       html = inicioView(me, sede === 'todas' || hasData(sede) ? sede : 'todas', new Date(), !!currentSession()?.samePassword);
       if (sede !== 'todas' && !hasData(sede)) html = html.replace('<main class="content overlap adm">', `<main class="content overlap adm"><section class="sec-alert info" role="note">${ico('pin')}<div><b>Esta sede todavía no tiene estudiantes ni pagos registrados.</b> Mientras tanto se muestran los datos de todas las sedes.</div></section>`);
+    } else if (route.startsWith('usuarios')) {
+      const m = findModule('usuarios')!;
+      const ok = canSee(m, me.role);
+      usrCtl.setCanEdit(ok && canEdit(m, me.role));
+      html = ok ? usuariosView(getUsuarios(), usr, { canEdit: canEdit(m, me.role), isAdmin: me.role === 'admin', meId: me.userId }, getInst()) : sinPermisoView();
     } else if (route.startsWith('institucion')) {
       const m = findModule('institucion')!;
       const d = getInst();
@@ -103,13 +114,14 @@ function start(): void {
     const h = decodeURIComponent(location.hash.slice(1)) || 'inicio';
     if (route === 'escala' && h !== 'escala' && escalaDirty()) toast('Dejaste cambios sin guardar en la escala de notas. Se descartaron.');
     if (h !== 'escala') draft = null;
-    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') ? h : 'inicio';
+    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') || h.startsWith('usuarios') ? h : 'inicio';
+    if (route.startsWith('usuarios')) { const tab = route.split('-')[1]; usr.tab = (USR_TABS.some((t) => t.id === tab) ? tab : 'personas') as UsrTab; }
     if (route.startsWith('institucion')) {
       const [, tab, sid] = route.split('-');
       instTab = (INST_TABS.some((t) => t.id === tab) ? tab : 'sedes') as InstTab;
       if (sid) instSede = sid;
     }
-    const id = route.startsWith('institucion') ? 'institucion' : route.replace(/^m-/, '');
+    const id = route.startsWith('institucion') ? 'institucion' : route.startsWith('usuarios') ? 'usuarios' : route.replace(/^m-/, '');
     markCurrent(id);
     const m = findModule(id);
     document.title = `${route === 'inicio' ? 'Inicio' : m?.name ?? 'Panel'} · Administración · Estrellas del Futuro`;
@@ -191,11 +203,13 @@ function start(): void {
   }
 
   const inst = instController({ me, dialog, render, sede: () => instSede });
+  const usrCtl = usrController({ me, dialog, render, state: usr, isAdmin: me.role === 'admin' });
 
   // ---------- Eventos ----------
   document.addEventListener('change', (e) => {
     const t = e.target as HTMLInputElement;
     if (route.startsWith('institucion') && inst.change(t)) return;
+    if (route.startsWith('usuarios') && usrCtl.change(t)) return;
     if (t.id === 'sede-select') { sede = t.value as SedeFiltro; ls.set('ef-sede', sede); if (route === 'inicio') render(); toast(`Mostrando: ${(t as unknown as HTMLSelectElement).selectedOptions[0].text}`); return; }
     if (!draft) return;
     if (t.dataset.modo) { draft.modo[t.dataset.modo as keyof Escala['modo']] = t.value as Escala['modo']['inicial']; render(); return; }
@@ -213,6 +227,7 @@ function start(): void {
   document.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;
     if (route.startsWith('institucion') && inst.click(t)) return;
+    if (route.startsWith('usuarios') && usrCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
     if (t.closest('[data-open="password"]')) { openPassword(); return; }
     const rem = t.closest<HTMLElement>('[data-remind]');
     if (rem) {
@@ -230,6 +245,7 @@ function start(): void {
     }
   });
 
+  document.addEventListener('input', (e) => { if (route.startsWith('usuarios')) usrCtl.input(e.target as HTMLInputElement); });
   window.addEventListener('beforeunload', (e) => { if (escalaDirty()) { e.preventDefault(); e.returnValue = ''; } });
   window.addEventListener('hashchange', go);
   window.addEventListener('storage', (e) => { if (e.key === 'ef-sesion' && !currentAccount()) location.replace('index.html?salir=1'); });

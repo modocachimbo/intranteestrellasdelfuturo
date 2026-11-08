@@ -1,6 +1,7 @@
 /* Mapa del panel de administración: bloques, módulos, quién los usa y qué incluirá cada uno.
    El menú, los permisos y las páginas "en diseño" salen de esta lista. */
 import type { Role } from '../core/session';
+import { permisosDe } from '../core/usuarios';
 
 export interface Modulo {
   id: string;
@@ -26,7 +27,7 @@ export const BLOQUES: Bloque[] = [
     { id: 'institucion', name: 'Institución', icon: 'school', roles: DIR, fase: 1, listo: true, desc: 'Lo que se configura una vez al año y usa todo el sistema.',
       incluye: ['Sedes Mazo y Huacho: dirección, código modular, director de sede', 'Año escolar y calendario: bimestres, semanas, vacaciones y feriados', 'Niveles, grados, secciones y turnos', 'Aulas y su capacidad (sirve para horarios y simulacros)', 'Logo, datos para libretas y documentos'] },
     { id: 'escala', name: 'Escala de notas', icon: 'grade', roles: ACAD, edit: DIR, fase: 1, listo: true, desc: 'Vigesimal, literal o ambas, por nivel.', incluye: [] },
-    { id: 'usuarios', name: 'Usuarios y roles', icon: 'users', roles: DIR, fase: 1, desc: 'Cuentas de todas las personas y lo que cada una puede ver y hacer.',
+    { id: 'usuarios', name: 'Usuarios y roles', icon: 'users', roles: DIR, fase: 1, listo: true, desc: 'Cuentas de todas las personas y lo que cada una puede ver y hacer.',
       incluye: ['Docentes, estudiantes, padres o apoderados y personal', 'Generar códigos de ingreso (la primera contraseña es el código)', 'Restablecer contraseñas y bloquear o activar cuentas', 'Roles y permisos detallados', 'Importar desde Excel y exportar listas'] },
   ] },
   { id: 'secretaria', name: 'Secretaría', modulos: [
@@ -85,5 +86,7 @@ export const BLOQUES: Bloque[] = [
 
 export const ALL_MODULES = BLOQUES.flatMap((b) => b.modulos.map((m) => ({ ...m, bloque: b })));
 export const findModule = (id: string) => ALL_MODULES.find((m) => m.id === id);
-export const canSee = (m: Modulo, r: Role) => m.roles.includes(r);
-export const canEdit = (m: Modulo, r: Role) => (m.edit ?? m.roles).includes(r);
+/** Lo que cada rol puede ver o editar sale de Usuarios y roles (permisos por módulo). */
+export const canSee = (m: Modulo, r: Role) => { const p = permisosDe(r); return p ? !!p[m.id] : m.roles.includes(r); };
+export const canEdit = (m: Modulo, r: Role) => { const p = permisosDe(r); return p ? p[m.id] === 'editar' : (m.edit ?? m.roles).includes(r); };
+export const canSeeId = (id: string, r: Role) => { const m = ALL_MODULES.find((x) => x.id === id); return !!m && canSee(m, r); };
