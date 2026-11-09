@@ -1,0 +1,29 @@
+// Trámites: piezas que comparten el panel y el portal de padres
+.warn-t { color: #8A5A00; font-weight: 600; }
+.tm-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; counter-reset: s;
+  li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--tinta-3); text-align: center;
+    span { position: relative; z-index: 1; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #fff; border: 2px dashed var(--borde); font-weight: 800; font-size: 12.5px; }
+    &:not(:last-child)::after { content: ''; position: absolute; top: 14px; left: calc(50% + 18px); right: calc(-50% + 18px); border-top: 2px dashed var(--borde); }
+    &.done { color: var(--exito-700); span { border: 2px solid #1E9E5A; background: #1E9E5A; color: #fff; } &::after { border-top-style: solid; border-color: #1E9E5A; } }
+    &.cur { color: var(--azul-700); span { border: 2px solid var(--azul-600); color: var(--azul-700); background: var(--azul-50, #EEF3FC); } }
+    &.warn { color: var(--peligro-700); span { border: 2px solid #E5484D; color: var(--peligro-700); background: var(--peligro-100); } } }
+  &.sm li { font-size: 11.5px; span { width: 24px; height: 24px; font-size: 11px; } &:not(:last-child)::after { top: 12px; } } }
+.tp-msg { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 14px; background: var(--azul-50, #EEF3FC); font-size: 13.5px; line-height: 1.45;
+  .ico { flex: none; margin-top: 2px; color: var(--azul-600); } small { display: block; margin-top: 2px; font-size: 11.5px; color: var(--tinta-3); }
+  &.observado, &.rechazado { background: #FFF6F6; .ico { color: var(--peligro-700); } } &.listo { background: #F3FBF6; .ico { color: var(--exito-700); } } }
+
+// Portal
+.tp-intro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; h2 { margin: 0 0 4px; } p { margin: 0; max-width: 560px; } }
+.tp-list { gap: 12px; }
+.tp-item { display: flex; flex-direction: column; gap: 14px; border-left: 4px solid var(--azul-200);
+  &.listo { border-left-color: #1E9E5A; } &.observado { border-left-color: #E5484D; } &.entregado, &.rechazado { border-left-color: var(--borde); }
+  .tp-h { display: flex; align-items: center; gap: 12px; > div { flex: 1; min-width: 0; b { display: block; font-size: 15.5px; } small { color: var(--tinta-3); font-size: 12.5px; } } }
+  .tp-txt { margin: 0; font-size: 14px; color: var(--tinta-2); }
+  .tp-act { display: flex; flex-wrap: wrap; gap: 8px; &:empty { display: none; } } }
+.tp-tipos { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; max-height: 46vh; overflow-y: auto; }
+.tp-tipo { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; border: 1.5px solid var(--borde-suave); cursor: pointer;
+  input { position: absolute; opacity: 0; pointer-events: none; }
+  .ico-tile { width: 38px; height: 38px; flex: none; } > span:last-child { flex: 1; min-width: 0; b { display: block; font-size: 14px; } small { display: block; font-size: 12px; color: var(--tinta-3); } .tp-meta { color: var(--azul-700); font-weight: 700; margin-top: 2px; } }
+  &:has(input:checked) { border-color: var(--azul-600); background: var(--azul-50, #EEF3FC); box-shadow: 0 0 0 3px rgba(30,79,196,.12); }
+  &:has(input:focus-visible) { outline: 3px solid var(--azul-200); } }
+a.tram-aviso { text-decoration: none; color: inherit; border-color: #A8DDBF; &:hover { text-decoration: none; box-shadow: var(--sombra-2); } > div { flex: 1; min-width: 200px; } p { margin: 2px 0 0; } }

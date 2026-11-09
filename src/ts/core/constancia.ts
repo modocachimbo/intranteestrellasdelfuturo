@@ -20,7 +20,8 @@ export interface ConstData {
 }
 
 const esc = (s: string) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
-const larga = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00`).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+const dia = (iso: string) => (iso.length > 10 ? hoyISO(new Date(iso)) : iso);
+const larga = (iso: string) => new Date(`${dia(iso)}T12:00`).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
 const TIT = { vacante: 'Constancia de vacante', traslado: 'Constancia de traslado', retiro: 'Constancia de retiro' };
 
 export function constanciaHtml(inst: Institucion, d: ConstData): string {
@@ -61,7 +62,7 @@ export function constanciaHtml(inst: Institucion, d: ConstData): string {
       <div><small>Nivel</small><b>${esc(gi?.nivel.name ?? '—')}</b></div>
       <div><small>Grado</small><b>${esc(gi?.grado.name ?? '—')}</b></div>
       <div><small>Sección</small><b>${esc(sec?.name ?? (d.tipo === 'vacante' ? 'Por asignar' : '—'))}</b></div>
-      <div><small>Fecha</small><b>${new Date(`${d.fecha.slice(0, 10)}T12:00`).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</b></div>
+      <div><small>Fecha</small><b>${new Date(`${dia(d.fecha)}T12:00`).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</b></div>
     </div>
     <p class="fd-texto">${texto} Se expide la presente a solicitud de la parte interesada.</p>
     ${tabla}

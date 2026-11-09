@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verificar documento · Las Estrellas del Futuro</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css?v=202611081950">
+<link rel="stylesheet" href="assets/css/postula.css?v=202611081950">
+</head>
+<body class="postula verifica">
+  <header class="po-hero">
+    <img src="logo.png" alt="Logo de IEP Las Estrellas del Futuro">
+    <div><p class="eyebrow">Verificación de documentos</p><h1>¿Este documento es auténtico?</h1><p>Escanea el QR del documento o escribe el código de verificación que aparece abajo.</p></div>
+  </header>
+  <main class="po-main">
+    <form id="vform" class="po-card vf-form" novalidate>
+      <label class="field-col"><span>Código de verificación</span><input class="input vf-code" id="vcode" maxlength="9" placeholder="ABCD-1234" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+      <button class="btn btn-primary" type="submit">Verificar</button>
+    </form>
+    <section id="vres" aria-live="polite"></section>
+  </main>
+  <p class="login-foot">© 2026 IEP Las Estrellas del Futuro · Mazo, Végueta</p>
+<script src="assets/js/verifica.js?v=202611081950"></script>
+</body>
+</html>

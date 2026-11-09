@@ -1,5 +1,6 @@
 @use "carne";
 @use "ficha";
+@use "tramites";
 // Panel de administración (admin.html)
 $bp-md: 720px;
 $bp-lg: 1180px;
@@ -583,3 +584,33 @@ dialog.adm-dlg.mid { width: min(660px, calc(100vw - 24px)); }
   b { display: block; font-size: 14px; font-weight: 600; } small { display: block; font-size: 12px; color: var(--tinta-3); }
   li.ok b { color: var(--exito-700); } }
 @media (max-width: 640px) { .tr-boxes { grid-template-columns: 1fr; } }
+
+// ==========================================================
+// Trámites y documentos
+// ==========================================================
+.exp-btn { display: flex; flex-direction: column; gap: 2px; text-align: left; border: 0; background: none; padding: 0; font: inherit; color: var(--tinta); cursor: pointer;
+  b { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13.5px; letter-spacing: .02em; } small { font-size: 12px; color: var(--tinta-3); } &:hover b { color: var(--azul-700); } }
+.tm-tipo { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; .ico { color: var(--azul-600); flex: none; } }
+.tm-table td.est small { display: block; margin-top: 3px; font-size: 11.5px; }
+.vcode { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13px; font-weight: 700; letter-spacing: .08em; padding: 3px 7px; border-radius: 7px; background: var(--fondo); margin-right: 4px; }
+.sec-alert.warn { background: #FFF6F6; border-color: #F3B4B6; color: var(--peligro-700); }
+.tm-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.tm-card { padding: 18px; display: flex; flex-direction: column; gap: 8px; border: 1.5px dashed var(--borde); box-shadow: none;
+  h3 { margin: 4px 0 0; font-size: 16px; } p { margin: 0; font-size: 13.5px; color: var(--tinta-2); flex: 1; }
+  .btn { margin-top: 6px; } &:hover { border-style: solid; border-color: var(--azul-200); } }
+.tm-card-meta { display: flex; flex-wrap: wrap; gap: 6px; span { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: var(--fondo); color: var(--tinta-2); } span:first-child { background: var(--amarillo-100); color: #7A5200; } }
+.tm-pl { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 18px; align-items: start; }
+.tm-pl-list { padding: 8px; display: flex; flex-direction: column; gap: 2px; position: sticky; top: 90px;
+  button { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; border: 0; background: none; font: inherit; color: var(--tinta); text-align: left; cursor: pointer;
+    .ico { color: var(--azul-600); flex: none; } b { display: block; font-size: 14px; } small { display: block; font-size: 12px; color: var(--tinta-3); }
+    &:hover { background: var(--fondo); } &[aria-current="true"] { background: var(--azul-50, #EEF3FC); b { color: var(--azul-700); } } } }
+#pl-cuerpo { min-height: 130px; resize: vertical; line-height: 1.55; font-family: inherit; }
+.pl-chips { display: flex; flex-wrap: wrap; gap: 6px; .chip { font-family: ui-monospace, Menlo, monospace; font-size: 12px; cursor: pointer; border: 0; } .chip:hover { background: var(--azul-100, #DCE6FA); color: var(--azul-700); } }
+.tm-firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 6px 0 10px; }
+.tm-firma { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.tm-firma-img { width: 100%; height: 110px; border-radius: 14px; border: 1.5px dashed var(--borde); display: grid; place-items: center; background: repeating-conic-gradient(#F4F6FB 0 25%, #fff 0 50%) 0 0 / 16px 16px; img { max-width: 90%; max-height: 92px; object-fit: contain; } }
+.tm-eventos { list-style: none; margin: 0; padding: 0 0 0 4px; display: flex; flex-direction: column; position: relative;
+  &::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; border-left: 2px dashed var(--borde); }
+  li { position: relative; display: flex; gap: 12px; padding: 6px 0; .dot-e { margin-top: 5px; position: relative; z-index: 1; box-shadow: 0 0 0 3px #fff; } b { display: block; font-size: 13.5px; font-weight: 600; } small { font-size: 12px; color: var(--tinta-3); } } }
+@media (max-width: 900px) { .tm-pl { grid-template-columns: 1fr; } .tm-pl-list { position: static; flex-direction: row; overflow-x: auto; button { flex: none; } } }
+@media (max-width: 560px) { .tm-firmas { grid-template-columns: 1fr; } .tm-steps li { font-size: 11px; } }

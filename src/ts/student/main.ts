@@ -13,6 +13,7 @@ import { fichaHtml as fichaDoc, mostrarFicha, numeroMatricula } from '../core/fi
 import { getAdm } from '../core/admision';
 import { getUsuarios } from '../core/usuarios';
 import type { Curso, EstadoTarea, Tarea } from './data';
+import { nuevaSolicitud, pendientesTram, responder, tramitesPortal, verDocumento } from './tramites';
 
 const acc = currentAccount();
 
@@ -194,7 +195,7 @@ function inicio(now: Date): string {
       <div class="stu-avg">${promIV !== null ? nota(promIV, true) : ''}<span>Promedio del IV bimestre<br><small>parcial</small></span></div>
     </section>
     ${llegada()}
-    ${matriculaCard()}
+    ${matriculaCard()}${tramAviso()}
     <section class="kpis" aria-label="Resumen">
       <a class="card kpi" href="#tareas"><span class="ico-tile y">${ico('tasks')}</span><span><span class="lbl">Por entregar</span><br><span class="num">${pend.length}</span><br><span class="sub">${pend[0]?.due ? `Próxima: ${relativo(pend[0].due, now)}` : 'Nada pendiente'}</span></span></a>
       <a class="card kpi" href="#tareas"><span class="ico-tile g">${ico('checkc')}</span><span><span class="lbl">Calificadas</span><br><span class="num">${ts.filter((t) => t.estado === 'calificada').length}</span><br><span class="sub">este bimestre</span></span></a>
@@ -284,6 +285,18 @@ function horarioView(now: Date): string {
   </main>`;
 }
 
+function tramAviso(): string {
+  if (!ALUMNO) return '';
+  const n = pendientesTram(ALUMNO.id);
+  return n ? `<a class="mat-card listo tram-aviso" href="#tramites">${ico('file')}<div><b>Trámites · ${n} ${n === 1 ? 'novedad' : 'novedades'}</b><p>Hay documentos listos para descargar o un mensaje de Secretaría.</p></div><span class="btn btn-ghost">Ver trámites</span></a>` : '';
+}
+
+function tramitesView(): string {
+  if (!ALUMNO) return '';
+  return `${band('file', 'Trámites', esPadre() ? 'Constancias y certificados con seguimiento en línea' : 'Documentos que pidió tu apoderado')}
+  <main class="content overlap stu">${padreBar()}${tramitesPortal(ALUMNO, esPadre())}</main>`;
+}
+
 function comunicadosView(): string {
   return `${band('megaphone', 'Comunicados', 'Avisos del colegio para ti y tu familia')}
   <main class="content overlap stu">${padreBar()}<section class="stack">${COMUNICADOS.map((c) => `<article class="card card-pad comm${c.nuevo ? ' nuevo' : ''}">
@@ -294,14 +307,14 @@ function comunicadosView(): string {
 function start(): void {
   mountShell({ page: 'inicio', search: 'Buscar curso o tarea…', topActions: `<span class="chip blue hide-sm">IV Bimestre</span>` });
   const root = document.getElementById('stu-root')!;
-  const TITLES: Record<string, string> = { inicio: 'Inicio', cursos: 'Mis cursos', tareas: 'Tareas', notas: 'Calificaciones', horario: 'Horario', comunicados: 'Comunicados', carne: 'Carné' };
+  const TITLES: Record<string, string> = { inicio: 'Inicio', cursos: 'Mis cursos', tareas: 'Tareas', notas: 'Calificaciones', horario: 'Horario', comunicados: 'Comunicados', carne: 'Carné', tramites: 'Trámites' };
   const go = () => {
     const h = location.hash.slice(1) || 'inicio';
     const [base, sub] = h.split('-');
     const r = TITLES[base] ? base : 'inicio';
     const now = nowFn();
     root.innerHTML = r === 'cursos' ? cursos() : r === 'tareas' ? tareasView(now, sub ?? 'pendientes') : r === 'notas' ? notasView()
-      : r === 'horario' ? horarioView(now) : r === 'comunicados' ? comunicadosView() : r === 'carne' ? carneView() : inicio(now);
+      : r === 'horario' ? horarioView(now) : r === 'comunicados' ? comunicadosView() : r === 'carne' ? carneView() : r === 'tramites' ? tramitesView() : inicio(now);
     markCurrent(r);
     document.title = `${TITLES[r]} · Estrellas del Futuro`;
     if (base !== 'tareas' || !sub) window.scrollTo(0, 0);
@@ -310,6 +323,10 @@ function start(): void {
     const hj = (e.target as HTMLElement).closest<HTMLElement>('[data-hijo]');
     if (hj) { try { localStorage.setItem('ef-hijo', hj.dataset.hijo!); } catch { /* sin almacenamiento */ } location.reload(); return; }
     if ((e.target as HTMLElement).closest('[data-mat-confirm]')) { confirmarMatricula(); return; }
+    const aviso = (m: string) => { go(); let el = document.querySelector<HTMLElement>('.toast'); if (!el) { el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); } el.textContent = m; el.classList.add('show'); clearTimeout(Number(el.dataset.timer)); el.dataset.timer = String(window.setTimeout(() => el!.classList.remove('show'), 3500)); };
+    if ((e.target as HTMLElement).closest('[data-tram-nueva]') && ALUMNO) { nuevaSolicitud(ALUMNO, aviso); return; }
+    const td = (e.target as HTMLElement).closest<HTMLElement>('[data-tram-doc]'); if (td) { verDocumento(td.dataset.tramDoc!); return; }
+    const tr = (e.target as HTMLElement).closest<HTMLElement>('[data-tram-resp]'); if (tr) { responder(tr.dataset.tramResp!, aviso); return; }
     const fc = (e.target as HTMLElement).closest<HTMLElement>('[data-ficha]');
     if (fc) { verFicha(Number(fc.dataset.ficha)); return; }
     const t = (e.target as HTMLElement).closest<HTMLElement>('[data-toast]');

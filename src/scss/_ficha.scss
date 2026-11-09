@@ -112,3 +112,15 @@ body.ficha-open { overflow: hidden; }
   .fd-req { margin: 0; padding-left: 4mm; font-size: 8.6pt; line-height: 1.6; }
   .fd-lugar { margin: 2mm 0 0; text-align: right; font-size: 9.5pt; font-weight: 600; color: var(--t2); }
   .fd-signs.two { grid-template-columns: repeat(2, 1fr); padding: 11mm 22mm 0; gap: 22mm; } }
+
+// Documentos de Trámites
+.doc-of { position: relative;
+  .fd-texto { font-size: 11pt; line-height: 1.85; margin-top: 4mm; }
+  .fd-signs.two > div { position: relative; }
+  .fd-firma { position: absolute; left: 50%; bottom: 9.5mm; transform: translateX(-50%); max-width: 46mm; max-height: 20mm; object-fit: contain; }
+  .fd-sello-img { position: absolute; left: 50%; bottom: 6mm; transform: translateX(-50%) rotate(-8deg); max-width: 30mm; max-height: 30mm; object-fit: contain; opacity: .9; }
+  .fd-verif { display: flex; align-items: center; gap: 4mm; padding: 3mm 4mm; border: .35mm dashed #9FB2DA; border-radius: 3mm;
+    > div { display: flex; flex-direction: column; gap: .6mm; b { font-size: 9.5pt; color: var(--n); letter-spacing: .02em; } span { font-size: 8pt; color: #33406A; } small { font-size: 7pt; color: var(--t2); } } }
+  .fd-notas.cert th small { display: block; font-size: 6.5pt; font-weight: 600; letter-spacing: 0; color: #8A97BC; }
+  .fd-nota-al { margin: 1.5mm 0 0; font-size: 7.4pt; color: var(--t2); }
+  .fd-anulado { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) rotate(-24deg); font-family: 'Outfit', sans-serif; font-size: 60pt; font-weight: 700; letter-spacing: .1em; color: rgba(198,40,40,.22); border: 2mm solid rgba(198,40,40,.22); padding: 2mm 10mm; border-radius: 4mm; pointer-events: none; z-index: 2; } }

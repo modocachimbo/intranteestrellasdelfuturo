@@ -70,3 +70,22 @@ export function confirmDel(dialog: DialogFn, title: string, items: string[], onY
   d.querySelector('#do-del')!.addEventListener('click', () => { d.close(); onYes(); });
 }
 
+
+/** Buscador de estudiantes (apellido, nombre, DNI o código). `extra` marca filas o las deshabilita con un motivo. */
+export function elegirEstudiante(dialog: DialogFn, titulo: string, users: import('../core/usuarios').Usuario[], detalle: (u: import('../core/usuarios').Usuario) => string,
+  onPick: (u: import('../core/usuarios').Usuario) => void, bloqueo?: (u: import('../core/usuarios').Usuario) => string): void {
+  const dl = dialog(`<div class="dlg-body">
+    <header class="dlg-h">${ico('search')}<div><h2>${esc(titulo)}</h2><p class="muted small">Busca por apellido, nombre, DNI o código.</p></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header>
+    <label class="search-f big">${ico('search', 'ico-sm')}<span class="sr-only">Buscar estudiante</span><input type="search" class="pick-q" placeholder="Ej.: Alvarado o 88888888" autocomplete="off"></label>
+    <ul class="tr-pick" aria-live="polite"></ul>
+  </div>`);
+  const inp = dl.querySelector<HTMLInputElement>('.pick-q')!, list = dl.querySelector<HTMLElement>('.tr-pick')!;
+  const pinta = () => {
+    const q = inp.value.trim().toLowerCase();
+    const us = users.filter((u) => !q || `${u.apellidos} ${u.nombres} ${u.dni} ${u.code}`.toLowerCase().includes(q)).sort((a, b) => a.apellidos.localeCompare(b.apellidos, 'es')).slice(0, 8);
+    list.innerHTML = us.length ? us.map((u) => { const no = bloqueo?.(u) ?? ''; return `<li><button type="button" data-pick="${u.id}"${no ? ' disabled' : ''}><span class="avatar sm t-estudiante">${esc(`${u.nombres[0] ?? ''}${u.apellidos[0] ?? ''}`.toUpperCase())}</span><span><b>${esc(`${u.apellidos}, ${u.nombres}`)}</b><small>${detalle(u)}${no ? ` · <span class="bad-t">${esc(no)}</span>` : ''}</small></span>${ico('chevron', 'ico-sm', 'transform:rotate(-90deg)')}</button></li>`; }).join('') : '<li class="muted small" style="padding:12px">Sin resultados.</li>';
+  };
+  inp.addEventListener('input', pinta);
+  list.addEventListener('click', (e) => { const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-pick]'); if (!b || b.disabled) return; const u = users.find((x) => x.id === b.dataset.pick); dl.close(); if (u) onPick(u); });
+  pinta(); inp.focus();
+}

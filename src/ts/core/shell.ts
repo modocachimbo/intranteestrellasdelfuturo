@@ -54,6 +54,7 @@ export const NAV_ESTUDIANTE: NavGroup[] = [
     { id: 'notas', label: 'Calificaciones', href: 'estudiante.html#notas', icon: 'grade' },
     { id: 'horario', label: 'Horario', href: 'estudiante.html#horario', icon: 'clock' },
     { id: 'carne', label: 'Carné', href: 'estudiante.html#carne', icon: 'idcard' },
+    { id: 'tramites', label: 'Trámites', href: 'estudiante.html#tramites', icon: 'file' },
   ] },
   { title: 'Comunicación', items: [
     { id: 'comunicados', label: 'Comunicados', href: 'estudiante.html#comunicados', icon: 'megaphone', count: 2 },
