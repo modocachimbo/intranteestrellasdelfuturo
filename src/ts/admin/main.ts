@@ -18,6 +18,8 @@ import { TRA_TABS, trasladosController, trasladosView } from './traslados';
 import type { TraState, TraTab } from './traslados';
 import { TRAM_TABS, tramitesController, tramitesView } from './tramites';
 import type { TramState, TramTab } from './tramites';
+import { expedienteController, expedienteView } from './expediente';
+import type { ExpState } from './expediente';
 import type { CarState, CarTab } from './carnes';
 import { USR_TABS, usuariosView } from './views/usuarios';
 import type { UsrState, UsrTab } from './views/usuarios';
@@ -55,6 +57,7 @@ function start(): void {
   const mat: MatState = { tab: 'resumen', sede: 'todas', grado: '', estado: 'todos', q: '', secSede: '' };
   const tra: TraState = { tab: 'resumen', sede: 'todas', tipo: 'todos', q: '' };
   const tram: TramState = { tab: 'bandeja', estado: 'abiertos', tipo: 'todos', q: '', pl: 'estudio' };
+  const exp: ExpState = { sel: '', sub: 'datos', sede: 'todas', seccion: '', estado: 'activo', filtro: '', q: '' };
   const car: CarState = { tab: 'disenar', tipo: 'estudiante', sede: 'todas', seccion: '', q: '', modo: 'ingreso', ultimo: '' };
 
   // Menú: solo los módulos que el rol puede ver
@@ -96,6 +99,9 @@ function start(): void {
     } else if (route.startsWith('matricula')) {
       const m = findModule('matricula')!;
       html = canSee(m, me.role) ? matriculaView(mat, canEdit(m, me.role)) : sinPermisoView();
+    } else if (route.startsWith('expediente')) {
+      const m = findModule('expediente')!;
+      html = canSee(m, me.role) ? expedienteView(exp, canEdit(m, me.role)) : sinPermisoView();
     } else if (route.startsWith('tramites')) {
       const m = findModule('tramites')!;
       html = canSee(m, me.role) ? tramitesView(tram, canEdit(m, me.role)) : sinPermisoView();
@@ -142,10 +148,11 @@ function start(): void {
     const h = decodeURIComponent(location.hash.slice(1)) || 'inicio';
     if (route === 'escala' && h !== 'escala' && escalaDirty()) toast('Dejaste cambios sin guardar en la escala de notas. Se descartaron.');
     if (h !== 'escala') draft = null;
-    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') || h.startsWith('usuarios') || h.startsWith('admision') || h.startsWith('carnes') || h.startsWith('matricula') || h.startsWith('traslados') || h.startsWith('tramites') ? h : 'inicio';
+    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') || h.startsWith('usuarios') || h.startsWith('admision') || h.startsWith('carnes') || h.startsWith('matricula') || h.startsWith('traslados') || h.startsWith('tramites') || h.startsWith('expediente') ? h : 'inicio';
     if (route.startsWith('matricula')) { const tab = route.split('-')[1]; mat.tab = (MAT_TABS.some((t) => t.id === tab) ? tab : 'resumen') as MatTab; }
     if (route.startsWith('traslados')) { const tab = route.split('-')[1]; tra.tab = (TRA_TABS.some((t) => t.id === tab) ? tab : 'resumen') as TraTab; }
     if (route.startsWith('tramites')) { const tab = route.split('-')[1]; const nt = (TRAM_TABS.some((t) => t.id === tab) ? tab : 'bandeja') as TramTab; if (nt !== tram.tab) { tram.q = ''; tram.tipo = 'todos'; } tram.tab = nt; }
+    if (route.startsWith('expediente')) { const id = route.slice('expediente-'.length); if (id !== exp.sel) exp.sub = 'datos'; exp.sel = route.startsWith('expediente-') ? id : ''; }
     if (!route.startsWith('carnes')) carCtl.stop();
     if (route.startsWith('admision')) { const tab = route.split('-')[1]; adm.tab = (ADM_TABS.some((t) => t.id === tab) ? tab : 'resumen') as AdmTab; }
     if (route.startsWith('carnes')) { const tab = route.split('-')[1]; car.tab = (CAR_TABS.some((t) => t.id === tab) ? tab : 'disenar') as CarTab; }
@@ -155,7 +162,7 @@ function start(): void {
       instTab = (INST_TABS.some((t) => t.id === tab) ? tab : 'sedes') as InstTab;
       if (sid) instSede = sid;
     }
-    const id = route.startsWith('institucion') ? 'institucion' : route.startsWith('usuarios') ? 'usuarios' : route.startsWith('admision') ? 'admision' : route.startsWith('carnes') ? 'carnes' : route.startsWith('matricula') ? 'matricula' : route.startsWith('traslados') ? 'traslados' : route.startsWith('tramites') ? 'tramites' : route.replace(/^m-/, '');
+    const id = route.startsWith('institucion') ? 'institucion' : route.startsWith('usuarios') ? 'usuarios' : route.startsWith('admision') ? 'admision' : route.startsWith('carnes') ? 'carnes' : route.startsWith('matricula') ? 'matricula' : route.startsWith('traslados') ? 'traslados' : route.startsWith('tramites') ? 'tramites' : route.startsWith('expediente') ? 'expediente' : route.replace(/^m-/, '');
     markCurrent(id);
     const m = findModule(id);
     document.title = `${route === 'inicio' ? 'Inicio' : m?.name ?? 'Panel'} · Administración · Estrellas del Futuro`;
@@ -241,6 +248,7 @@ function start(): void {
   const matCtl = matriculaController({ me, dialog, render, state: mat, canEdit: () => canEdit(findModule('matricula')!, me.role), abrirAdm: (id) => admCtl.abrir(id) });
   const traCtl = trasladosController({ me, dialog, render, state: tra, canEdit: () => canEdit(findModule('traslados')!, me.role), abrirAdm: (id) => admCtl.abrir(id) });
   const tramCtl = tramitesController({ me, dialog, render, state: tram, canEdit: () => canEdit(findModule('tramites')!, me.role) });
+  const expCtl = expedienteController({ me, dialog, render, state: exp, canEdit: () => canEdit(findModule('expediente')!, me.role) });
   const carCtl = carnesController({ me, dialog, render, state: car });
   const usrCtl = usrController({ me, dialog, render, state: usr, isAdmin: me.role === 'admin' });
 
@@ -254,6 +262,7 @@ function start(): void {
     if (route.startsWith('matricula') && matCtl.change(t)) return;
     if (route.startsWith('traslados') && traCtl.change(t)) return;
     if (route.startsWith('tramites') && tramCtl.change(t)) return;
+    if (route.startsWith('expediente') && expCtl.change(t)) return;
     if (t.id === 'sede-select') { sede = t.value as SedeFiltro; ls.set('ef-sede', sede); if (route === 'inicio') render(); toast(`Mostrando: ${(t as unknown as HTMLSelectElement).selectedOptions[0].text}`); return; }
     if (!draft) return;
     if (t.dataset.modo) { draft.modo[t.dataset.modo as keyof Escala['modo']] = t.value as Escala['modo']['inicial']; render(); return; }
@@ -274,6 +283,7 @@ function start(): void {
     if (route.startsWith('admision') && admCtl.click(t)) return;
     if (route.startsWith('carnes') && carCtl.click(t)) return;
     if (route.startsWith('traslados') && traCtl.click(t)) return;
+    if (route.startsWith('expediente') && expCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
     if (route.startsWith('tramites') && tramCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
     if (route.startsWith('matricula') && matCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
     if (route.startsWith('usuarios') && usrCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
@@ -302,8 +312,14 @@ function start(): void {
     else if (route.startsWith('matricula')) matCtl.input(t);
     else if (route.startsWith('traslados')) traCtl.input(t);
     else if (route.startsWith('tramites')) tramCtl.input(t);
+    else if (route.startsWith('expediente')) expCtl.input(t);
   });
   window.addEventListener('beforeunload', (e) => { if (escalaDirty()) { e.preventDefault(); e.returnValue = ''; } });
+  // Buscador de la barra superior: estudiante por apellido, nombre, DNI o código → Expediente
+  document.querySelector<HTMLInputElement>('#topbar input[type="search"]')?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || !canSee(findModule('expediente')!, me.role)) return;
+    e.preventDefault(); const i = e.target as HTMLInputElement; expCtl.buscar(i.value); i.value = ''; i.blur();
+  });
   window.addEventListener('hashchange', go);
   window.addEventListener('storage', (e) => { if (e.key === 'ef-sesion' && !currentAccount()) location.replace('index.html?salir=1'); });
   go();

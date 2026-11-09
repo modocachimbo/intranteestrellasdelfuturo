@@ -37,7 +37,7 @@ export const BLOQUES: Bloque[] = [
       incluye: ['Matrícula nueva y ratificación en línea', 'Reserva de vacante', 'Control de documentos: DNI, partida, certificados, libreta anterior', 'Contrato, reglamento interno y consentimiento de uso de imagen firmados', 'Exportar al SIAGIE', 'Formar secciones balanceadas con sorteo'] },
     { id: 'traslados', name: 'Traslados y retiros', icon: 'swap', roles: SEC, fase: 1, listo: true, desc: 'Movimientos de estudiantes durante el año.',
       incluye: ['Traslado de entrada: constancia de vacante, resolución, certificados', 'Traslado de salida: constancia, certificados, baja en SIAGIE', 'Cambio de sección y de sede', 'Retiro', 'Antes de cada movimiento: cierre del estado de cuenta y notas al certificado'] },
-    { id: 'expediente', name: 'Expediente', icon: 'folder', roles: [...SEC, 'coordinador'], fase: 1, desc: 'Todo sobre un estudiante en una sola ficha.',
+    { id: 'expediente', name: 'Expediente', icon: 'folder', roles: [...SEC, 'coordinador'], fase: 1, listo: true, desc: 'Todo sobre un estudiante en una sola ficha.',
       incluye: ['Datos personales y foto', 'Apoderados y contactos de emergencia', 'Historial de matrículas, notas y conducta', 'Documentos escaneados'] },
     { id: 'tramites', name: 'Trámites y documentos', icon: 'file', roles: SEC, fase: 1, listo: true, desc: 'Solicitudes de padres y documentos oficiales.',
       incluye: ['Mesa de partes virtual con seguimiento', 'Constancias de estudio, matrícula, conducta y no adeudo', 'Certificados de estudios', 'Firma digital y verificación con QR', 'Plantillas con el logo del colegio'] },
