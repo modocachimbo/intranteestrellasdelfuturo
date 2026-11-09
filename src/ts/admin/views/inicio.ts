@@ -19,7 +19,7 @@ function acciones(r: Role): Accion[] {
   ];
   if (r === 'secretaria') return [
     { label: 'Matricular estudiante', href: '#m-matricula', icon: 'plus', star: true },
-    { label: 'Registrar traslado', href: '#m-traslados', icon: 'swap' },
+    { label: 'Registrar traslado', href: '#traslados', icon: 'swap' },
     { label: 'Emitir constancia', href: '#m-tramites', icon: 'file' },
   ];
   if (r === 'coordinador') return [

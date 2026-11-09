@@ -1,5 +1,5 @@
 /* Acciones de Institución: crear, editar y eliminar con sus reglas, deshacer, respaldo y logo. */
-import { TIPOS_AULA, clone, getInst, gradoInfo, problemasCalendario, repetido, resetInst, saveInst, seccionLabel, siguienteLetra, uid } from '../core/institucion';
+import { TIPOS_AULA, clone, getInst, gradoInfo, hoyISO, problemasCalendario, repetido, resetInst, saveInst, seccionLabel, siguienteLetra, uid } from '../core/institucion';
 import type { Institucion } from '../core/institucion';
 import { ROLE_NAME } from '../core/session';
 import { confirmDel as uiConfirm, form as uiForm } from './ui';
@@ -313,7 +313,7 @@ export function instController(ctx: InstCtx) {
     const blob = new Blob([JSON.stringify(getInst(), null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `institucion-respaldo-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `institucion-respaldo-${hoyISO()}.json`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     toast('Respaldo descargado.');

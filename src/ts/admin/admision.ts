@@ -5,7 +5,7 @@ import { fichaHtml as fichaDoc, mostrarFicha, numeroMatricula } from '../core/fi
 import { getMat, saveMat } from '../core/matricula';
 import type { AdmisionStore, Etapa, Postulante } from '../core/admision';
 import { ico } from '../core/icons';
-import { clone, getInst, gradoInfo, seccionLabel } from '../core/institucion';
+import { clone, getInst, gradoInfo, hoyISO, seccionLabel } from '../core/institucion';
 import type { Institucion } from '../core/institucion';
 import { ROLE_NAME } from '../core/session';
 import type { Account } from '../core/session';
@@ -255,7 +255,7 @@ export function admisionController(ctx: { me: Account; dialog: DialogFn; render:
       { k: 'medio', label: 'Medio de pago', type: 'select', options: ['Efectivo', 'Yape', 'Plin', 'Transferencia', 'Tarjeta (POS)'].map((x) => [x, x]), half: true },
       { k: 'recibo', label: 'N.º de boleta o recibo', type: 'text', max: 20, placeholder: 'B001-000123' },
     ], { monto: String(d.proceso.costo), medio: 'Efectivo' }, (v) => {
-      commit((x) => { const y = x.postulantes.find((z) => z.id === p.id)!; y.pago = { fecha: new Date().toISOString().slice(0, 10), monto: Number(v.monto), medio: String(v.medio), recibo: String(v.recibo ?? '') }; if (y.etapa === 'interesado') y.etapa = 'postulante'; nota(y, `Pagó S/ ${v.monto} (${v.medio}). Pasa a postulante.`); }, `Pago registrado: ${pNombre(p)} ahora es postulante.`);
+      commit((x) => { const y = x.postulantes.find((z) => z.id === p.id)!; y.pago = { fecha: hoyISO(), monto: Number(v.monto), medio: String(v.medio), recibo: String(v.recibo ?? '') }; if (y.etapa === 'interesado') y.etapa = 'postulante'; nota(y, `Pagó S/ ${v.monto} (${v.medio}). Pasa a postulante.`); }, `Pago registrado: ${pNombre(p)} ahora es postulante.`);
       return null;
     }, 'Registrar pago', `${pNombre(p)} · al pagar pasa a Postulante`);
   }

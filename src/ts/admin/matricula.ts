@@ -2,7 +2,7 @@
    (mantener, balancear o sortear), documentos firmados, pagos y exportación de la nómina para el SIAGIE. */
 import { getAdm, pNombre } from '../core/admision';
 import { ico } from '../core/icons';
-import { clone, getInst, seccionLabel } from '../core/institucion';
+import { clone, getInst, hoyISO, seccionLabel } from '../core/institucion';
 import type { Institucion } from '../core/institucion';
 import { DOCS_MAT, ESTADOS_MAT, MOTIVOS, deuda2026, docsFaltanMat, getMat, gradoTxt, resetMat, saveMat } from '../core/matricula';
 import type { EstadoMat, MatStore, RegMat } from '../core/matricula';
@@ -244,7 +244,7 @@ export function matriculaController(ctx: { me: Account; dialog: DialogFn; render
       commit((x) => {
         const y = x.regs[id];
         y.grado = String(v.grado); y.seccion = sec ? sec.id : ''; y.docs = docs; y.estado = 'matriculado'; y.at = new Date().toISOString();
-        y.pago = { fecha: new Date().toISOString().slice(0, 10), monto: Number(v.monto) + yaPagado, medio: String(v.medio), recibo: String(v.recibo ?? ''), tipo: 'matricula' };
+        y.pago = { fecha: hoyISO(), monto: Number(v.monto) + yaPagado, medio: String(v.medio), recibo: String(v.recibo ?? ''), tipo: 'matricula' };
         if (deuda) y.autorizaDeuda = by();
       }, `${fullName(u)} quedó matriculado para ${d.cfg.anio}${sec ? ` en ${seccionLabel(inst, sec)}` : ''}.`);
       return null;
@@ -258,7 +258,7 @@ export function matriculaController(ctx: { me: Account; dialog: DialogFn; render
       { k: 'medio', label: 'Medio', type: 'select', options: ['Efectivo', 'Yape', 'Plin', 'Transferencia'].map((x) => [x, x]), half: true },
       { k: 'recibo', label: 'N.º de boleta', type: 'text', max: 20 },
     ], { monto: String(d.cfg.reserva), medio: 'Efectivo' }, (v) => {
-      commit((x) => { const y = x.regs[id]; y.estado = 'reserva'; y.pago = { fecha: new Date().toISOString().slice(0, 10), monto: Number(v.monto), medio: String(v.medio), recibo: String(v.recibo ?? ''), tipo: 'reserva' }; }, `Vacante reservada: ${fullName(u)}.`);
+      commit((x) => { const y = x.regs[id]; y.estado = 'reserva'; y.pago = { fecha: hoyISO(), monto: Number(v.monto), medio: String(v.medio), recibo: String(v.recibo ?? ''), tipo: 'reserva' }; }, `Vacante reservada: ${fullName(u)}.`);
       return null;
     }, 'Reservar', 'Se descuenta de la cuota de matrícula.');
   }

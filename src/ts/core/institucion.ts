@@ -160,3 +160,5 @@ export function problemasCalendario(d: Institucion): string[] {
   });
   return out;
 }
+/** Fecha de hoy en la hora local (Perú), no en UTC: de noche toISOString() ya daría el día siguiente. */
+export const hoyISO = (d = new Date()) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);

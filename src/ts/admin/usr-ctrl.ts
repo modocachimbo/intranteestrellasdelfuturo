@@ -2,7 +2,7 @@
    credenciales, importar y exportar. Reglas: siempre queda un administrador activo; nadie se bloquea o elimina a sí mismo;
    Dirección no puede crear ni tocar cuentas de administrador. */
 import { ico } from '../core/icons';
-import { getInst } from '../core/institucion';
+import { getInst, hoyISO } from '../core/institucion';
 import type { Institucion } from '../core/institucion';
 import { ROLE_NAME, hasOwnPassword, resetPassword } from '../core/session';
 import type { Account } from '../core/session';
@@ -401,8 +401,8 @@ export function usrController(ctx: UsrCtx) {
       else if (a === 'bulk-print') printCards([...st.sel].map((x) => d.users.find((y) => y.id === x)).filter((x): x is Usuario => !!x), getInst());
       else if (a === 'bulk-clear') { st.sel.clear(); render(); }
       else if (a === 'clear-filters') { Object.assign(st, { tipo: 'todos', estado: 'todos', sede: 'todas', seccion: '', q: '', page: 1 }); render(); }
-      else if (a === 'export') exportar(filtrar(d, st, getInst()), `cuentas-${new Date().toISOString().slice(0, 10)}.csv`);
-      else if (a === 'export-tipo') { const t = b.dataset.tipo!; exportar(d.users.filter((x) => t === 'todos' || x.tipo === t), `cuentas-${t}-${new Date().toISOString().slice(0, 10)}.csv`); }
+      else if (a === 'export') exportar(filtrar(d, st, getInst()), `cuentas-${hoyISO()}.csv`);
+      else if (a === 'export-tipo') { const t = b.dataset.tipo!; exportar(d.users.filter((x) => t === 'todos' || x.tipo === t), `cuentas-${t}-${hoyISO()}.csv`); }
       else if (a === 'template') template(st.importTipo);
       else if (a === 'imp-cancel') { st.importRows = null; render(); }
       else if (a === 'imp-run') runImport();

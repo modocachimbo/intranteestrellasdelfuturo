@@ -14,6 +14,8 @@ import type { AdmState, AdmTab } from './admision';
 import { CAR_TABS, carnesController, carnesView } from './carnes';
 import { MAT_TABS, matriculaController, matriculaView } from './matricula';
 import type { MatState, MatTab } from './matricula';
+import { TRA_TABS, trasladosController, trasladosView } from './traslados';
+import type { TraState, TraTab } from './traslados';
 import type { CarState, CarTab } from './carnes';
 import { USR_TABS, usuariosView } from './views/usuarios';
 import type { UsrState, UsrTab } from './views/usuarios';
@@ -49,6 +51,7 @@ function start(): void {
   let instSede = '';
   const adm: AdmState = { tab: 'resumen', sede: 'todas', grado: '', q: '' };
   const mat: MatState = { tab: 'resumen', sede: 'todas', grado: '', estado: 'todos', q: '', secSede: '' };
+  const tra: TraState = { tab: 'resumen', sede: 'todas', tipo: 'todos', q: '' };
   const car: CarState = { tab: 'disenar', tipo: 'estudiante', sede: 'todas', seccion: '', q: '', modo: 'ingreso', ultimo: '' };
 
   // Menú: solo los módulos que el rol puede ver
@@ -90,6 +93,9 @@ function start(): void {
     } else if (route.startsWith('matricula')) {
       const m = findModule('matricula')!;
       html = canSee(m, me.role) ? matriculaView(mat, canEdit(m, me.role)) : sinPermisoView();
+    } else if (route.startsWith('traslados')) {
+      const m = findModule('traslados')!;
+      html = canSee(m, me.role) ? trasladosView(tra, canEdit(m, me.role)) : sinPermisoView();
     } else if (route.startsWith('admision') || route.startsWith('carnes')) {
       const id = route.startsWith('admision') ? 'admision' : 'carnes';
       const m = findModule(id)!;
@@ -130,8 +136,9 @@ function start(): void {
     const h = decodeURIComponent(location.hash.slice(1)) || 'inicio';
     if (route === 'escala' && h !== 'escala' && escalaDirty()) toast('Dejaste cambios sin guardar en la escala de notas. Se descartaron.');
     if (h !== 'escala') draft = null;
-    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') || h.startsWith('usuarios') || h.startsWith('admision') || h.startsWith('carnes') || h.startsWith('matricula') ? h : 'inicio';
+    route = h === 'inicio' || h === 'escala' || h.startsWith('m-') || h.startsWith('institucion') || h.startsWith('usuarios') || h.startsWith('admision') || h.startsWith('carnes') || h.startsWith('matricula') || h.startsWith('traslados') ? h : 'inicio';
     if (route.startsWith('matricula')) { const tab = route.split('-')[1]; mat.tab = (MAT_TABS.some((t) => t.id === tab) ? tab : 'resumen') as MatTab; }
+    if (route.startsWith('traslados')) { const tab = route.split('-')[1]; tra.tab = (TRA_TABS.some((t) => t.id === tab) ? tab : 'resumen') as TraTab; }
     if (!route.startsWith('carnes')) carCtl.stop();
     if (route.startsWith('admision')) { const tab = route.split('-')[1]; adm.tab = (ADM_TABS.some((t) => t.id === tab) ? tab : 'resumen') as AdmTab; }
     if (route.startsWith('carnes')) { const tab = route.split('-')[1]; car.tab = (CAR_TABS.some((t) => t.id === tab) ? tab : 'disenar') as CarTab; }
@@ -141,7 +148,7 @@ function start(): void {
       instTab = (INST_TABS.some((t) => t.id === tab) ? tab : 'sedes') as InstTab;
       if (sid) instSede = sid;
     }
-    const id = route.startsWith('institucion') ? 'institucion' : route.startsWith('usuarios') ? 'usuarios' : route.startsWith('admision') ? 'admision' : route.startsWith('carnes') ? 'carnes' : route.startsWith('matricula') ? 'matricula' : route.replace(/^m-/, '');
+    const id = route.startsWith('institucion') ? 'institucion' : route.startsWith('usuarios') ? 'usuarios' : route.startsWith('admision') ? 'admision' : route.startsWith('carnes') ? 'carnes' : route.startsWith('matricula') ? 'matricula' : route.startsWith('traslados') ? 'traslados' : route.replace(/^m-/, '');
     markCurrent(id);
     const m = findModule(id);
     document.title = `${route === 'inicio' ? 'Inicio' : m?.name ?? 'Panel'} · Administración · Estrellas del Futuro`;
@@ -225,6 +232,7 @@ function start(): void {
   const inst = instController({ me, dialog, render, sede: () => instSede });
   const admCtl = admisionController({ me, dialog, render, state: adm, canEdit: () => canEdit(findModule('admision')!, me.role) });
   const matCtl = matriculaController({ me, dialog, render, state: mat, canEdit: () => canEdit(findModule('matricula')!, me.role), abrirAdm: (id) => admCtl.abrir(id) });
+  const traCtl = trasladosController({ me, dialog, render, state: tra, canEdit: () => canEdit(findModule('traslados')!, me.role), abrirAdm: (id) => admCtl.abrir(id) });
   const carCtl = carnesController({ me, dialog, render, state: car });
   const usrCtl = usrController({ me, dialog, render, state: usr, isAdmin: me.role === 'admin' });
 
@@ -236,6 +244,7 @@ function start(): void {
     if (route.startsWith('admision') && admCtl.change(t)) return;
     if (route.startsWith('carnes') && carCtl.change(t)) return;
     if (route.startsWith('matricula') && matCtl.change(t)) return;
+    if (route.startsWith('traslados') && traCtl.change(t)) return;
     if (t.id === 'sede-select') { sede = t.value as SedeFiltro; ls.set('ef-sede', sede); if (route === 'inicio') render(); toast(`Mostrando: ${(t as unknown as HTMLSelectElement).selectedOptions[0].text}`); return; }
     if (!draft) return;
     if (t.dataset.modo) { draft.modo[t.dataset.modo as keyof Escala['modo']] = t.value as Escala['modo']['inicial']; render(); return; }
@@ -255,6 +264,7 @@ function start(): void {
     if (route.startsWith('institucion') && inst.click(t)) return;
     if (route.startsWith('admision') && admCtl.click(t)) return;
     if (route.startsWith('carnes') && carCtl.click(t)) return;
+    if (route.startsWith('traslados') && traCtl.click(t)) return;
     if (route.startsWith('matricula') && matCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
     if (route.startsWith('usuarios') && usrCtl.click(t)) { if (t.closest('a[href="#"]')) e.preventDefault(); return; }
     if (t.closest('[data-open="password"]')) { openPassword(); return; }
@@ -280,6 +290,7 @@ function start(): void {
     else if (route.startsWith('admision')) admCtl.input(t);
     else if (route.startsWith('carnes')) carCtl.input(t);
     else if (route.startsWith('matricula')) matCtl.input(t);
+    else if (route.startsWith('traslados')) traCtl.input(t);
   });
   window.addEventListener('beforeunload', (e) => { if (escalaDirty()) { e.preventDefault(); e.returnValue = ''; } });
   window.addEventListener('hashchange', go);
