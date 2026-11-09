@@ -49,6 +49,14 @@ const BASE: Record<TipoTram, Plantilla> = {
   otro: { titulo: 'Solicitud general', prefijo: 'FUT', costo: 0, dias: 3, activo: true, cuerpo: '' },
 };
 
+/** Captura del pago que sube el apoderado desde el portal. */
+export interface Voucher { img: string; medio: string; operacion: string; monto: number; at: string; estado: 'por_revisar' | 'aceptado' | 'rechazado'; motivo?: string }
+/** Cuentas del colegio que ve el apoderado para pagar. */
+export interface Banco { banco: string; cuenta: string; cci: string }
+export interface Cuentas { titular: string; yape: string; plin: string; yapeQr?: string; bancos: Banco[]; nota: string; ejemplo?: boolean }
+export const MEDIOS_PORTAL = ['Yape', 'Plin', 'Transferencia', 'Depósito en agente'];
+const CUENTAS_BASE: Cuentas = { titular: 'IEP Las Estrellas del Futuro', yape: '952712898', plin: '952712898', bancos: [{ banco: 'BCP', cuenta: '000-0000000-0-00', cci: '002-000-000000000000-00' }], nota: 'En el mensaje del Yape o la transferencia escribe el nombre del estudiante.', ejemplo: true };
+
 export interface Evento { at: string; by: string; texto: string; estado?: EstadoTram; padre?: boolean }
 export interface Solicitud {
   id: string; exp: string; tipo: TipoTram; canal: Canal; estado: EstadoTram;
@@ -56,6 +64,7 @@ export interface Solicitud {
   solicitante: { nombre: string; dni: string; parentesco: string; celular: string; userId?: string };
   detalle: string; at: string; vence: string;
   pago?: { monto: number; medio: string; recibo: string; fecha: string };
+  voucher?: Voucher;
   docId?: string; respuesta?: string;
   eventos: Evento[];
 }
@@ -68,7 +77,7 @@ export interface DocEmitido {
   anulado?: { at: string; by: string; motivo: string };
 }
 export interface Firma { firma?: string; sello?: string }
-export interface TramStore { version: 1; solicitudes: Solicitud[]; docs: DocEmitido[]; plantillas: Record<TipoTram, Plantilla>; seq: Record<string, number>; firma: Firma }
+export interface TramStore { version: 1; solicitudes: Solicitud[]; docs: DocEmitido[]; plantillas: Record<TipoTram, Plantilla>; seq: Record<string, number>; firma: Firma; cuentas: Cuentas }
 
 const KEY = 'ef-tramites';
 let n = 0;
@@ -94,7 +103,7 @@ function semilla(): TramStore {
   const est = (code: string) => us.find((u) => u.code === code);
   const apoDe = (id: string) => us.find((a) => a.tipo === 'apoderado' && (a.hijos ?? []).includes(id));
   const plantillas = JSON.parse(JSON.stringify(BASE)) as Record<TipoTram, Plantilla>;
-  const s: TramStore = { version: 1, solicitudes: [], docs: [], plantillas, seq: { EXP: 0 }, firma: {} };
+  const s: TramStore = { version: 1, solicitudes: [], docs: [], plantillas, seq: { EXP: 0 }, firma: {}, cuentas: JSON.parse(JSON.stringify(CUENTAS_BASE)) as Cuentas };
   const add = (code: string, tipo: TipoTram, estado: EstadoTram, at: string, canal: Canal, detalle: string, extra: Partial<Solicitud> = {}) => {
     const u = est(code); if (!u) return;
     const a = apoDe(u.id);
@@ -136,6 +145,7 @@ export function getTram(): TramStore {
   d ??= semilla();
   for (const k of Object.keys(BASE) as TipoTram[]) d.plantillas[k] ??= JSON.parse(JSON.stringify(BASE[k])) as Plantilla;
   d.firma ??= {};
+  d.cuentas ??= JSON.parse(JSON.stringify(CUENTAS_BASE)) as Cuentas;
   return d;
 }
 export function saveTram(d: TramStore): boolean { try { localStorage.setItem(KEY, JSON.stringify(d)); return true; } catch { return false; } }
@@ -144,6 +154,8 @@ export const plantillaBase = (t: TipoTram) => JSON.parse(JSON.stringify(BASE[t])
 
 export const tipoTram = (t: TipoTram) => TIPOS_TRAM.find((x) => x.id === t)!;
 export const estadoTram = (e: EstadoTram) => ESTADOS_TRAM.find((x) => x.id === e)!;
+/** Falta pagar (tiene costo, no hay pago confirmado y está abierta). */
+export const debePagar = (d: TramStore, s: Solicitud) => !!d.plantillas[s.tipo].costo && !s.pago && abiertos(s);
 export const abiertos = (s: Solicitud) => s.estado === 'recibido' || s.estado === 'revision' || s.estado === 'observado';
 
 /** Vence según los días hábiles del trámite (se recalcula al leer, por si cambió el plazo). */

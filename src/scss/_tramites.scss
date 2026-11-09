@@ -27,3 +27,32 @@
   &:has(input:checked) { border-color: var(--azul-600); background: var(--azul-50, #EEF3FC); box-shadow: 0 0 0 3px rgba(30,79,196,.12); }
   &:has(input:focus-visible) { outline: 3px solid var(--azul-200); } }
 a.tram-aviso { text-decoration: none; color: inherit; border-color: #A8DDBF; &:hover { text-decoration: none; box-shadow: var(--sombra-2); } > div { flex: 1; min-width: 200px; } p { margin: 2px 0 0; } }
+
+// Pago con captura (portal) y revisión (panel)
+dialog.stu-dlg { max-height: calc(100vh - 24px); overflow-y: auto; }
+.tp-gratis { margin: 0; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #F3FBF6; color: var(--exito-700); font-size: 13.5px; }
+.tp-pago:empty { display: none; }
+.tp-pago:not(:has(.tp-gratis)) { display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 16px; border: 1.5px dashed var(--azul-200); background: #FAFBFF; }
+.tp-pago-h { display: flex; align-items: center; justify-content: space-between; b { font-size: 15px; } }
+.tp-monto { font-family: var(--f-titulo); font-size: 22px; font-weight: 700; color: var(--azul-700); }
+.tp-cuentas { display: flex; flex-direction: column; gap: 6px; }
+.tp-cta { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: #fff; border: 1px solid var(--borde-suave);
+  > span { flex: 1; min-width: 0; display: flex; flex-direction: column; small { font-size: 11.5px; font-weight: 700; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .05em; } b { font-size: 16px; letter-spacing: .02em; word-break: break-all; } small + b + small { text-transform: none; letter-spacing: 0; font-weight: 600; } }
+  img { width: 72px; height: 72px; object-fit: contain; border-radius: 8px; flex: none; }
+  &.yape { border-left: 4px solid #742284; } &.plin { border-left: 4px solid #00B5C8; } &.banco { border-left: 4px solid var(--azul-600); } }
+.tp-copy { flex: none; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--borde); background: #fff; display: grid; place-items: center; cursor: pointer; color: var(--tinta-2);
+  &:hover { background: var(--fondo); } &.ok { background: #E7F6EE; border-color: #A8DDBF; color: var(--exito-700); } }
+.tp-titular { margin: 0; font-size: 12.5px; color: var(--tinta-2); }
+.tp-sube { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; .field-col { margin: 0; } .field-col[hidden] { display: none; } }
+.tp-file { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; border: 1.5px dashed var(--azul-300, #9FB2DA); background: #fff; cursor: pointer;
+  input { position: absolute; opacity: 0; width: 1px; height: 1px; } &[hidden] { display: none; }
+  .tp-file-in { width: 56px; height: 56px; flex: none; border-radius: 10px; background: var(--azul-50, #EEF3FC); display: grid; place-items: center; color: var(--azul-600); overflow: hidden; img { width: 100%; height: 100%; object-fit: cover; } }
+  b { display: block; font-size: 14px; } small { display: block; font-size: 12px; color: var(--tinta-3); }
+  &.ok { border-style: solid; border-color: #A8DDBF; background: #F3FBF6; b { color: var(--exito-700); } }
+  &:has(input:focus-visible) { outline: 3px solid var(--azul-200); } }
+.tp-pago-est { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 12px; border-radius: 14px; background: #FFFBEA; border: 1px solid var(--amarillo-400, #FFD43B); font-size: 13.5px;
+  > span { flex: 1; min-width: 200px; } .ico { flex: none; color: #8A5A00; }
+  &.rev { background: var(--azul-50, #EEF3FC); border-color: var(--azul-200); .ico { color: var(--azul-600); } }
+  &.mal { background: #FFF6F6; border-color: #F3B4B6; .ico { color: var(--peligro-700); } } }
+.tp-captura-big { display: block; max-width: 100%; max-height: 70vh; margin: 0 auto; border-radius: 12px; border: 1px solid var(--borde-suave); }
+@media (max-width: 480px) { .tp-sube { grid-template-columns: 1fr; } }

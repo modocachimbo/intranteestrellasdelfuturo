@@ -9,12 +9,13 @@ import type { Institucion } from '../core/institucion';
 import type { Account } from '../core/session';
 import { ROLE_NAME } from '../core/session';
 import {
-  ESTADOS_TRAM, PLACEHOLDERS, TIPOS_TRAM, abiertos, estadoTram, getTram, nuevoExp, plantillaBase, resetTram, saveTram, tid, tipoTram, venceDe,
+  ESTADOS_TRAM, PLACEHOLDERS, TIPOS_TRAM, abiertos, debePagar, estadoTram, getTram, nuevoExp, plantillaBase, resetTram, saveTram, tid, tipoTram, venceDe,
 } from '../core/tramites';
 import type { DocEmitido, EstadoTram, Solicitud, TipoTram, TramStore } from '../core/tramites';
 import { getUsuarios } from '../core/usuarios';
 import type { Usuario } from '../core/usuarios';
 import { confirmDel, elegirEstudiante, esc, form, toast } from './ui';
+import { reducirImagen } from '../core/imagen';
 import type { DialogFn } from './ui';
 
 export const TRAM_TABS = [
@@ -51,7 +52,7 @@ function bandeja(d: TramStore, st: TramState, inst: Institucion, canEdit: boolea
   const us = getUsuarios().users;
   const chips: [string, string, number][] = [['abiertos', 'Por atender', n((s) => abiertos(s) || s.estado === 'listo')], ...ESTADOS_TRAM.map((e) => [e.id, e.name, n((s) => s.estado === e.id)] as [string, string, number]), ['todos', 'Todos', all.length]];
   return `<section class="kpis adm-kpis">
-    <div class="card kpi adm-kpi"><span class="ico-tile">${ico('megaphone')}</span><span class="kpi-body"><span class="lbl">Nuevos</span><span class="num">${n((s) => s.estado === 'recibido')}</span><span class="sub">${n((s) => s.estado === 'recibido' && s.canal === 'Portal')} desde el portal</span></span></div>
+    <div class="card kpi adm-kpi"><span class="ico-tile">${ico('megaphone')}</span><span class="kpi-body"><span class="lbl">Nuevos</span><span class="num">${n((s) => s.estado === 'recibido')}</span><span class="sub">${n((s) => s.voucher?.estado === 'por_revisar' && !s.pago)} capturas de pago por revisar</span></span></div>
     <div class="card kpi adm-kpi"><span class="ico-tile y">${ico('clock')}</span><span class="kpi-body"><span class="lbl">En revisión</span><span class="num">${n((s) => s.estado === 'revision')}</span><span class="sub">${n((s) => s.estado === 'observado')} observados</span></span></div>
     <div class="card kpi adm-kpi"><span class="ico-tile r">${ico('bell')}</span><span class="kpi-body"><span class="lbl">Vencen hoy o vencidos</span><span class="num">${n((s) => abiertos(s) && venceDe(inst, d, s) <= hoy)}</span><span class="sub">según el plazo de cada trámite</span></span></div>
     <div class="card kpi adm-kpi"><span class="ico-tile g">${ico('checkc')}</span><span class="kpi-body"><span class="lbl">Listos por entregar</span><span class="num">${n((s) => s.estado === 'listo')}</span><span class="sub">${d.docs.filter((x) => x.fecha.slice(0, 7) === hoy.slice(0, 7)).length} documentos este mes</span></span></div>
@@ -71,7 +72,7 @@ function bandeja(d: TramStore, st: TramState, inst: Institucion, canEdit: boolea
       <td class="det"><b>${esc(`${s.est.nombres.split(' ')[0]} ${s.est.apellidos}`)}</b><small class="muted" style="display:block">${esc(secTxt(inst, u))}</small></td>
       <td class="det">${esc(s.solicitante.nombre)}<small class="muted" style="display:block">${esc(s.solicitante.parentesco)}</small></td>
       <td class="det">${venceTag(inst, d, s)}</td>
-      <td class="est">${chipE(s.estado)}${s.pago || !d.plantillas[s.tipo].costo ? '' : '<small class="warn-t">Pago pendiente</small>'}</td>
+      <td class="est">${chipE(s.estado)}${!debePagar(d, s) ? '' : s.voucher?.estado === 'por_revisar' ? '<small class="tm-cap">Captura por revisar</small>' : '<small class="warn-t">Pago pendiente</small>'}</td>
       <td class="row-actions">${s.docId ? `<button type="button" class="icon-btn sm" data-tm-doc="${s.docId}" aria-label="Ver documento" title="Ver documento">${ico('file', 'ico-sm')}</button>` : ''}<button type="button" class="${abiertos(s) && canEdit ? 'btn btn-primary sm' : 'icon-btn sm'}" data-tm-open="${s.id}"${abiertos(s) && canEdit ? '' : ' aria-label="Ver" title="Ver"'}>${abiertos(s) && canEdit ? 'Atender' : ico('dots', 'ico-sm')}</button></td>
     </tr>`; }).join('')}</tbody></table></div>` : `<div class="empty-state">${ico('checkc', 'ico-lg')}<h2>Nada por aquí</h2><p class="muted">No hay solicitudes con esos filtros.</p></div>`}
   </section>`;
@@ -129,6 +130,22 @@ function plantillas(d: TramStore, st: TramState, canEdit: boolean): string {
             <span class="pl-chips">${PLACEHOLDERS.map(([k, l]) => `<button type="button" class="chip gray" data-tm-ph="${k}"${dis} title="${esc(l)}">{${k}}</button>`).join('')}</span></label>` : '<p class="muted small">Esta solicitud no genera documento: Secretaría responde con un mensaje que el apoderado ve en su portal.</p>'}
         </div>
         ${canEdit ? `<footer class="dlg-f">${t.doc ? `<button type="button" class="btn btn-ghost" data-tm="pl-preview">${ico('eye', 'ico-sm')}Vista previa</button>` : ''}<button type="button" class="btn btn-primary" data-tm="pl-save">Guardar plantilla</button></footer>` : ''}
+      </section>
+      <section class="card card-pad" id="cta-form"><div class="card-head"><h2>Cuentas para pagos</h2></div>
+        <p class="card-sub">Los padres las ven al pedir un trámite con costo, para pagar y subir la captura.</p>
+        ${d.cuentas.ejemplo ? `<section class="sec-alert warn" role="note">${ico('bell')}<div><b>Son datos de ejemplo.</b> Reemplázalos por el Yape y las cuentas reales del colegio antes de usarlo.</div></section>` : ''}
+        <div class="form-grid">
+          <label class="field-col"><span>Titular (a nombre de)</span><input class="input" id="cta-titular" maxlength="80" value="${esc(d.cuentas.titular)}"${dis}></label>
+          <label class="field-col half"><span>Yape (celular)</span><input class="input" id="cta-yape" inputmode="numeric" maxlength="9" value="${esc(d.cuentas.yape)}"${dis}></label>
+          <label class="field-col half"><span>Plin (celular)</span><input class="input" id="cta-plin" inputmode="numeric" maxlength="9" value="${esc(d.cuentas.plin)}"${dis}></label>
+          ${[0, 1].map((i) => { const b = d.cuentas.bancos[i] ?? { banco: '', cuenta: '', cci: '' }; return `<div class="cta-banco"><label class="field-col"><span>Banco ${i + 1}</span><select class="input" id="cta-b${i}"${dis}>${['', 'BCP', 'BBVA', 'Interbank', 'Scotiabank', 'Banco de la Nación', 'BanBif', 'Caja Huancayo', 'Caja Sullana', 'Otro'].map((x) => `<option value="${x}"${x === b.banco ? ' selected' : ''}>${x || '—'}</option>`).join('')}</select></label>
+            <label class="field-col"><span>N.º de cuenta</span><input class="input" id="cta-c${i}" maxlength="24" value="${esc(b.cuenta)}"${dis}></label>
+            <label class="field-col"><span>CCI</span><input class="input" id="cta-i${i}" maxlength="26" value="${esc(b.cci)}"${dis}></label></div>`; }).join('')}
+          <label class="field-col"><span>Indicación para los padres</span><input class="input" id="cta-nota" maxlength="160" value="${esc(d.cuentas.nota)}"${dis}></label>
+        </div>
+        <div class="tm-firma cta-qr"><span class="tm-firma-img">${d.cuentas.yapeQr ? `<img src="${d.cuentas.yapeQr}" alt="QR de Yape">` : '<span class="muted small">Sin QR de Yape</span>'}</span>
+          ${canEdit ? `<label class="btn btn-ghost sm">${ico('upload', 'ico-sm')}${d.cuentas.yapeQr ? 'Cambiar' : 'Subir'} QR de Yape<input type="file" accept="image/*" data-tm-qr hidden></label>${d.cuentas.yapeQr ? '<button type="button" class="link-btn" data-tm="qr-quitar">Quitar</button>' : ''}` : ''}</div>
+        ${canEdit ? '<footer class="dlg-f"><button type="button" class="btn btn-primary" data-tm="cuentas-save">Guardar cuentas</button></footer>' : ''}
       </section>
       <section class="card card-pad"><div class="card-head"><h2>Firma y sello</h2></div>
         <p class="card-sub">Sube la firma de ${esc(getInst().datos.firma)} y el sello del colegio (foto o escaneo en PNG con fondo blanco o transparente). Aparecen en todos los documentos.</p>
@@ -241,7 +258,10 @@ export function tramitesController(ctx: { me: Account; dialog: DialogFn; render:
           <div><dt>Detalle</dt><dd>${esc(s.detalle)}</dd></div>
           <div><dt>Recibido</dt><dd>${fechaHora(s.at)} · ${esc(s.canal)}</dd></div>
           <div><dt>Plazo</dt><dd>${venceTag(inst, d, s)}<small class="muted" style="display:block">${p.dias} día${p.dias === 1 ? '' : 's'} hábil${p.dias === 1 ? '' : 'es'}</small></dd></div>
-          <div><dt>Pago</dt><dd>${!p.costo ? 'Gratuito' : s.pago ? `<span class="ok-t">Pagado</span> · ${soles(s.pago.monto)} · ${esc(s.pago.medio)}${s.pago.recibo ? ` · ${esc(s.pago.recibo)}` : ''}` : `<span class="warn-t">Pendiente: ${soles(p.costo)}</span>${canEdit && abierto ? ' <button type="button" class="btn btn-soft sm" data-e="pagar">Registrar pago</button>' : ''}`}</dd></div>
+          <div><dt>Pago</dt><dd>${!p.costo ? 'Gratuito' : s.pago ? `<span class="ok-t">Pagado</span> · ${soles(s.pago.monto)} · ${esc(s.pago.medio)}${s.pago.recibo ? ` · ${esc(s.pago.recibo)}` : ''}` : `<span class="warn-t">Pendiente: ${soles(p.costo)}</span>${canEdit && abierto ? ' <button type="button" class="btn btn-soft sm" data-e="pagar">Registrar pago en caja</button>' : ''}`}
+            ${s.voucher ? `<div class="tm-voucher ${s.voucher.estado}"><button type="button" class="tm-v-img" data-e="vervoucher" aria-label="Ver captura en grande"><img src="${s.voucher.img}" alt="Captura del pago"></button>
+              <div><b>${s.voucher.estado === 'por_revisar' ? 'Captura por revisar' : s.voucher.estado === 'aceptado' ? 'Captura confirmada' : 'Captura rechazada'}</b><small>${soles(s.voucher.monto)} · ${esc(s.voucher.medio)}${s.voucher.operacion ? ` · op. ${esc(s.voucher.operacion)}` : ''} · ${fechaHora(s.voucher.at)}</small>${s.voucher.motivo ? `<small>${esc(s.voucher.motivo)}</small>` : ''}
+              ${canEdit && s.voucher.estado === 'por_revisar' && !s.pago ? '<span class="tm-v-act"><button type="button" class="btn btn-primary sm" data-e="vok">Confirmar pago</button><button type="button" class="btn btn-ghost sm danger-t" data-e="vno">Rechazar</button></span>' : ''}</div></div>` : ''}</dd></div>
           ${s.respuesta ? `<div><dt>Respuesta</dt><dd>${esc(s.respuesta)}</dd></div>` : ''}
         </dl>
         ${imp && abierto ? `<section class="sec-alert warn" role="note">${ico('bell')}<div><b>No se puede emitir todavía.</b> ${esc(imp)}</div></section>` : ''}
@@ -270,6 +290,17 @@ export function tramitesController(ctx: { me: Account; dialog: DialogFn; render:
           { k: 'medio', label: 'Medio de pago', type: 'select', options: ['Efectivo', 'Yape', 'Plin', 'Transferencia', 'Tarjeta (POS)'].map((x) => [x, x]), half: true },
           { k: 'recibo', label: 'N.º de boleta', type: 'text', max: 20, half: true, placeholder: 'B001-000789' },
         ], { medio: 'Yape' }, (v) => { mover(s0.estado, `Pago registrado: ${soles(p.costo)} (${v.medio}).`, true, (s) => { s.pago = { monto: p.costo, medio: String(v.medio), recibo: String(v.recibo ?? ''), fecha: hoyISO() }; }, 'Pago registrado.'); return null; }, 'Registrar pago');
+      } else if (k === 'vervoucher' && s0.voucher) {
+        dialog(`<div class="dlg-body"><header class="dlg-h">${ico('cash')}<div><h2>Captura del pago · ${esc(s0.exp)}</h2><p class="muted small">${soles(s0.voucher.monto)} · ${esc(s0.voucher.medio)}${s0.voucher.operacion ? ` · op. ${esc(s0.voucher.operacion)}` : ''}</p></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">${ico('close')}</button></header><img class="tp-captura-big" src="${s0.voucher.img}" alt="Captura del pago"><p class="muted small">Compara el monto, la fecha y el número de operación con el Yape o la cuenta del colegio antes de confirmar.</p></div>`);
+      } else if (k === 'vok' && s0.voucher) {
+        const v0 = s0.voucher;
+        form(dialog, `Confirmar pago · ${soles(v0.monto)}`, 'cash', [{ k: 'recibo', label: 'N.º de boleta (opcional)', type: 'text', max: 20, placeholder: 'B001-000789' }], {}, (v) => {
+          mover(s0.estado === 'recibido' ? 'revision' : s0.estado, `Pago confirmado: ${soles(v0.monto)} por ${v0.medio}.`, true, (s) => { s.voucher!.estado = 'aceptado'; s.pago = { monto: v0.monto, medio: v0.medio, recibo: String(v.recibo ?? ''), fecha: hoyISO() }; }, 'Pago confirmado. El trámite sigue en revisión.');
+          return null;
+        }, 'Confirmar pago', 'Revisaste que el dinero llegó a la cuenta del colegio.');
+      } else if (k === 'vno') {
+        if (!m) { toast('Escribe en el mensaje por qué no se acepta la captura.'); body.querySelector<HTMLElement>('#tm-msg')?.focus(); return; }
+        mover('observado', m, true, (s) => { s.voucher!.estado = 'rechazado'; s.voucher!.motivo = m; }, 'Captura rechazada: el apoderado puede subir otra.');
       } else if (k === 'revision') mover('revision', m || 'En revisión.', !!m, undefined, 'Pasó a revisión.');
       else if (k === 'observar') { if (!m) { toast('Escribe qué falta en el mensaje para el apoderado.'); body.querySelector<HTMLElement>('#tm-msg')?.focus(); return; } mover('observado', m, true, undefined, 'Observado: el apoderado verá tu mensaje.'); }
       else if (k === 'rechazar') { if (!m) { toast('Escribe el motivo en el mensaje para el apoderado.'); body.querySelector<HTMLElement>('#tm-msg')?.focus(); return; } mover('rechazado', m, true, (s) => { s.respuesta = m; }, 'Solicitud rechazada.'); }
@@ -293,6 +324,18 @@ export function tramitesController(ctx: { me: Account; dialog: DialogFn; render:
       commit((d) => { const x = d.docs.find((y) => y.id === id)!; x.anulado = { at: new Date().toISOString(), by: by(), motivo: String(v.motivo) }; }, `${doc.numero} anulado. Al verificarlo aparecerá como anulado.`);
       return null;
     }, 'Anular documento', 'Quien escanee su QR verá que ya no es válido.');
+  }
+
+  function saveCuentas(): void {
+    const v = (id: string) => ((document.getElementById(id) as HTMLInputElement | null)?.value ?? '').trim();
+    const cel = (x: string) => x.replace(/\D/g, '');
+    const yape = cel(v('cta-yape')); const plin = cel(v('cta-plin'));
+    if (!v('cta-titular')) { toast('Escribe a nombre de quién están las cuentas.'); return; }
+    for (const [n, x] of [['Yape', yape], ['Plin', plin]] as const) if (x && !/^9\d{8}$/.test(x)) { toast(`${n}: escribe un celular de 9 dígitos que empiece con 9.`); return; }
+    const bancos = [0, 1].map((i) => ({ banco: v(`cta-b${i}`), cuenta: v(`cta-c${i}`), cci: cel(v(`cta-i${i}`)) })).filter((b) => b.banco || b.cuenta);
+    for (const b of bancos) { if (!b.banco || !b.cuenta) { toast('Cada banco necesita su nombre y número de cuenta.'); return; } if (b.cci && b.cci.length !== 20) { toast(`El CCI de ${b.banco} debe tener 20 dígitos.`); return; } }
+    if (!yape && !plin && !bancos.length) { toast('Agrega al menos un Yape, Plin o cuenta bancaria.'); return; }
+    commit((d) => { d.cuentas = { ...d.cuentas, titular: v('cta-titular'), yape, plin, bancos: bancos.map((b) => ({ ...b, cci: b.cci.replace(/^(\d{3})(\d{3})(\d{12})(\d{2})$/, '$1-$2-$3-$4') })), nota: v('cta-nota'), ejemplo: false }; }, 'Cuentas guardadas. Los padres las verán al pagar.');
   }
 
   function savePlantilla(): void {
@@ -354,6 +397,8 @@ export function tramitesController(ctx: { me: Account; dialog: DialogFn; render:
       const a = b.dataset.tm;
       if (a === 'nueva') nueva();
       else if (a === 'pl-save') savePlantilla();
+      else if (a === 'cuentas-save') saveCuentas();
+      else if (a === 'qr-quitar') commit((d) => { delete d.cuentas.yapeQr; }, 'QR de Yape quitado.');
       else if (a === 'pl-preview') preview();
       else if (a === 'pl-reset') commit((d) => { const base = plantillaBase(st.pl); d.plantillas[st.pl] = { ...d.plantillas[st.pl], titulo: base.titulo, cuerpo: base.cuerpo }; }, 'Texto original restaurado.');
       else if (a === 'reset') confirmDel(dialog, '¿Volver a los datos de ejemplo de Trámites?', ['Se reemplazan solicitudes, documentos emitidos, plantillas, firma y sello.'], () => commit((d) => { Object.assign(d, resetTram()); }, 'Trámites restablecidos.'), 'Restablecer');
@@ -361,6 +406,7 @@ export function tramitesController(ctx: { me: Account; dialog: DialogFn; render:
     },
     change(el: HTMLInputElement): boolean {
       if (el.dataset.tmF) { (st as unknown as Record<string, string>)[el.dataset.tmF] = el.value; render(); return true; }
+      if (el.hasAttribute('data-tm-qr') && el.files?.[0]) { reducirImagen(el.files[0], 520, 'image/png').then((img) => commit((d) => { d.cuentas.yapeQr = img; }, 'QR de Yape guardado: los padres lo verán al pagar.'), () => toast('No se pudo leer la imagen.')); el.value = ''; return true; }
       if (el.dataset.tmImg && el.files?.[0]) { subirImagen(el.dataset.tmImg as 'firma' | 'sello', el.files[0]); el.value = ''; return true; }
       return false;
     },

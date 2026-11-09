@@ -13,7 +13,7 @@ import { fichaHtml as fichaDoc, mostrarFicha, numeroMatricula } from '../core/fi
 import { getAdm } from '../core/admision';
 import { getUsuarios } from '../core/usuarios';
 import type { Curso, EstadoTarea, Tarea } from './data';
-import { nuevaSolicitud, pendientesTram, responder, tramitesPortal, verDocumento } from './tramites';
+import { nuevaSolicitud, pendientesTram, responder, subirPago, tramitesPortal, verCaptura, verDocumento } from './tramites';
 
 const acc = currentAccount();
 
@@ -327,6 +327,8 @@ function start(): void {
     if ((e.target as HTMLElement).closest('[data-tram-nueva]') && ALUMNO) { nuevaSolicitud(ALUMNO, aviso); return; }
     const td = (e.target as HTMLElement).closest<HTMLElement>('[data-tram-doc]'); if (td) { verDocumento(td.dataset.tramDoc!); return; }
     const tr = (e.target as HTMLElement).closest<HTMLElement>('[data-tram-resp]'); if (tr) { responder(tr.dataset.tramResp!, aviso); return; }
+    const tp = (e.target as HTMLElement).closest<HTMLElement>('[data-tram-pagar]'); if (tp) { subirPago(tp.dataset.tramPagar!, aviso); return; }
+    const tv = (e.target as HTMLElement).closest<HTMLElement>('[data-tram-voucher]'); if (tv) { verCaptura(tv.dataset.tramVoucher!); return; }
     const fc = (e.target as HTMLElement).closest<HTMLElement>('[data-ficha]');
     if (fc) { verFicha(Number(fc.dataset.ficha)); return; }
     const t = (e.target as HTMLElement).closest<HTMLElement>('[data-toast]');
